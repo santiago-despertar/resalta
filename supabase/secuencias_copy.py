@@ -18,54 +18,92 @@ En 1977 unos psicólogos descubrieron algo raro: las personas prefieren su cara 
 
 Nos acostumbramos tanto a nuestra cara que dejamos de verla.
 
+Mientras tanto, todos los demás sí la ven. Tu jefe, la persona que te entrevista, alguien que ve tu foto en una app, alguien que te conoce en una fiesta. Todos se forman una idea de ti antes de que digas nada.
+
+Tú eres la única persona que no sabe qué ven.
+
 Por eso es tan difícil saber, solo mirándote, qué te está sumando y qué te está restando.
 
-Una medición no tiene ni cariño ni pena. Te dice lo que hay, con números, y te dice qué hacer con eso.
+En Resalta no tenemos ni cariño ni pena. Medimos tu cara, te decimos lo que hay con números y te decimos qué hacer con eso.
 
-Tu análisis sigue donde lo dejaste.
+Tus respuestas siguen guardadas. Te falta muy poco.
 
-{boton:Ver mi análisis}"""),
-("el impuesto que nadie ve", """Esto es incómodo, pero está medido.
+{boton:Terminar mi análisis}"""),
+("el impuesto que nadie ve", """{nombre}, esto es incómodo, pero está medido.
 
-En 1994 dos economistas analizaron los datos de miles de trabajadores. Los que se veían por debajo del promedio ganaban menos, aun comparándolos con gente de preparación parecida.
+Hay un impuesto que casi nadie sabe que paga. No sale en ningún recibo y nadie te lo cobra de frente. Se cobra en cómo te ven.
 
-{dato:5 a 10%|Lo que ganaban de menos las personas con apariencia por debajo del promedio}
+Empecemos por el dinero.
 
-No es justo. Pero pasa todos los días, en entrevistas, en ventas, en citas, en cómo te tratan en un restaurante.
+El economista Daniel Hamermesh lleva más de 30 años estudiando esto. Comparó a miles de personas con edad, estudios y trabajos parecidos. Lo único que cambiaba era cómo se veían.
 
-La parte que casi nadie cuenta es esta: la diferencia no está entre caras "bonitas" y "feas".
+{dato:$230 mil|Dólares que gana de más en toda su vida laboral una persona atractiva frente a una poco atractiva con la misma preparación}
 
-Está en detalles. Una piel uniforme. Unas cejas que acompañan los ojos. Un corte que equilibra la cara. Una mandíbula que se nota.
+Dicho fácil: dos personas hacen el mismo trabajo igual de bien. La que se ve mejor puede ganar hasta 15% más cada año. Le dan más entrevistas, más aumentos y más ascensos.
 
-Cosas que se pueden ajustar, cuando sabes cuáles son las tuyas.
+Y el dinero es lo de menos.
 
-{boton:Ver qué me está restando}"""),
+Con la gente pasa lo mismo. Los psicólogos lo llaman efecto halo: cuando alguien nos parece atractivo, asumimos sin darnos cuenta que también es más amable, más inteligente y más confiable.
+
+Y lo decidimos rápido. En Princeton midieron que nos formamos esa impresión de una cara en una décima de segundo.
+
+Antes de que digas una palabra, ya decidieron cuánto te van a escuchar.
+
+En el amor es todavía más claro.
+
+OkCupid, una de las apps de citas más grandes, analizó los datos de sus usuarios. Los hombres mejor calificados por su foto recibían unas 11 veces más mensajes que los peor calificados. En las mujeres la diferencia era de 25 veces.
+
+Misma app, mismas reglas. La cara decidía quién recibía mensajes y quién no.
+
+Eso se traduce en más citas, más segundas citas y más opciones para elegir pareja en lugar de conformarte.
+
+No es justo. Pero pasa todos los días, lo veas o no.
+
+Ahora la parte que casi nadie cuenta, y que es la buena noticia.
+
+La diferencia casi nunca está entre gente "guapa" y gente "fea". Está en detalles. Una piel uniforme. Unas cejas que acompañan los ojos. Un corte que equilibra la cara. Una mandíbula que se nota. Una foto tomada desde el ángulo que te favorece.
+
+Cosas que se pueden ajustar. La mayoría sin gastar mucho y sin tocarte nada.
+
+El problema es saber cuáles son las tuyas. A simple vista nadie lo sabe.
+
+Para eso existe Resalta. Hacemos más de 120 evaluaciones de tu cara y te decimos qué te está restando puntos y qué hacer primero.
+
+Ya contestaste las preguntas. Solo te falta terminar.
+
+{boton:Ver qué me está restando}
+
+P.D. Piensa cuántas veces al día alguien decide algo sobre ti por tu cara. En una entrevista, en una app, en una reunión, en la calle. Cada una cuenta."""),
 ("por qué no te ha funcionado", """Si alguna vez seguiste un consejo de belleza y no notaste nada, no es tu culpa.
 
 Los consejos que circulan están hechos para una cara promedio. Y la tuya no lo es.
 
 "Cejas gruesas", "barba de candado", "rubor en las mejillas". Lo que a una cara le suaviza, a otra la endurece. Lo que a una le da forma, a otra la alarga.
 
-Por eso medimos primero.
+Por eso tanta gente gasta en productos, cortes y tutoriales que no le cambian nada. No hacían nada mal. Estaban siguiendo la receta de otra cara.
+
+Por eso en Resalta medimos primero.
 
 {imagen:/assets/img/email/medidas.jpg}
 
-Tu análisis hace más de 120 evaluaciones de tu cara con tus fotos de frente, sonriendo y de perfil. Tu simetría, tus tercios, tus ángulos, tu piel, tu edad visual.
+Hacemos más de 120 evaluaciones de tu cara con tus fotos de frente, sonriendo y de perfil. Tu simetría, tus tercios, tus ángulos, tu piel, tu edad visual.
 
-Y con eso te dice tres cosas:
+Y con eso te decimos tres cosas:
 
 Qué te favorece y conviene resaltar.
 Qué te está restando y cómo se corrige.
 Qué no vale la pena tocar, aunque esté de moda.
 
-{boton:Ver mi análisis}"""),
+Es la diferencia entre adivinar y saber.
+
+{boton:Terminar mi análisis}"""),
 ("tres cambios", """En casi cualquier cara pasa lo mismo.
 
 De todo lo que se podría mejorar, hay dos o tres cosas que hacen casi toda la diferencia. El resto apenas se nota.
 
 {imagen:/assets/img/email/tercios.jpg}
 
-Y esas dos o tres cosas casi nunca son caras ni complicadas.
+Y casi siempre son cambios sencillos, que no cuestan mucho dinero.
 
 Un corte que equilibra los tercios de tu cara. Unas cejas con la forma correcta para tus ojos. Una rutina de piel sencilla. Bajar un poco de grasa en la cara.
 
@@ -73,7 +111,9 @@ Lo difícil nunca fue hacer los cambios.
 
 Lo difícil es saber cuáles son, en tu cara, y en qué orden.
 
-Eso es tu plan: lo primero que conviene hacer, lo segundo, y lo que puedes ignorar.
+Hacer diez cosas a medias no se nota. Hacer bien las tres correctas se nota en semanas, y la gente empieza a decirte "te ves bien" sin saber qué cambió.
+
+Eso es lo que te damos en Resalta: lo primero que conviene hacer, lo segundo, y lo que puedes ignorar.
 
 {boton:Ver mis tres cambios}"""),
 ("lo que cuesta adivinar", """Pasa más de lo que crees.
@@ -86,14 +126,16 @@ Fue empezar por la solución sin entender primero su cara.
 
 Un relleno donde no hacía falta. Unas cejas que endurecieron la mirada. Un corte que alargó todavía más una cara larga.
 
-Equivocarse en algo así cuesta dinero, y a veces meses.
+Equivocarse en algo así cuesta dinero. Un corte malo tarda meses en crecer. Un tratamiento mal elegido no se devuelve.
 
-[[proc]]Si estás pensando en algún procedimiento, tu análisis te dice qué tiene sentido en tu cara, qué preguntar en la consulta y qué no necesitas aunque te lo ofrezcan.
+Y casi todos esos errores se evitan sabiendo una sola cosa: qué necesita tu cara y qué no.
+
+[[proc]]Si estás pensando en algún procedimiento, en Resalta te decimos qué tiene sentido en tu cara, qué preguntar en la consulta y qué no necesitas aunque te lo ofrezcan.
 
 [[/proc]]Medir antes cuesta menos que corregir después.
 
 {boton:Medir antes de gastar}"""),
-("¿y si sale bajo?", """Mucha gente no hace su análisis por miedo a una cosa:
+("¿y si sale bajo?", """Mucha gente no termina su análisis por miedo a una cosa:
 
 "¿Y si me sale bajo?"
 
@@ -103,28 +145,41 @@ Un número no dice cuánto vales. Dice dónde estás hoy y cuánto margen tienes
 
 Y las caras con el número más bajo casi siempre son las que más pueden mejorar, porque tienen más cosas fáciles por ajustar.
 
+Piénsalo así: tu cara ya es la que es, la midas o no. Lo único que cambia al medirla es que dejas de adivinar.
+
 Lo que de verdad no ayuda es quedarse con la duda. Seguir mirándote sin entender qué es lo que no te convence.
 
-Tu análisis no está hecho para juzgarte. Está hecho para decirte qué hacer primero.
+En Resalta no estamos para juzgarte. Estamos para decirte qué hacer primero.
 
 {boton:Ver qué hacer primero}"""),
-("dentro de 90 días", """{nombre}, este es el último correo que te mandamos sobre tu análisis.
+("vamos a ser directos", """{nombre}, este es el último correo que te mandamos sobre esto. Así que vamos a ser directos.
 
-Así que te dejamos una imagen.
+Ya hiciste la parte difícil. Contestaste las preguntas. Te importó lo suficiente para empezar.
 
-Dentro de 90 días vas a estar en algún lado. La pregunta es cómo.
+Y te detuviste justo antes de la respuesta.
 
-Puede ser igual que hoy. Viéndote en el espejo con la misma duda de siempre.
+Casi siempre es por una de tres razones.
 
-O puede ser con tres cambios hechos. Sabiendo qué corte pedir, qué hacer con tus cejas y qué rutina seguir. Viendo en las fotos una versión de ti que te gusta más.
+"Lo hago después."
+Después casi nunca llega. Dentro de 90 días vas a tener la misma cara y la misma duda, a menos que hagas algo distinto.
 
-Para eso tu análisis incluye un plan de 90 días, paso por paso, hecho para tu cara.
+"No sé si vale la pena."
+Suma lo que ya gastaste en productos, cortes o tratamientos que no cambiaron nada. Saber qué hacer cuesta menos que seguir adivinando.
 
-Lo único que cambia entre una versión y la otra es empezar.
+"Me da miedo lo que salga."
+El resultado no cambia tu cara. Ya es la que es. Lo único que cambia es que por fin sabes qué hacer con ella.
 
-{boton:Empezar mi plan}
+Mientras lo piensas, el impuesto del que te hablamos se sigue cobrando. En cada entrevista, en cada foto de perfil, en cada primera impresión.
 
-P.D. Tus respuestas siguen guardadas. Cuando quieras, entras desde resalta.co con tu correo."""),
+En Resalta te damos tus puntos fuertes, lo que te está restando y un plan de 90 días, paso por paso, hecho para tu cara.
+
+La gente que se ve bien no tuvo suerte. Sabe qué le queda.
+
+Hoy puedes saberlo tú.
+
+{boton:Terminar mi análisis}
+
+P.D. Tus respuestas siguen guardadas. Entras desde resalta.co con tu correo y empiezas donde lo dejaste."""),
 ])
 
 SEC["joven"] = ("Verme más joven", [
