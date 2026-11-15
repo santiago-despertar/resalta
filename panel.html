@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/site.css?v=1794681222">
+<link rel="stylesheet" href="/assets/css/site.css?v=1794769272">
 <script>try{var _q=new URLSearchParams(location.search),_u={};["utm_source","utm_medium","utm_campaign","utm_content"].forEach(function(k){if(_q.get(k))_u[k]=_q.get(k).slice(0,80)});if(!_u.utm_source&&_q.get("fbclid")){_u.utm_source="facebook";_u.utm_medium=_u.utm_medium||"paid"}if(!_u.utm_source&&_q.get("gclid")){_u.utm_source="google";_u.utm_medium=_u.utm_medium||"cpc"}if(!_u.utm_source&&_q.get("ttclid")){_u.utm_source="tiktok";_u.utm_medium=_u.utm_medium||"paid"}if(_u.utm_source||_u.utm_campaign)sessionStorage.setItem("rs_utm",JSON.stringify(_u))}catch(e){}</script>
 <script>try{var _p=location.pathname;if(/\.html$/.test(_p))history.replaceState(null,"",((/\/index\.html$/.test(_p)?_p.slice(0,-10):_p.slice(0,-5))||"/")+location.search+location.hash)}catch(e){}</script>
 <script>try{var _d=document.documentElement;if(document.fonts&&document.fonts.load){_d.classList.add("fload");var _ok=function(){_d.classList.remove("fload")};Promise.all([document.fonts.load("300 40px Inter"),document.fonts.load("400 16px Inter"),document.fonts.load("600 16px Inter")]).then(_ok,_ok);setTimeout(_ok,900)}}catch(e){}</script>
@@ -182,6 +182,7 @@
                 <label class="sim-magro"><input type="checkbox" id="simMagro"> <span><b>Con menos grasa en la cara</b><small>Cómo te verías si bajas de peso: mandíbula, pómulos y cuello más marcados.</small></span></label>
                 <label class="sim-magro"><input type="checkbox" data-extra="piel"> <span><b>Piel más limpia</b><small>Menos manchas, marcas y rojez, como con una buena rutina.</small></span></label>
                 <label class="sim-magro"><input type="checkbox" data-extra="ojeras"> <span><b>Ojeras corregidas</b><small>Menos color y hundimiento bajo los ojos.</small></span></label>
+                <p class="hint sim-ext-n" id="simExtN" hidden>Estos tres cambios no se ven en la vista rápida. Toca <b>Ver resultado realista</b> para verlos aplicados a tu foto.</p>
                 <div class="sim-acc"><button type="button" class="btn btn-primary" id="simIABtn">Ver resultado realista</button><button type="button" class="btn btn-ghost" id="simReset">Reiniciar</button></div>
                 <p class="hint sim-acc-n">Aplica estos mismos cambios a tu foto con IA para verlo como se vería de verdad.</p>
                 <div class="msg" id="simIAMsg"></div>
@@ -231,7 +232,7 @@
             <p class="hint rep-sub">Responde con base en tus medidas y tu reporte. Pregunta lo que quieras sobre tu cara, cortes, barba, piel o qué hacer primero.</p>
             <div class="card chat-card">
               <div class="chat-log" id="chatLog" aria-live="polite"></div>
-              <div class="chat-sug" id="chatSug">
+              <div class="chat-sug" id="chatSug" hidden>
                 <button type="button" class="sim-pre">¿Qué corte de pelo me queda mejor?</button>
                 <button type="button" class="sim-pre">¿Qué es lo primero que debo trabajar?</button>
                 <button type="button" class="sim-pre">¿Qué tipo de barba me conviene?</button>
@@ -295,8 +296,8 @@
   </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="/assets/js/config.js?v=1794681222"></script>
-<script src="/assets/js/app.js?v=1794681222"></script>
+<script src="/assets/js/config.js?v=1794769272"></script>
+<script src="/assets/js/app.js?v=1794769272"></script>
 
 </body>
 </html>
