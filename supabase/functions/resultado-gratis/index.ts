@@ -139,22 +139,47 @@ Deno.serve(async (req) => {
 
 type Lead = { id: string; email: string; nombre: string; score: number; metrics: { partes?: Parte[]; fuerte?: string; debil?: { k: string; tip?: string } | null; foto?: string | null } | null };
 
+
+// Email tracking: each email gets a row in correos_log (sent, opened, clicked), a 1px open image and
+// resalta.co links that pass through the 'correo' function. Admin > Correos reads it.
+// deno-lint-ignore no-explicit-any
+async function registrarCorreo(db: any, datos: { email: string; tipo: string; secuencia?: string | null; paso?: number | null; asunto: string }) {
+  try {
+    const { data } = await db.from("correos_log").insert({ ...datos, email: datos.email.toLowerCase() }).select("id").single();
+    return (data?.id as string | undefined) ?? undefined;
+  } catch { return undefined; }
+}
+function rastrear(html: string, id?: string) {
+  if (!id) return html;
+  const base = `${Deno.env.get("SUPABASE_URL")}/functions/v1/correo`;
+  const con = html.replace(/href="(https:\/\/(?:www\.)?resalta\.co[^"]*)"/g, (_m, u: string) => `href="${base}?a=c&amp;i=${id}&amp;u=${encodeURIComponent(u.replace(/&amp;/g, "&"))}"`);
+  const px = `<img src="${base}?a=o&amp;i=${id}" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0;opacity:0">`;
+  return con.includes("</body>") ? con.replace("</body>", px + "</body>") : con + px;
+}
+// deno-lint-ignore no-explicit-any
+async function cerrarCorreo(db: any, id: string | undefined, ok: boolean) {
+  if (id) { try { await db.from("correos_log").update({ ok }).eq("id", id); } catch { /* ignore */ } }
+}
+
 async function enviar(key: string, l: Lead) {
   const site = Deno.env.get("SITE_URL") ?? "https://resalta.co";
   const h = { Authorization: `Bearer ${key}`, "Content-Type": "application/json", Accept: "application/json" };
   const m = l.metrics ?? {};
   const nombre = l.nombre || "Hola";
+  const asunto = `${nombre.split(/\s+/)[0]}, tu calificación facial: ${Math.round(l.score)}/100`;
+  const idc = await registrarCorreo(admin, { email: l.email, tipo: "resultado", asunto });
   const envio = await fetch("https://api.sender.net/v2/message/send", {
     method: "POST", headers: h,
     body: JSON.stringify({
       from: { name: "Resalta", email: Deno.env.get("SENDER_FROM") ?? "contacto@resalta.co" },
       to: { email: l.email, name: nombre },
-      subject: `${nombre.split(/\s+/)[0]}, tu calificación facial: ${Math.round(l.score)}/100`,
-      html: correo(nombre, l.score, m.partes ?? [], m.fuerte ?? "", m.debil ?? null, site, m.foto ?? null),
+      subject: asunto,
+      html: rastrear(correo(nombre, l.score, m.partes ?? [], m.fuerte ?? "", m.debil ?? null, site, m.foto ?? null), idc),
     }),
   });
   const r = await envio.text();
-  if (!envio.ok || !/"success"\s*:\s*true/.test(r)) { console.error("sender send", envio.status, r); return false; }
+  if (!envio.ok || !/"success"\s*:\s*true/.test(r)) { console.error("sender send", envio.status, r); await cerrarCorreo(admin, idc, false); return false; }
+  await cerrarCorreo(admin, idc, true);
   await admin.from("leads").update({ enviado_at: new Date().toISOString() }).eq("id", l.id);
 
   // the group is what starts the sequence in Sender. Only the first free rating of an address joins it:
