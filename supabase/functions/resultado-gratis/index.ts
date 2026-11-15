@@ -52,10 +52,10 @@ function correo(nombre: string, score: number, partes: Parte[], fuerte: string, 
   .sc{font-size:84px!important}
 }
 </style></head>
-<body style="margin:0;padding:0;background:#F3F1EC;-webkit-text-size-adjust:100%">
+<body style="margin:0;padding:0;background:#FFFFFF;-webkit-text-size-adjust:100%">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0">Tu armonía facial: ${s}/100 y tus puntajes, con tu foto medida.</div>
-<div style="width:100%;background-color:#F3F1EC;margin:0;padding:0"><center style="width:100%;table-layout:fixed;background-color:#F3F1EC">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#F3F1EC" style="width:100%;min-width:100%;background:#F3F1EC"><tr><td align="center" valign="top" style="padding:32px 0;text-align:center">
+<div style="width:100%;background-color:#FFFFFF;margin:0;padding:0"><center style="width:100%;table-layout:fixed;background-color:#FFFFFF">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#FFFFFF" style="width:100%;min-width:100%;background:#FFFFFF"><tr><td align="center" valign="top" style="padding:32px 0;text-align:center">
 <table role="presentation" class="pn" align="center" width="600" cellspacing="0" cellpadding="0" border="0" bgcolor="#97A6B2" style="margin:0 auto;width:100%;max-width:600px;background-color:#97A6B2;background-image:linear-gradient(180deg,#8B9BA8 0%,#A9B6C0 100%);border-radius:28px">
 <tr><td class="pi" style="padding:44px 36px 34px">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
