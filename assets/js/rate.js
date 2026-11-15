@@ -1,4 +1,4 @@
-// Free facial harmony score. Runs entirely in the browser: the photo is never uploaded.
+// Free facial harmony score. The face is measured in the browser; only a small annotated crop is sent, for the result email.
 import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
 
 const $ = (s) => document.querySelector(s);
@@ -212,6 +212,17 @@ function bloquear(m) {
   ir("bloqueado");
 }
 
+// the face crop with its measurement lines, small enough for an email
+function fotoCorreo() {
+  try {
+    const c = $("#rateCanvas"); if (!c || !c.width) return null;
+    const W = Math.min(600, c.width), H = Math.round(c.height * W / c.width);
+    const o = document.createElement("canvas"); o.width = W; o.height = H;
+    o.getContext("2d").drawImage(c, 0, 0, W, H);
+    return o.toDataURL("image/jpeg", 0.82);
+  } catch (e) { return null; }
+}
+
 $("#leadForm").addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const f = ev.target, m2 = $("#leadMsg"), b = f.querySelector("button");
@@ -230,7 +241,7 @@ $("#leadForm").addEventListener("submit", async (ev) => {
       body: JSON.stringify({
         nombre, email, score: m.score,
         partes: (m.parts || []).map(p => ({ k: p.k, v: Math.round(p.v), tip: p.tip })),
-        fuerte: sorted[0] && sorted[0].k, debil: sorted.length ? { k: sorted[sorted.length - 1].k, tip: sorted[sorted.length - 1].tip } : null,
+        foto: fotoCorreo(), fuerte: sorted[0] && sorted[0].k, debil: sorted.length ? { k: sorted[sorted.length - 1].k, tip: sorted[sorted.length - 1].tip } : null,
       }),
     });
     if (!r.ok) throw new Error(String(r.status));
