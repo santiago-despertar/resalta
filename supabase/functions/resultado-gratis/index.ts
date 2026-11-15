@@ -54,8 +54,9 @@ function correo(nombre: string, score: number, partes: Parte[], fuerte: string, 
 </style></head>
 <body style="margin:0;padding:0;background:#F3F1EC;-webkit-text-size-adjust:100%">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0">Tu armonía facial: ${s}/100 y tus puntajes, con tu foto medida.</div>
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#F3F1EC" style="background:#F3F1EC"><tr><td align="center" style="padding:24px 0">
-<table role="presentation" class="pn" width="600" cellspacing="0" cellpadding="0" border="0" bgcolor="#97A6B2" style="width:100%;max-width:600px;background-color:#97A6B2;background-image:linear-gradient(180deg,#8B9BA8 0%,#A9B6C0 100%);border-radius:28px">
+<div style="width:100%;background-color:#F3F1EC;margin:0;padding:0"><center style="width:100%;table-layout:fixed;background-color:#F3F1EC">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#F3F1EC" style="width:100%;min-width:100%;background:#F3F1EC"><tr><td align="center" valign="top" style="padding:32px 0;text-align:center">
+<table role="presentation" class="pn" align="center" width="600" cellspacing="0" cellpadding="0" border="0" bgcolor="#97A6B2" style="margin:0 auto;width:100%;max-width:600px;background-color:#97A6B2;background-image:linear-gradient(180deg,#8B9BA8 0%,#A9B6C0 100%);border-radius:28px">
 <tr><td class="pi" style="padding:44px 36px 34px">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
     <tr><td align="center" style="padding:0 0 34px"><a href="${site}" style="text-decoration:none"><img src="${site}/assets/img/email/logo-blanco.png" width="136" height="38" alt="resalta" style="display:block;border:0;width:136px;height:38px"></a></td></tr>
@@ -73,8 +74,8 @@ function correo(nombre: string, score: number, partes: Parte[], fuerte: string, 
       <a href="${url}" style="display:inline-block;background:#FFFFFF;color:#16191D;text-decoration:none;padding:17px 34px;border-radius:999px;font-family:${sans};font-size:16px;font-weight:600">Ver mi análisis completo</a></div>`, "34px 24px 34px")}
   </table>
 </td></tr></table>
-<table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px"><tr><td align="center" style="padding:20px 24px 8px;font-family:${sans};font-size:13px;line-height:20px;color:#5B6470">Puntaje estético y educativo basado en proporciones medidas en una foto. No es un juicio sobre tu valor ni un diagnóstico.${foto ? " La imagen de este correo se borra de nuestros servidores en 30 días." : ""}<br><a href="${site}" style="color:#4A5866;text-decoration:none">resalta.co</a></td></tr></table>
-</td></tr></table></body></html>`;
+<table role="presentation" align="center" width="600" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto;width:100%;max-width:600px"><tr><td align="center" style="padding:20px 24px 8px;font-family:${sans};font-size:13px;line-height:20px;color:#5B6470">Puntaje estético y educativo basado en proporciones medidas en una foto. No es un juicio sobre tu valor ni un diagnóstico.${foto ? " La imagen de este correo se borra de nuestros servidores en 30 días." : ""}<br><a href="${site}" style="color:#4A5866;text-decoration:none">resalta.co</a></td></tr></table>
+</td></tr></table></center></div></body></html>`;
 }
 
 // The annotated face crop the browser made. It lives in a public bucket under an unguessable name only so
