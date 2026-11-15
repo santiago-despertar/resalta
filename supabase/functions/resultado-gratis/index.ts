@@ -1,5 +1,6 @@
 // Free rating: saves the lead and emails the result. The result is only delivered by email, so the
 // address has to be real and the first email gets opened (good for the follow-up sequence).
+// The email shows the annotated face crop the browser sends (stored 30 days) and every score.
 // It also adds the contact to a Sender group, which is what starts the email sequence.
 // Secrets: SENDER_API_KEY, SENDER_GROUP_ID (optional, defaults to the "Leads calificación gratis" group), SENDER_FROM (default contacto@resalta.co), SITE_URL
 // Without SENDER_API_KEY the lead is still saved with enviado_at empty. Every later call also retries
@@ -17,47 +18,68 @@ const esc = (s: unknown) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&am
 
 type Parte = { k: string; v: number; tip?: string };
 
-function correo(nombre: string, score: number, partes: Parte[], fuerte: string, debil: { k: string; tip?: string } | null, site: string) {
+// Email styled like the site: blue-gray backdrop, white type, soft translucent cards, everything centered.
+// rgba backgrounds have solid bgcolor fallbacks for clients (Outlook desktop) that ignore them.
+function correo(nombre: string, score: number, partes: Parte[], fuerte: string, debil: { k: string; tip?: string } | null, site: string, foto: string | null) {
   const nivel = score >= 80 ? "Tienes una cara muy armónica. Tu margen está en los detalles finos." : score >= 65 ? "Tienes una buena base y varias mejoras claras a tu alcance." : "Tienes mucho potencial. Los cambios correctos se van a notar bastante.";
-  // The two best proportions are shown; the rest stay locked. Knowing why the score is what it is, is
-  // what the full analysis sells, so the email gives just enough to want the rest.
-  const orden = [...partes].sort((x, y) => y.v - x.v);
-  const visibles = new Set(orden.slice(0, 2).map(p => p.k));
-  const fila = (p: Parte) => visibles.has(p.k) ? `
-      <tr><td style="padding:10px 0;border-bottom:1px solid #E3E7EA;font-size:15px;color:#16191D">${esc(p.k)}</td>
-      <td style="padding:10px 0;border-bottom:1px solid #E3E7EA;width:140px"><div style="background:#E3E7EA;border-radius:4px;height:6px"><div style="background:#4A5866;border-radius:4px;height:6px;width:${Math.max(4, Math.min(100, p.v))}%"></div></div></td>
-      <td style="padding:10px 0 10px 12px;border-bottom:1px solid #E3E7EA;text-align:right;font-family:monospace;font-size:15px;color:#16191D">${Math.round(p.v)}</td></tr>` : `
-      <tr><td style="padding:10px 0;border-bottom:1px solid #E3E7EA;font-size:15px;color:#16191D">${esc(p.k)}</td>
-      <td style="padding:10px 0;border-bottom:1px solid #E3E7EA;width:140px"><div style="background:#EEF0F2;border-radius:4px;height:6px"></div></td>
-      <td style="padding:10px 0 10px 12px;border-bottom:1px solid #E3E7EA;text-align:right;font-family:monospace;font-size:15px;color:#C9CED3;letter-spacing:1px">&#9632;&#9632;</td></tr>`;
-  const filas = partes.map(fila).join("");
-  const ocultos = partes.length - visibles.size;
   const url = `${site}/cuenta?next=/analisis&utm_source=email&utm_medium=resultado&utm_campaign=calificacion`;
-  return `<!doctype html><html><body style="margin:0;background:#F3F1EC;font-family:Helvetica,Arial,sans-serif;color:#16191D">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F3F1EC"><tr><td align="center" style="padding:28px 14px">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#FFFFFF;border-radius:16px;border:1px solid #D3D8DD">
-  <tr><td style="padding:32px 30px 8px">
-    <p style="margin:0 0 22px;font-size:20px;letter-spacing:-.01em">resalta</p>
-    <p style="margin:0 0 6px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#5B6470">Tu calificación facial</p>
-    <h1 style="margin:0 0 18px;font-size:26px;font-weight:400;line-height:1.2">${esc(nombre)}, este es tu resultado</h1>
-    <p style="margin:0;font-size:15px;color:#5B6470">Armonía facial</p>
-    <p style="margin:4px 0 6px;font-family:monospace;font-size:64px;line-height:1">${Math.round(score)}<span style="font-size:20px;color:#5B6470"> / 100</span></p>
-    <p style="margin:0 0 24px;font-size:15px;line-height:1.5;color:#5B6470">${esc(nivel)}</p>
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">${filas}</table>
-    <p style="margin:20px 0 0;font-size:15px;line-height:1.5">Tu punto más fuerte: <b>${esc((fuerte || "").toLowerCase())}</b>.</p>
-    ${ocultos > 0 ? `<div style="margin:18px 0 0;padding:18px;background:#F3F1EC;border-radius:12px">
-      <p style="margin:0 0 6px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#5B6470">${ocultos} puntajes bloqueados</p>
-      <p style="margin:0;font-size:15px;line-height:1.55">${debil ? `Hay una zona que está bajando tu puntaje más que las demás, y es <b>${esc(debil.k.toLowerCase())}</b>. ` : ""}Los demás puntajes, por qué te dimos este resultado y qué hacer para subirlo vienen en tu análisis completo.</p>
-    </div>` : ""}
-  </td></tr>
-  <tr><td style="padding:24px 30px 30px">
-    <p style="margin:0 0 6px;font-size:19px;line-height:1.35">¿Quieres saber por qué te dimos ${Math.round(score)}?</p>
-    <p style="margin:0 0 18px;font-size:15px;line-height:1.55;color:#5B6470">Este puntaje mide 6 proporciones de tu cara de frente. El análisis completo revisa más de 110 rasgos con tus fotos de frente, sonriendo y de perfil, y te dice qué cambiar primero, qué no vale la pena y cómo te verías con tu plan.</p>
-    <a href="${url}" style="display:inline-block;background:#4A5866;color:#FFFFFF;text-decoration:none;padding:14px 26px;border-radius:999px;font-size:15px">Ver mi análisis completo</a>
-  </td></tr>
-  </table>
-  <p style="max-width:560px;margin:16px auto 0;font-size:12px;line-height:1.5;color:#5B6470">Puntaje estético y educativo basado en proporciones medidas en una foto. No es un juicio sobre tu valor ni un diagnóstico. Nunca guardamos tu foto.</p>
-  </td></tr></table></body></html>`;
+  const mono = "'SFMono-Regular',Menlo,Consolas,monospace";
+  const sans = "'Inter','Helvetica Neue',Helvetica,Arial,sans-serif";
+  const label = (t: string) => `<p style="margin:0;font-family:${mono};font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.72)">${t}</p>`;
+  const glass = (inner: string, pad = "22px 22px") => `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate"><tr><td bgcolor="#A3B1BC" style="background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:18px;padding:${pad}">${inner}</td></tr></table>`;
+  const fila = (p: Parte, i: number) => {
+    const v = Math.round(p.v), w = Math.max(4, Math.min(100, v));
+    return `<tr><td style="padding:${i ? "14px" : "4px"} 0 0;font-family:${sans};font-size:15px;color:#FFFFFF">${esc(p.k)}</td>
+      <td align="right" style="padding:${i ? "14px" : "4px"} 0 0;font-family:${mono};font-size:15px;color:#FFFFFF;width:44px">${v}</td></tr>
+      <tr><td colspan="2" style="padding:7px 0 0"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>
+        <td width="${w}%" bgcolor="#FFFFFF" style="height:4px;line-height:4px;font-size:0;border-radius:4px 0 0 4px;background:#FFFFFF">&nbsp;</td>
+        ${w < 100 ? `<td bgcolor="#8E9DAA" style="height:4px;line-height:4px;font-size:0;border-radius:0 4px 4px 0;background:rgba(255,255,255,.22)">&nbsp;</td>` : ""}
+      </tr></table></td></tr>`;
+  };
+  const filas = partes.map(fila).join("");
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><title>Tu calificación facial</title></head>
+<body style="margin:0;padding:0;background:#97A6B2">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#97A6B2" style="background:#97A6B2;background-image:linear-gradient(180deg,#8E9DAA,#A9B6C0)"><tr><td align="center" style="padding:36px 16px 40px">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:540px">
+  <tr><td align="center" style="padding:0 0 30px"><img src="${site}/assets/img/email/logo-blanco.png" width="129" height="36" alt="resalta" style="display:block;border:0;width:129px;height:36px"></td></tr>
+  <tr><td align="center" style="padding:0 0 12px"><span style="display:inline-block;font-family:${mono};font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#FFFFFF;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:7px 14px">Tu calificación facial</span></td></tr>
+  <tr><td align="center" style="padding:0 0 26px;font-family:${sans};font-size:30px;line-height:1.15;font-weight:300;letter-spacing:-.02em;color:#FFFFFF">${esc(nombre)}, este es tu resultado</td></tr>
+  ${foto ? `<tr><td style="padding:0 0 16px">${glass(`<img src="${esc(foto)}" width="494" alt="Tu foto con tus medidas" style="display:block;width:100%;max-width:494px;height:auto;border:0;border-radius:12px">`, "8px")}</td></tr>` : ""}
+  <tr><td style="padding:0 0 16px">${glass(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center">
+      ${label("Armonía facial")}
+      <p style="margin:10px 0 0;font-family:${sans};font-size:76px;line-height:1;font-weight:300;letter-spacing:-.04em;color:#FFFFFF">${Math.round(score)}<span style="font-size:22px;letter-spacing:0;color:rgba(255,255,255,.7)"> / 100</span></p>
+      <p style="margin:14px auto 0;max-width:380px;font-family:${sans};font-size:15px;line-height:1.55;color:rgba(255,255,255,.88)">${esc(nivel)}</p>
+    </td></tr></table>`, "28px 24px")}</td></tr>
+  ${filas ? `<tr><td style="padding:0 0 16px">${glass(`${label("Tus puntajes")}<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:10px">${filas}</table>
+      ${fuerte ? `<p style="margin:20px 0 0;font-family:${sans};font-size:14px;line-height:1.55;color:rgba(255,255,255,.88)">Tu punto más fuerte: <b style="color:#FFFFFF;font-weight:500">${esc(fuerte.toLowerCase())}</b>.${debil && debil.k && debil.k !== fuerte ? ` Lo que más te baja el puntaje: <b style="color:#FFFFFF;font-weight:500">${esc(debil.k.toLowerCase())}</b>.` : ""}</p>` : ""}`, "22px 22px 24px")}</td></tr>` : ""}
+  <tr><td style="padding:0 0 22px">${glass(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center">
+      <p style="margin:0;font-family:${sans};font-size:21px;line-height:1.3;font-weight:300;color:#FFFFFF">¿Quieres saber por qué te dimos ${Math.round(score)}?</p>
+      <p style="margin:12px auto 22px;max-width:420px;font-family:${sans};font-size:15px;line-height:1.55;color:rgba(255,255,255,.88)">Este puntaje mide unas cuantas proporciones de tu cara de frente. El análisis completo revisa más de 110 rasgos con tus fotos de frente, sonriendo y de perfil, y te dice qué cambiar primero, qué no vale la pena y cómo te verías con tu plan.</p>
+      <a href="${url}" style="display:inline-block;background:#FFFFFF;color:#16191D;text-decoration:none;padding:15px 30px;border-radius:999px;font-family:${sans};font-size:15px;font-weight:500">Ver mi análisis completo</a>
+    </td></tr></table>`, "30px 24px")}</td></tr>
+  <tr><td align="center" style="font-family:${sans};font-size:12px;line-height:1.6;color:rgba(255,255,255,.75)">Puntaje estético y educativo basado en proporciones medidas en una foto. No es un juicio sobre tu valor ni un diagnóstico.${foto ? " La imagen de este correo se borra de nuestros servidores en 30 días." : ""}<br><a href="${site}" style="color:#FFFFFF;text-decoration:none">resalta.co</a></td></tr>
+</table>
+</td></tr></table></body></html>`;
+}
+
+// The annotated face crop the browser made. It lives in a public bucket under an unguessable name only so
+// the email can show it, and every call deletes the ones older than 30 days.
+const BUCKET = "correo";
+async function subirFoto(id: string, dataUrl: unknown): Promise<string | null> {
+  const m = /^data:image\/jpeg;base64,([A-Za-z0-9+/=]+)$/.exec(String(dataUrl ?? ""));
+  if (!m || m[1].length > 700_000) return null;
+  const bytes = Uint8Array.from(atob(m[1]), c => c.charCodeAt(0));
+  const path = `${id}-${crypto.randomUUID().slice(0, 8)}.jpg`;
+  const up = () => admin.storage.from(BUCKET).upload(path, bytes, { contentType: "image/jpeg", upsert: true });
+  let { error } = await up();
+  if (error && /not.?found/i.test(error.message)) { await admin.storage.createBucket(BUCKET, { public: true }); ({ error } = await up()); }
+  if (error) { console.error("foto", error.message); return null; }
+  return admin.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+async function limpiarFotos() {
+  const { data } = await admin.storage.from(BUCKET).list("", { limit: 100, sortBy: { column: "created_at", order: "asc" } });
+  const viejas = (data ?? []).filter(f => f.created_at && Date.now() - new Date(f.created_at).getTime() > 30 * 864e5).map(f => f.name);
+  if (viejas.length) await admin.storage.from(BUCKET).remove(viejas);
 }
 
 Deno.serve(async (req) => {
@@ -79,10 +101,13 @@ Deno.serve(async (req) => {
 
     const { data: lead, error } = await admin.from("leads").insert({ email, nombre, score, metrics: { partes, fuerte, debil }, source: "calificacion" }).select("id").single();
     if (error) throw error;
+    const foto = await subirFoto(lead.id, b.foto).catch(() => null);
+    if (foto) await admin.from("leads").update({ metrics: { partes, fuerte, debil, foto } }).eq("id", lead.id);
+    limpiarFotos().catch(() => {});
 
     const key = Deno.env.get("SENDER_API_KEY");
     if (!key) return json({ ok: true, pendiente: true });
-    const enviado = await enviar(key, { id: lead.id, email, nombre, score, metrics: { partes, fuerte, debil } });
+    const enviado = await enviar(key, { id: lead.id, email, nombre, score, metrics: { partes, fuerte, debil, foto } });
 
     // clear any backlog (leads saved while email was not set up yet)
     const { data: atrasados } = await admin.from("leads").select("id,email,nombre,score,metrics")
@@ -96,7 +121,7 @@ Deno.serve(async (req) => {
   }
 });
 
-type Lead = { id: string; email: string; nombre: string; score: number; metrics: { partes?: Parte[]; fuerte?: string; debil?: { k: string; tip?: string } | null } | null };
+type Lead = { id: string; email: string; nombre: string; score: number; metrics: { partes?: Parte[]; fuerte?: string; debil?: { k: string; tip?: string } | null; foto?: string | null } | null };
 
 async function enviar(key: string, l: Lead) {
   const site = Deno.env.get("SITE_URL") ?? "https://resalta.co";
@@ -109,7 +134,7 @@ async function enviar(key: string, l: Lead) {
       from: { name: "Resalta", email: Deno.env.get("SENDER_FROM") ?? "contacto@resalta.co" },
       to: { email: l.email, name: nombre },
       subject: `${nombre.split(/\s+/)[0]}, tu calificación facial: ${Math.round(l.score)}/100`,
-      html: correo(nombre, l.score, m.partes ?? [], m.fuerte ?? "", m.debil ?? null, site),
+      html: correo(nombre, l.score, m.partes ?? [], m.fuerte ?? "", m.debil ?? null, site, m.foto ?? null),
     }),
   });
   const r = await envio.text();
