@@ -384,3 +384,11 @@ export async function iniciar(datos) {
     $("#simBox").classList.remove("sim-cargando");
   }));
 }
+
+// the three checkboxes only apply in the realistic result, so say so and point at that button
+document.addEventListener("change", ev => {
+  const x = ev.target; if (!x.matches || !x.matches("#simMagro, #simBox [data-extra]")) return;
+  const alguno = [...document.querySelectorAll("#simMagro, #simBox [data-extra]")].some(i => i.checked);
+  const n = document.getElementById("simExtN"); if (n) n.hidden = !alguno;
+  const b = document.getElementById("simIABtn"); if (b) b.classList.toggle("pulso", alguno);
+});
