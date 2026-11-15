@@ -1567,6 +1567,8 @@ g.esc3d-marcas{opacity:0;transition:opacity .3s}
 .cal-borroso{filter:blur(7px);user-select:none;pointer-events:none}
 .cal-filas{margin:0 0 6px}
 .cal-filas .report-row{border-bottom-color:rgba(255,255,255,.14);padding:9px 0;font-size:14px}
+.cal-filas .report-row span{color:rgba(255,255,255,.62)}
+.cal-filas .report-row b{color:#fff}
 .cal-gate{margin-top:-60px;position:relative;padding:22px 20px 18px;border-radius:16px;background:rgba(18,24,30,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.18)}
 .cal-gate .su-h{margin-bottom:6px}
 .cal-gate .hint{margin:0 0 14px}
