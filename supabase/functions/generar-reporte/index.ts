@@ -162,6 +162,41 @@ Cómo escribir:
 - Sé concreto y breve: cada texto de dos a cuatro frases, cada acción en una frase. No pienses en voz alta ni expliques tu proceso.`;
 }
 
+// Shared look for every Resalta email: a centered rounded blue-gray panel on white, the white logo,
+// white type and soft translucent cards, like resalta.co. Built for Gmail (centered wrapper, no
+// collapsible percentage tables) with solid bgcolor fallbacks for Outlook desktop.
+const EM_SANS = "'Inter','Helvetica Neue',Helvetica,Arial,sans-serif";
+const EM_MONO = "'SFMono-Regular',Menlo,Consolas,'Courier New',monospace";
+const EM_SUAVE = "rgba(255,255,255,.82)";
+function emCaja(inner: string, pad = "26px 24px") {
+  return `<tr><td class="cd" bgcolor="#A0AEB9" style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.26);border-radius:22px;padding:${pad}">${inner}</td></tr><tr><td style="height:14px;line-height:14px;font-size:0">&nbsp;</td></tr>`;
+}
+function emBoton(texto: string, href: string) {
+  return `<tr><td align="center" style="padding:8px 0 22px"><a href="${href}" style="display:inline-block;background:#FFFFFF;color:#16191D;text-decoration:none;padding:17px 34px;border-radius:999px;font-family:${EM_SANS};font-size:16px;font-weight:600">${texto}</a></td></tr>`;
+}
+function emTexto(html: string) {
+  return `<tr><td style="padding:0 4px 18px;font-family:${EM_SANS};font-size:17px;line-height:27px;color:#FFFFFF">${html}</td></tr>`;
+}
+function emShell(o: { site: string; etiqueta?: string; titulo?: string; filas: string; pie: string; preview?: string }) {
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light"><title>Resalta</title>
+<style>@media only screen and (max-width:520px){.pn{border-radius:0!important}.pi{padding:34px 18px 26px!important}.cd{padding:22px 18px!important}.ti{font-size:28px!important;line-height:34px!important}.sc{font-size:84px!important}}</style></head>
+<body style="margin:0;padding:0;background:#FFFFFF;-webkit-text-size-adjust:100%">
+${o.preview ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0">${o.preview}</div>` : ""}
+<div style="width:100%;background-color:#FFFFFF;margin:0;padding:0"><center style="width:100%;table-layout:fixed;background-color:#FFFFFF">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#FFFFFF" style="width:100%;min-width:100%;background:#FFFFFF"><tr><td align="center" valign="top" style="padding:32px 0;text-align:center">
+<table role="presentation" class="pn" align="center" width="600" cellspacing="0" cellpadding="0" border="0" bgcolor="#97A6B2" style="margin:0 auto;width:100%;max-width:600px;background-color:#97A6B2;background-image:linear-gradient(180deg,#8B9BA8 0%,#A9B6C0 100%);border-radius:28px">
+<tr><td class="pi" style="padding:44px 36px 26px;text-align:left">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr><td align="center" style="padding:0 0 ${o.etiqueta || o.titulo ? 30 : 34}px"><a href="${o.site}" style="text-decoration:none"><img src="${o.site}/assets/img/email/logo-blanco.png" width="136" height="38" alt="resalta" style="display:block;border:0;width:136px;height:38px"></a></td></tr>
+    ${o.etiqueta ? `<tr><td align="center" style="padding:0 0 16px"><span style="display:inline-block;font-family:${EM_MONO};font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#FFFFFF;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:8px 16px">${o.etiqueta}</span></td></tr>` : ""}
+    ${o.titulo ? `<tr><td align="center" class="ti" style="padding:0 0 28px;font-family:${EM_SANS};font-size:34px;line-height:40px;font-weight:300;letter-spacing:-.02em;color:#FFFFFF">${o.titulo}</td></tr>` : ""}
+    ${o.filas}
+  </table>
+</td></tr></table>
+<table role="presentation" align="center" width="600" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto;width:100%;max-width:600px"><tr><td align="center" style="padding:20px 24px 8px;font-family:${EM_SANS};font-size:13px;line-height:20px;color:#5B6470">${o.pie}</td></tr></table>
+</td></tr></table></center></div></body></html>`;
+}
+
 // "Your analysis is ready" email, through Sender. Secret: SENDER_API_KEY (without it nothing is sent).
 async function avisarListo(email: string, nombre: string, general: unknown) {
   const key = Deno.env.get("SENDER_API_KEY");
@@ -169,21 +204,16 @@ async function avisarListo(email: string, nombre: string, general: unknown) {
   const site = Deno.env.get("SITE_URL") ?? "https://resalta.co";
   const esc = (t: string) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
   const primero = nombre.trim().split(/\s+/)[0] || "";
-  const nota = typeof general === "number" ? `<p style="margin:0;font-size:15px;color:#5B6470">Calificación general</p>
-    <p style="margin:4px 0 22px;font-family:monospace;font-size:56px;line-height:1">${general.toFixed(1)}<span style="font-size:18px;color:#5B6470"> / 10</span></p>` : "";
-  const html = `<!doctype html><html lang="es"><body style="margin:0;background:#F3F1EC;font-family:Helvetica,Arial,sans-serif;color:#16191D">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F3F1EC"><tr><td align="center" style="padding:28px 14px">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px;background:#FFFFFF;border-radius:16px;border:1px solid #D3D8DD">
-<tr><td style="padding:32px 30px 30px">
-<p style="margin:0 0 26px;font-size:20px;letter-spacing:-.01em">resalta</p>
-<h1 style="margin:0 0 14px;font-size:24px;font-weight:400;line-height:1.25">${primero ? esc(primero) + ", tu" : "Tu"} análisis está listo</h1>
-<p style="margin:0 0 22px;font-size:15px;line-height:1.55;color:#5B6470">Ya revisamos tus fotos y tus medidas. En tu panel tienes tus puntajes por zona, lo que más te conviene cambiar primero y tu plan paso a paso.</p>
-${nota}
-<a href="${site}/panel?utm_source=email&utm_medium=reporte&utm_campaign=listo" style="display:inline-block;background:#4A5866;color:#FFFFFF;text-decoration:none;padding:14px 26px;border-radius:999px;font-size:15px">Ver mi análisis</a>
-<p style="margin:26px 0 0;font-size:13px;line-height:1.5;color:#5B6470">Entra con el mismo correo con el que compraste. Tu análisis se queda guardado en tu cuenta.</p>
-</td></tr></table>
-<p style="max-width:520px;margin:16px auto 0;font-size:12px;line-height:1.5;color:#5B6470">Resalta · resalta.co<br>Si tienes dudas, responde a este correo.</p>
-</td></tr></table></body></html>`;
+  const nota = typeof general === "number" ? emCaja(`<div style="text-align:center"><div style="font-family:${EM_MONO};font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)">Calificación general</div>
+    <div class="sc" style="margin-top:10px;font-family:${EM_SANS};font-size:96px;line-height:1;font-weight:300;letter-spacing:-.045em;color:#FFFFFF">${general.toFixed(1)}<span style="font-size:24px;letter-spacing:0;color:${EM_SUAVE}">&nbsp;/ 10</span></div></div>`, "32px 24px 30px") : "";
+  const html = emShell({
+    site, etiqueta: "Tu análisis facial", titulo: `${primero ? esc(primero) + ", tu" : "Tu"} análisis está listo`,
+    preview: "Tus puntajes por zona, qué cambiar primero y tu plan paso a paso.",
+    filas: emTexto(`<div style="text-align:center;color:${EM_SUAVE}">Ya revisamos tus fotos y tus medidas. En tu panel tienes tus puntajes por zona, lo que más te conviene cambiar primero y tu plan paso a paso.</div>`)
+      + nota + emBoton("Ver mi análisis", `${site}/panel?utm_source=email&utm_medium=reporte&utm_campaign=listo`)
+      + emTexto(`<div style="text-align:center;font-size:14px;line-height:22px;color:${EM_SUAVE}">Entra con el mismo correo con el que compraste. Tu análisis se queda guardado en tu cuenta.</div>`),
+    pie: "Resalta · resalta.co<br>Si tienes dudas, responde a este correo.",
+  });
   try {
     const r = await fetch("https://api.sender.net/v2/message/send", {
       method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", Accept: "application/json" },
