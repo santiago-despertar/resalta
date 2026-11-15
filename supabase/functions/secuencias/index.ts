@@ -124,6 +124,28 @@ const PUNTAJE_ALTO = 80;
 const nombreDe = (a: Obj, u: Obj) => String(a?.nombre || u?.user_metadata?.full_name || "").trim().split(/\s+/)[0] || "Hola";
 const objetivoTexto = (o: string) => (o || "").split(", ").filter(Boolean).map((x) => x.toLowerCase()).join(" y ") || "tu imagen";
 
+
+// Email tracking: each email gets a row in correos_log (sent, opened, clicked), a 1px open image and
+// resalta.co links that pass through the 'correo' function. Admin > Correos reads it.
+// deno-lint-ignore no-explicit-any
+async function registrarCorreo(db: any, datos: { email: string; tipo: string; secuencia?: string | null; paso?: number | null; asunto: string }) {
+  try {
+    const { data } = await db.from("correos_log").insert({ ...datos, email: datos.email.toLowerCase() }).select("id").single();
+    return (data?.id as string | undefined) ?? undefined;
+  } catch { return undefined; }
+}
+function rastrear(html: string, id?: string) {
+  if (!id) return html;
+  const base = `${Deno.env.get("SUPABASE_URL")}/functions/v1/correo`;
+  const con = html.replace(/href="(https:\/\/(?:www\.)?resalta\.co[^"]*)"/g, (_m, u: string) => `href="${base}?a=c&amp;i=${id}&amp;u=${encodeURIComponent(u.replace(/&amp;/g, "&"))}"`);
+  const px = `<img src="${base}?a=o&amp;i=${id}" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0;opacity:0">`;
+  return con.includes("</body>") ? con.replace("</body>", px + "</body>") : con + px;
+}
+// deno-lint-ignore no-explicit-any
+async function cerrarCorreo(db: any, id: string | undefined, ok: boolean) {
+  if (id) { try { await db.from("correos_log").update({ ok }).eq("id", id); } catch { /* ignore */ } }
+}
+
 async function enviar(key: string, email: string, asunto: string, cuerpo: string, nombre: string) {
   const r = await fetch("https://api.sender.net/v2/message/send", {
     method: "POST",
@@ -211,7 +233,9 @@ Deno.serve(async (req) => {
     const enlace = `${SITE}/analisis?utm_source=email&utm_medium=abandono&utm_campaign=${ins.secuencia}-${sig.paso}`;
     const baja = `${Deno.env.get("SUPABASE_URL")}/functions/v1/secuencias?baja=${encodeURIComponent(ins.email)}&t=${await firma(ins.email)}`;
     const asunto = String(sig.asunto).replace(/\{(nombre|objetivo)\}/g, (_: string, k: string) => String((vars as Obj)[k] ?? ""));
-    const ok = await enviar(key, ins.email, asunto, plantilla(render(sig.cuerpo, vars, banderas(a), enlace), baja), nombre);
+    const idc = await registrarCorreo(admin, { email: ins.email, tipo: "secuencia", secuencia: ins.secuencia, paso: sig.paso, asunto });
+    const ok = await enviar(key, ins.email, asunto, rastrear(plantilla(render(sig.cuerpo, vars, banderas(a), enlace), baja), idc), nombre);
+    await cerrarCorreo(admin, idc, ok);
     await admin.from("secuencia_envios").upsert({ user_id: ins.user_id, email: ins.email, secuencia: ins.secuencia, paso: sig.paso, ok, enviado_at: new Date().toISOString() }, { onConflict: "user_id,secuencia,paso" });
     cuenta++; ok ? resumen.enviados++ : resumen.fallidos++;
     if (!ok) break; // Sender is refusing (limit or account issue): try again next hour
@@ -257,7 +281,9 @@ Deno.serve(async (req) => {
       const enlace = `${SITE}/analisis?utm_source=email&utm_medium=calificacion&utm_campaign=gratis-${sig.paso}`;
       const baja = `${Deno.env.get("SUPABASE_URL")}/functions/v1/secuencias?baja=${encodeURIComponent(ins.email)}&t=${await firma(ins.email)}`;
       const asunto = String(sig.asunto).replace(/\{(nombre|puntaje)\}/g, (_: string, k: string) => String((vars as Obj)[k] ?? ""));
-      const ok = await enviar(key, ins.email, asunto, plantilla(render(sig.cuerpo, vars, flags, enlace), baja, "hiciste tu calificación gratis"), nombre);
+      const idc = await registrarCorreo(admin, { email: ins.email, tipo: "secuencia", secuencia: "gratis", paso: sig.paso, asunto });
+      const ok = await enviar(key, ins.email, asunto, rastrear(plantilla(render(sig.cuerpo, vars, flags, enlace), baja, "hiciste tu calificación gratis"), idc), nombre);
+      await cerrarCorreo(admin, idc, ok);
       await admin.from("lead_envios").upsert({ email: ins.email, paso: sig.paso, ok, enviado_at: new Date().toISOString() }, { onConflict: "email,paso" });
       cuenta++; ok ? resumen.enviados++ : resumen.fallidos++;
       if (!ok) break;
