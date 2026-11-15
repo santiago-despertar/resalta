@@ -197,8 +197,31 @@ ${o.preview ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0">
 </td></tr></table></center></div></body></html>`;
 }
 
+
+// Email tracking: each email gets a row in correos_log (sent, opened, clicked), a 1px open image and
+// resalta.co links that pass through the 'correo' function. Admin > Correos reads it.
+// deno-lint-ignore no-explicit-any
+async function registrarCorreo(db: any, datos: { email: string; tipo: string; secuencia?: string | null; paso?: number | null; asunto: string }) {
+  try {
+    const { data } = await db.from("correos_log").insert({ ...datos, email: datos.email.toLowerCase() }).select("id").single();
+    return (data?.id as string | undefined) ?? undefined;
+  } catch { return undefined; }
+}
+function rastrear(html: string, id?: string) {
+  if (!id) return html;
+  const base = `${Deno.env.get("SUPABASE_URL")}/functions/v1/correo`;
+  const con = html.replace(/href="(https:\/\/(?:www\.)?resalta\.co[^"]*)"/g, (_m, u: string) => `href="${base}?a=c&amp;i=${id}&amp;u=${encodeURIComponent(u.replace(/&amp;/g, "&"))}"`);
+  const px = `<img src="${base}?a=o&amp;i=${id}" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0;opacity:0">`;
+  return con.includes("</body>") ? con.replace("</body>", px + "</body>") : con + px;
+}
+// deno-lint-ignore no-explicit-any
+async function cerrarCorreo(db: any, id: string | undefined, ok: boolean) {
+  if (id) { try { await db.from("correos_log").update({ ok }).eq("id", id); } catch { /* ignore */ } }
+}
+
 // "Your analysis is ready" email, through Sender. Secret: SENDER_API_KEY (without it nothing is sent).
-async function avisarListo(email: string, nombre: string, general: unknown) {
+// deno-lint-ignore no-explicit-any
+async function avisarListo(db: any, email: string, nombre: string, general: unknown) {
   const key = Deno.env.get("SENDER_API_KEY");
   if (!key) return;
   const site = Deno.env.get("SITE_URL") ?? "https://resalta.co";
@@ -214,12 +237,15 @@ async function avisarListo(email: string, nombre: string, general: unknown) {
       + emTexto(`<div style="text-align:center;font-size:14px;line-height:22px;color:${EM_SUAVE}">Entra con el mismo correo con el que compraste. Tu análisis se queda guardado en tu cuenta.</div>`),
     pie: "Resalta · resalta.co<br>Si tienes dudas, responde a este correo.",
   });
+  const asunto = primero ? `${primero}, tu análisis facial está listo` : "Tu análisis facial está listo";
+  const idc = await registrarCorreo(db, { email, tipo: "listo", asunto });
   try {
     const r = await fetch("https://api.sender.net/v2/message/send", {
       method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({ from: { name: "Resalta", email: Deno.env.get("SENDER_FROM") ?? "contacto@resalta.co" }, to: { email, name: primero || email },
-        subject: primero ? `${primero}, tu análisis facial está listo` : "Tu análisis facial está listo", html }),
+        subject: asunto, html: rastrear(html, idc) }),
     });
+    await cerrarCorreo(db, idc, r.ok);
     if (!r.ok) console.error("sender listo", r.status, (await r.text()).slice(0, 200));
   } catch (e) { console.error("sender listo", e); }
 }
@@ -382,7 +408,7 @@ En dimorfismo, califica qué tanto ese rasgo se acerca a lo que se percibe como 
         await admin.from("reports").update({ data }).eq("order_id", order.id);
         const { data: entregado } = await admin.from("orders").update({ status: "listo", delivered_at: new Date().toISOString() }).eq("id", order.id).eq("status", "pagado").select("id");
         // first delivery only: let them know by email, in case they closed the page while it was being written
-        if (entregado?.length && user.email) await avisarListo(user.email, String((order.answers ?? {}).nombre || user.user_metadata?.full_name || ""), puntajes.general);
+        if (entregado?.length && user.email) await avisarListo(admin, user.email, String((order.answers ?? {}).nombre || user.user_metadata?.full_name || ""), puntajes.general);
       } catch (e) {
         console.error(e);
         await fallar("excepcion");
