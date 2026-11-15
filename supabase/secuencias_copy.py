@@ -7,7 +7,7 @@ DIAS = [0, 1, 2, 4, 6, 9, 13]
 
 SEC = {}
 
-SEC["fotos"] = ("Salir mejor en fotos / verme mejor en general", [
+SEC["general"] = ("General (todas las personas)", [
 ("la foto del pasaporte", """{nombre}, ¿has visto la foto de tu INE o de tu pasaporte?
 
 Casi nadie se reconoce en ella.
@@ -124,7 +124,7 @@ Tu análisis no está hecho para juzgarte. Está hecho para decirte qué hacer p
 
 Así que vamos a ser directos.
 
-Hay gente que pasa años sintiendo que no sale bien en fotos, que algo de su cara no le convence, sin poder decir qué es.
+Hay gente que pasa años sintiendo que algo de su cara no le convence, sin poder decir qué es.
 
 Y hay gente que un día lo mide, entiende sus proporciones, cambia tres cosas y deja de pensar en eso.
 
