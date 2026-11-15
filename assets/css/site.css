@@ -1837,6 +1837,9 @@ html.fq-abierto{overflow:hidden}
 @media (max-width:640px){.sim-ia-g{gap:8px}.sim-acc .btn{flex:1 1 100%}}
 .sim-magro{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;margin:0 0 10px;border:1px solid var(--line);border-radius:var(--r-sm);cursor:pointer;font-size:15px}
 .sim-magro input{margin-top:4px;accent-color:var(--slate-deep);width:18px;height:18px;flex:none}
+#simCtl{margin-bottom:12px}
+.sim-ext-n{margin:-2px 0 12px;padding:10px 14px;border-radius:var(--r-sm);background:var(--azul-v);color:var(--ink)}
+.sim-acc .btn.pulso{box-shadow:0 0 0 4px var(--azul-b)}
 .sim-magro small{display:block;color:var(--ink-muted);font-size:13px;margin-top:2px}
 
 /* explorer: percentile, strengths/flaws, impact */
