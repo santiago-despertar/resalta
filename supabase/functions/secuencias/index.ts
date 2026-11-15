@@ -1,4 +1,5 @@
-// Follow-up sequences for people who finished the onboarding questions but did not pay.
+// Follow-up sequences for people who finished the onboarding questions but did not pay, and (secuencia 'gratis')
+// for people who only did the free rating.
 // Runs every hour (pg_cron). One hour after someone leaves the offer page without paying, they join the
 // sequence that matches what they want to improve, leave the free-rating sequence in Sender, and get one
 // email per step on the days set in public.secuencia_correos (editable from admin.resalta.co).
@@ -84,7 +85,7 @@ ${o.preview ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0">
 
 export function render(cuerpo: string, vars: Obj, flags: Obj, enlace: string) {
   let t = cuerpo.replace(/\[\[(\w+)\]\]([\s\S]*?)\[\[\/\1\]\]/g, (_, k, dentro) => (flags[k] ? dentro : ""));
-  t = t.replace(/\{(nombre|objetivo)\}/g, (_, k) => String(vars[k] ?? ""));
+  t = t.replace(/\{(nombre|objetivo|puntaje|fuerte|debil)\}/g, (_, k) => String(vars[k] ?? ""));
   const partes = t.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
   return partes.map((p) => {
     const b = p.match(/^\{boton:([^}]+)\}$/);
@@ -99,9 +100,26 @@ export function render(cuerpo: string, vars: Obj, flags: Obj, enlace: string) {
   }).join("");
 }
 
-export function plantilla(contenido: string, baja: string) {
-  return emShell({ site: SITE, filas: contenido, pie: `Te escribimos porque empezaste tu análisis en resalta.co.<br><a href="${baja}" style="color:#4A5866">No quiero recibir estos correos</a>` });
+export function plantilla(contenido: string, baja: string, porque = "empezaste tu análisis") {
+  return emShell({ site: SITE, filas: contenido, pie: `Te escribimos porque ${porque} en resalta.co.<br><a href="${baja}" style="color:#4A5866">No quiero recibir estos correos</a>` });
 }
+
+// Free-rating leads: the rating does not ask sex, so it is guessed from the first name (only used to pick
+// the man or woman example pictures). Unknown names get the man's pictures, like the homepage.
+const MUJER_SIN_A = new Set(("carmen isabel raquel ruth rut beatriz ines inés rocio rocío pilar belen belén luz soledad mercedes dolores consuelo abigail ester esther miriam maribel marisol lourdes monserrat montserrat itzel citlali xochitl nayeli yaretzi jennifer karen evelyn ivonne michelle nicole denise jazmin jazmín abril sol flor mar noemi noemí zoe zoé irene guadalupe lupe ximena jimena araceli estefany estefani yuridia yazmin yazmín madeleine allison ashley kimberly lizbeth elizabeth isabel maite nohemi ingrid iris raquel").split(" "));
+const HOMBRE_CON_A = new Set("luca nicola joshua jeremia borja elias garcia sasha misha nikita kosta".split(" "));
+export function esMujer(nombre: string) {
+  const n = (nombre || "").trim().split(/\s+/)[0].toLowerCase();
+  if (!n) return false;
+  if (MUJER_SIN_A.has(n)) return true;
+  if (HOMBRE_CON_A.has(n)) return false;
+  return /a$/.test(n);
+}
+// "Mandíbula" -> "tu mandíbula": the rating's measure names, ready to drop into a sentence
+const CON_ARTICULO: Record<string, string> = { "simetría": "tu simetría", "tercios faciales": "tus tercios faciales", "tercio inferior": "tu tercio inferior", "ojos": "tus ojos", "inclinación de ojos": "la inclinación de tus ojos", "mandíbula": "tu mandíbula", "proporción del rostro": "la proporción de tu rostro" };
+const conArticulo = (k: string) => { const x = (k || "").trim().toLowerCase(); return x ? (CON_ARTICULO[x] ?? x) : ""; };
+const LANZAMIENTO_GRATIS = "2026-11-15T23:59:00Z"; // only people who did the free rating from here on
+const PUNTAJE_ALTO = 80;
 
 const nombreDe = (a: Obj, u: Obj) => String(a?.nombre || u?.user_metadata?.full_name || "").trim().split(/\s+/)[0] || "Hola";
 const objetivoTexto = (o: string) => (o || "").split(", ").filter(Boolean).map((x) => x.toLowerCase()).join(" y ") || "tu imagen";
@@ -126,6 +144,7 @@ Deno.serve(async (req) => {
     if (t !== await firma(email)) return pagina("Este enlace no es válido.");
     await admin.from("bajas").upsert({ email });
     await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "baja" }).eq("email", email).is("salio_at", null);
+    await admin.from("lead_secuencia").update({ salio_at: new Date().toISOString(), motivo: "baja" }).eq("email", email).is("salio_at", null);
     return pagina("Listo. Ya no te vamos a mandar estos correos. Los avisos de tu cuenta (por ejemplo, cuando tu análisis está listo) te siguen llegando.");
   }
   if (req.method !== "POST") return new Response("ok");
@@ -196,6 +215,53 @@ Deno.serve(async (req) => {
     await admin.from("secuencia_envios").upsert({ user_id: ins.user_id, email: ins.email, secuencia: ins.secuencia, paso: sig.paso, ok, enviado_at: new Date().toISOString() }, { onConflict: "user_id,secuencia,paso" });
     cuenta++; ok ? resumen.enviados++ : resumen.fallidos++;
     if (!ok) break; // Sender is refusing (limit or account issue): try again next hour
+  }
+  // 3) free-rating sequence: people who only did the free rating get one email per step after their result.
+  // They leave it as soon as they create an account and start the plan form (then the general sequence takes
+  // over), buy, or unsubscribe. One run per email address, however many times they repeat the rating.
+  const gratis = porSec["gratis"] ?? [];
+  if (gratis.length && cuenta < MAX_POR_CORRIDA && resumen.fallidos === 0) {
+    const { data: nuevos } = await admin.from("leads").select("id,email,created_at").eq("source", "calificacion")
+      .not("enviado_at", "is", null).gt("created_at", LANZAMIENTO_GRATIS).gt("created_at", mes).order("created_at", { ascending: true }).limit(1000);
+    const { data: yaL } = await admin.from("lead_secuencia").select("email");
+    const enLeads = new Set((yaL ?? []).map((x: Obj) => x.email));
+    for (const l of nuevos ?? []) {
+      const email = String(l.email).toLowerCase();
+      if (enLeads.has(email) || bajas.has(email)) continue;
+      const { error } = await admin.from("lead_secuencia").insert({ email, lead_id: l.id, desde: l.created_at });
+      if (!error) { enLeads.add(email); resumen.inscritos++; }
+    }
+    const { data: activosL } = await admin.from("lead_secuencia").select("*").is("salio_at", null).limit(2000);
+    const { data: hechosL } = await admin.from("lead_envios").select("email,paso,enviado_at").eq("ok", true);
+    const hechoL = new Set((hechosL ?? []).map((e: Obj) => `${e.email}|${e.paso}`));
+    const ultimoL: Record<string, number> = {};
+    for (const e of hechosL ?? []) ultimoL[e.email] = Math.max(ultimoL[e.email] ?? 0, new Date(e.enviado_at).getTime());
+    for (const ins of activosL ?? []) {
+      if (cuenta >= MAX_POR_CORRIDA) break;
+      const sale = (motivo: string) => admin.from("lead_secuencia").update({ salio_at: new Date().toISOString(), motivo }).eq("email", ins.email);
+      if (bajas.has(ins.email)) { await sale("baja"); continue; }
+      const { data: estado } = await admin.rpc("lead_estado", { e: ins.email });
+      if (estado) { await sale(String(estado)); resumen.salieron++; continue; }
+      const sig = gratis.find((c) => !hechoL.has(`${ins.email}|${c.paso}`));
+      if (!sig) { await sale("terminó"); continue; }
+      if (ahora < new Date(ins.desde).getTime() + Number(sig.dias) * 864e5) continue;
+      if (ahora - (ultimoL[ins.email] ?? 0) < 20 * 3600e3) continue;
+      // their most recent rating: if they repeated it, the emails talk about the newest number
+      const { data: ls } = await admin.from("leads").select("nombre,score,metrics").eq("email", ins.email).eq("source", "calificacion").order("created_at", { ascending: false }).limit(1);
+      const l = ls?.[0] ?? {};
+      const nombre = String(l.nombre || "").trim().split(/\s+/)[0] || "Hola";
+      const m = l.metrics ?? {};
+      const vars = { nombre, puntaje: String(l.score ?? ""), fuerte: conArticulo(m.fuerte) || "algunos rasgos", debil: conArticulo(m.debil?.k) || "algunos detalles" };
+      const mujer = esMujer(nombre);
+      const flags = { mujer, hombre: !mujer, alto: Number(l.score) >= PUNTAJE_ALTO, bajo: !(Number(l.score) >= PUNTAJE_ALTO) };
+      const enlace = `${SITE}/analisis?utm_source=email&utm_medium=calificacion&utm_campaign=gratis-${sig.paso}`;
+      const baja = `${Deno.env.get("SUPABASE_URL")}/functions/v1/secuencias?baja=${encodeURIComponent(ins.email)}&t=${await firma(ins.email)}`;
+      const asunto = String(sig.asunto).replace(/\{(nombre|puntaje)\}/g, (_: string, k: string) => String((vars as Obj)[k] ?? ""));
+      const ok = await enviar(key, ins.email, asunto, plantilla(render(sig.cuerpo, vars, flags, enlace), baja, "hiciste tu calificación gratis"), nombre);
+      await admin.from("lead_envios").upsert({ email: ins.email, paso: sig.paso, ok, enviado_at: new Date().toISOString() }, { onConflict: "email,paso" });
+      cuenta++; ok ? resumen.enviados++ : resumen.fallidos++;
+      if (!ok) break;
+    }
   }
   return json({ ok: true, ...resumen });
 });
