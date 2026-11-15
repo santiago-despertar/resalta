@@ -157,7 +157,12 @@ async function enviar(key: string, l: Lead) {
   if (!envio.ok || !/"success"\s*:\s*true/.test(r)) { console.error("sender send", envio.status, r); return false; }
   await admin.from("leads").update({ enviado_at: new Date().toISOString() }).eq("id", l.id);
 
-  // the group is what starts the sequence in Sender
+  // the group is what starts the sequence in Sender. Only the first free rating of an address joins it:
+  // repeating the test sends the new result but never restarts the sequence, and someone who already
+  // signed up (and so is in, or past, another sequence) is not put back into this one.
+  const { count: previos } = await admin.from("leads").select("id", { count: "exact", head: true })
+    .eq("email", l.email).neq("id", l.id).or("and(source.eq.calificacion,enviado_at.not.is.null),source.eq.registro");
+  if ((previos ?? 0) > 0) return true;
   const grupo = Deno.env.get("SENDER_GROUP_ID") ?? "aM2mX5"; // "Leads calificación gratis"
   const sub = await fetch("https://api.sender.net/v2/subscribers", {
     method: "POST", headers: h,
