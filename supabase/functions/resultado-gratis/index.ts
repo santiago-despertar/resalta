@@ -18,47 +18,62 @@ const esc = (s: unknown) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&am
 
 type Parte = { k: string; v: number; tip?: string };
 
-// Email styled like the site: blue-gray backdrop, white type, soft translucent cards, everything centered.
-// rgba backgrounds have solid bgcolor fallbacks for clients (Outlook desktop) that ignore them.
+// Email styled like the site: a rounded blue-gray panel on a light page, white type, soft translucent cards.
+// Built for Gmail: no width percentages on tables that Gmail can collapse, bars as divs, a 600px panel that
+// shrinks on phones, and solid bgcolor fallbacks where rgba is ignored (Outlook desktop).
 function correo(nombre: string, score: number, partes: Parte[], fuerte: string, debil: { k: string; tip?: string } | null, site: string, foto: string | null) {
   const nivel = score >= 80 ? "Tienes una cara muy armónica. Tu margen está en los detalles finos." : score >= 65 ? "Tienes una buena base y varias mejoras claras a tu alcance." : "Tienes mucho potencial. Los cambios correctos se van a notar bastante.";
   const url = `${site}/cuenta?next=/analisis&utm_source=email&utm_medium=resultado&utm_campaign=calificacion`;
-  const mono = "'SFMono-Regular',Menlo,Consolas,monospace";
+  const mono = "'SFMono-Regular',Menlo,Consolas,'Courier New',monospace";
   const sans = "'Inter','Helvetica Neue',Helvetica,Arial,sans-serif";
-  const label = (t: string) => `<p style="margin:0;font-family:${mono};font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.72)">${t}</p>`;
-  const glass = (inner: string, pad = "22px 22px") => `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate"><tr><td align="center" bgcolor="#A3B1BC" style="background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:18px;padding:${pad}">${inner}</td></tr></table>`;
+  const W = "rgba(255,255,255,.78)";
+  const label = (t: string, center = false) => `<div style="font-family:${mono};font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7);${center ? "text-align:center;" : ""}">${t}</div>`;
+  // one card = one table cell, so Gmail can't shrink it
+  const card = (inner: string, pad = "26px 24px") => `<tr><td class="cd" bgcolor="#A0AEB9" style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.26);border-radius:22px;padding:${pad}">${inner}</td></tr><tr><td style="height:14px;line-height:14px;font-size:0">&nbsp;</td></tr>`;
   const fila = (p: Parte, i: number) => {
-    const v = Math.round(p.v), w = Math.max(4, Math.min(100, v));
-    return `<tr><td style="padding:${i ? "14px" : "4px"} 0 0;font-family:${sans};font-size:15px;color:#FFFFFF">${esc(p.k)}</td>
-      <td align="right" style="padding:${i ? "14px" : "4px"} 0 0;font-family:${mono};font-size:15px;color:#FFFFFF;width:44px">${v}</td></tr>
-      <tr><td colspan="2" style="padding:7px 0 0"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr>
-        <td width="${w}%" bgcolor="#FFFFFF" style="height:4px;line-height:4px;font-size:0;border-radius:4px 0 0 4px;background:#FFFFFF">&nbsp;</td>
-        ${w < 100 ? `<td bgcolor="#8E9DAA" style="height:4px;line-height:4px;font-size:0;border-radius:0 4px 4px 0;background:rgba(255,255,255,.22)">&nbsp;</td>` : ""}
-      </tr></table></td></tr>`;
+    const v = Math.round(p.v), w = Math.max(3, Math.min(100, v));
+    return `<div style="padding:${i ? 18 : 14}px 0 0">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr>
+        <td style="font-family:${sans};font-size:16px;line-height:22px;color:#FFFFFF">${esc(p.k)}</td>
+        <td align="right" style="font-family:${mono};font-size:16px;line-height:22px;color:#FFFFFF;white-space:nowrap">${v}</td>
+      </tr></table>
+      <div style="margin-top:9px;height:5px;line-height:5px;font-size:0;background-color:#8E9DAA;background:rgba(255,255,255,.22);border-radius:5px"><div style="width:${w}%;height:5px;line-height:5px;font-size:0;background:#FFFFFF;border-radius:5px">&nbsp;</div></div>
+    </div>`;
   };
   const filas = partes.map(fila).join("");
-  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><title>Tu calificación facial</title></head>
-<body style="margin:0;padding:0;background:#97A6B2">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#97A6B2" style="background:#97A6B2;background-image:linear-gradient(180deg,#8E9DAA,#A9B6C0)"><tr><td align="center" style="padding:36px 16px 40px">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:540px">
-  <tr><td align="center" style="padding:0 0 30px"><img src="${site}/assets/img/email/logo-blanco.png" width="129" height="36" alt="resalta" style="display:block;border:0;width:129px;height:36px"></td></tr>
-  <tr><td align="center" style="padding:0 0 12px"><span style="display:inline-block;font-family:${mono};font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#FFFFFF;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:7px 14px">Tu calificación facial</span></td></tr>
-  <tr><td align="center" style="padding:0 0 26px;font-family:${sans};font-size:30px;line-height:1.15;font-weight:300;letter-spacing:-.02em;color:#FFFFFF">${esc(nombre)}, este es tu resultado</td></tr>
-  ${foto ? `<tr><td style="padding:0 0 16px">${glass(`<img src="${esc(foto)}" width="522" alt="Tu foto con tus medidas" style="display:block;width:100%;max-width:522px;height:auto;margin:0 auto;border:0;border-radius:12px">`, "8px")}</td></tr>` : ""}
-  <tr><td style="padding:0 0 16px">${glass(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center">
-      ${label("Armonía facial")}
-      <p style="margin:10px 0 0;font-family:${sans};font-size:76px;line-height:1;font-weight:300;letter-spacing:-.04em;color:#FFFFFF">${Math.round(score)}<span style="font-size:22px;letter-spacing:0;color:rgba(255,255,255,.7)"> / 100</span></p>
-      <p style="margin:14px auto 0;max-width:380px;font-family:${sans};font-size:15px;line-height:1.55;color:rgba(255,255,255,.88)">${esc(nivel)}</p>
-    </td></tr></table>`, "28px 24px")}</td></tr>
-  ${filas ? `<tr><td style="padding:0 0 16px">${glass(`${label("Tus puntajes")}<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:10px">${filas}</table>
-      ${fuerte ? `<p style="margin:20px 0 0;font-family:${sans};font-size:14px;line-height:1.55;color:rgba(255,255,255,.88)">Tu punto más fuerte: <b style="color:#FFFFFF;font-weight:500">${esc(fuerte.toLowerCase())}</b>.${debil && debil.k && debil.k !== fuerte ? ` Lo que más te baja el puntaje: <b style="color:#FFFFFF;font-weight:500">${esc(debil.k.toLowerCase())}</b>.` : ""}</p>` : ""}`, "22px 22px 24px")}</td></tr>` : ""}
-  <tr><td style="padding:0 0 22px">${glass(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center">
-      <p style="margin:0;font-family:${sans};font-size:21px;line-height:1.3;font-weight:300;color:#FFFFFF">¿Quieres saber por qué te dimos ${Math.round(score)}?</p>
-      <p style="margin:12px auto 22px;max-width:420px;font-family:${sans};font-size:15px;line-height:1.55;color:rgba(255,255,255,.88)">Este puntaje mide unas cuantas proporciones de tu cara de frente. El análisis completo revisa más de 110 rasgos con tus fotos de frente, sonriendo y de perfil, y te dice qué cambiar primero, qué no vale la pena y cómo te verías con tu plan.</p>
-      <a href="${url}" style="display:inline-block;background:#FFFFFF;color:#16191D;text-decoration:none;padding:15px 30px;border-radius:999px;font-family:${sans};font-size:15px;font-weight:500">Ver mi análisis completo</a>
-    </td></tr></table>`, "30px 24px")}</td></tr>
-  <tr><td align="center" style="font-family:${sans};font-size:12px;line-height:1.6;color:rgba(255,255,255,.75)">Puntaje estético y educativo basado en proporciones medidas en una foto. No es un juicio sobre tu valor ni un diagnóstico.${foto ? " La imagen de este correo se borra de nuestros servidores en 30 días." : ""}<br><a href="${site}" style="color:#FFFFFF;text-decoration:none">resalta.co</a></td></tr>
-</table>
+  const s = Math.round(score);
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light"><title>Tu calificación facial</title>
+<style>
+@media only screen and (max-width:520px){
+  .pn{border-radius:0!important}
+  .pi{padding:34px 16px 26px!important}
+  .cd{padding:22px 18px!important}
+  .ti{font-size:28px!important;line-height:34px!important}
+  .sc{font-size:84px!important}
+}
+</style></head>
+<body style="margin:0;padding:0;background:#F3F1EC;-webkit-text-size-adjust:100%">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0">Tu armonía facial: ${s}/100 y tus puntajes, con tu foto medida.</div>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#F3F1EC" style="background:#F3F1EC"><tr><td align="center" style="padding:24px 0">
+<table role="presentation" class="pn" width="600" cellspacing="0" cellpadding="0" border="0" bgcolor="#97A6B2" style="width:100%;max-width:600px;background-color:#97A6B2;background-image:linear-gradient(180deg,#8B9BA8 0%,#A9B6C0 100%);border-radius:28px">
+<tr><td class="pi" style="padding:44px 36px 34px">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr><td align="center" style="padding:0 0 34px"><a href="${site}" style="text-decoration:none"><img src="${site}/assets/img/email/logo-blanco.png" width="136" height="38" alt="resalta" style="display:block;border:0;width:136px;height:38px"></a></td></tr>
+    <tr><td align="center" style="padding:0 0 16px"><span style="display:inline-block;font-family:${mono};font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#FFFFFF;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:8px 16px">Tu calificación facial</span></td></tr>
+    <tr><td align="center" class="ti" style="padding:0 0 30px;font-family:${sans};font-size:34px;line-height:40px;font-weight:300;letter-spacing:-.02em;color:#FFFFFF">${esc(nombre)}, este es tu resultado</td></tr>
+    ${foto ? card(`<img src="${esc(foto)}" width="510" alt="Tu foto con tus medidas" style="display:block;width:100%;max-width:510px;height:auto;margin:0 auto;border:0;border-radius:14px">`, "9px") : ""}
+    ${card(`<div style="text-align:center">${label("Armonía facial", true)}
+      <div class="sc" style="margin-top:10px;font-family:${sans};font-size:96px;line-height:1;font-weight:300;letter-spacing:-.045em;color:#FFFFFF">${s}<span style="font-size:24px;letter-spacing:0;color:${W}">&nbsp;/ 100</span></div>
+      <div style="margin:16px auto 0;max-width:400px;font-family:${sans};font-size:17px;line-height:26px;color:${W}">${esc(nivel)}</div></div>`, "32px 24px 30px")}
+    ${filas ? card(`${label("Tus puntajes")}${filas}
+      ${fuerte ? `<div style="margin-top:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,.22);font-family:${sans};font-size:16px;line-height:25px;color:${W}">Tu punto más fuerte es <b style="color:#FFFFFF;font-weight:600">${esc(fuerte.toLowerCase())}</b>.${debil && debil.k && debil.k !== fuerte ? ` Lo que más te baja el puntaje es <b style="color:#FFFFFF;font-weight:600">${esc(debil.k.toLowerCase())}</b>.` : ""}</div>` : ""}`) : ""}
+    ${card(`<div style="text-align:center">
+      <div style="font-family:${sans};font-size:24px;line-height:31px;font-weight:300;letter-spacing:-.01em;color:#FFFFFF">¿Quieres saber por qué te dimos ${s}?</div>
+      <div style="margin:14px auto 26px;max-width:430px;font-family:${sans};font-size:16px;line-height:25px;color:${W}">Este puntaje mide unas cuantas proporciones de tu cara de frente. El análisis completo revisa más de 110 rasgos con tus fotos de frente, sonriendo y de perfil, y te dice qué cambiar primero, qué no vale la pena y cómo te verías con tu plan.</div>
+      <a href="${url}" style="display:inline-block;background:#FFFFFF;color:#16191D;text-decoration:none;padding:17px 34px;border-radius:999px;font-family:${sans};font-size:16px;font-weight:600">Ver mi análisis completo</a></div>`, "34px 24px 34px")}
+  </table>
+</td></tr></table>
+<table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px"><tr><td align="center" style="padding:20px 24px 8px;font-family:${sans};font-size:13px;line-height:20px;color:#5B6470">Puntaje estético y educativo basado en proporciones medidas en una foto. No es un juicio sobre tu valor ni un diagnóstico.${foto ? " La imagen de este correo se borra de nuestros servidores en 30 días." : ""}<br><a href="${site}" style="color:#4A5866;text-decoration:none">resalta.co</a></td></tr></table>
 </td></tr></table></body></html>`;
 }
 
