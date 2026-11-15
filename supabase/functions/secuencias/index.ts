@@ -42,28 +42,60 @@ export function banderas(a: Obj) {
   };
 }
 
+// Shared look for every Resalta email: a centered rounded blue-gray panel on white, the white logo,
+// white type and soft translucent cards, like resalta.co. Built for Gmail (centered wrapper, no
+// collapsible percentage tables) with solid bgcolor fallbacks for Outlook desktop.
+const EM_SANS = "'Inter','Helvetica Neue',Helvetica,Arial,sans-serif";
+const EM_MONO = "'SFMono-Regular',Menlo,Consolas,'Courier New',monospace";
+const EM_SUAVE = "rgba(255,255,255,.82)";
+function emCaja(inner: string, pad = "26px 24px") {
+  return `<tr><td class="cd" bgcolor="#A0AEB9" style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.26);border-radius:22px;padding:${pad}">${inner}</td></tr><tr><td style="height:14px;line-height:14px;font-size:0">&nbsp;</td></tr>`;
+}
+function emBoton(texto: string, href: string) {
+  return `<tr><td align="center" style="padding:8px 0 22px"><a href="${href}" style="display:inline-block;background:#FFFFFF;color:#16191D;text-decoration:none;padding:17px 34px;border-radius:999px;font-family:${EM_SANS};font-size:16px;font-weight:600">${texto}</a></td></tr>`;
+}
+function emTexto(html: string) {
+  return `<tr><td style="padding:0 4px 18px;font-family:${EM_SANS};font-size:17px;line-height:27px;color:#FFFFFF">${html}</td></tr>`;
+}
+function emShell(o: { site: string; etiqueta?: string; titulo?: string; filas: string; pie: string; preview?: string }) {
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light"><title>Resalta</title>
+<style>@media only screen and (max-width:520px){.pn{border-radius:0!important}.pi{padding:34px 18px 26px!important}.cd{padding:22px 18px!important}.ti{font-size:28px!important;line-height:34px!important}.sc{font-size:84px!important}}</style></head>
+<body style="margin:0;padding:0;background:#FFFFFF;-webkit-text-size-adjust:100%">
+${o.preview ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0">${o.preview}</div>` : ""}
+<div style="width:100%;background-color:#FFFFFF;margin:0;padding:0"><center style="width:100%;table-layout:fixed;background-color:#FFFFFF">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#FFFFFF" style="width:100%;min-width:100%;background:#FFFFFF"><tr><td align="center" valign="top" style="padding:32px 0;text-align:center">
+<table role="presentation" class="pn" align="center" width="600" cellspacing="0" cellpadding="0" border="0" bgcolor="#97A6B2" style="margin:0 auto;width:100%;max-width:600px;background-color:#97A6B2;background-image:linear-gradient(180deg,#8B9BA8 0%,#A9B6C0 100%);border-radius:28px">
+<tr><td class="pi" style="padding:44px 36px 26px;text-align:left">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr><td align="center" style="padding:0 0 ${o.etiqueta || o.titulo ? 30 : 34}px"><a href="${o.site}" style="text-decoration:none"><img src="${o.site}/assets/img/email/logo-blanco.png" width="136" height="38" alt="resalta" style="display:block;border:0;width:136px;height:38px"></a></td></tr>
+    ${o.etiqueta ? `<tr><td align="center" style="padding:0 0 16px"><span style="display:inline-block;font-family:${EM_MONO};font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#FFFFFF;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:8px 16px">${o.etiqueta}</span></td></tr>` : ""}
+    ${o.titulo ? `<tr><td align="center" class="ti" style="padding:0 0 28px;font-family:${EM_SANS};font-size:34px;line-height:40px;font-weight:300;letter-spacing:-.02em;color:#FFFFFF">${o.titulo}</td></tr>` : ""}
+    ${o.filas}
+  </table>
+</td></tr></table>
+<table role="presentation" align="center" width="600" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto;width:100%;max-width:600px"><tr><td align="center" style="padding:20px 24px 8px;font-family:${EM_SANS};font-size:13px;line-height:20px;color:#5B6470">${o.pie}</td></tr></table>
+</td></tr></table></center></div></body></html>`;
+}
+
 export function render(cuerpo: string, vars: Obj, flags: Obj, enlace: string) {
   let t = cuerpo.replace(/\[\[(\w+)\]\]([\s\S]*?)\[\[\/\1\]\]/g, (_, k, dentro) => (flags[k] ? dentro : ""));
   t = t.replace(/\{(nombre|objetivo)\}/g, (_, k) => String(vars[k] ?? ""));
   const partes = t.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
   return partes.map((p) => {
     const b = p.match(/^\{boton:([^}]+)\}$/);
-    if (b) return `<p style="margin:22px 0"><a href="${enlace}" style="display:inline-block;background:#4A5866;color:#FFFFFF;text-decoration:none;padding:14px 26px;border-radius:999px;font-size:15px">${esc(b[1])}</a></p>`;
-    const lineas = esc(p).split("\n").join("<br>");
-    return `<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#16191D">${lineas}</p>`;
+    if (b) return emBoton(esc(b[1]), enlace);
+    // {imagen:/assets/img/x.jpg} or a full URL: a picture in a translucent card
+    const im = p.match(/^\{imagen:([^}]+)\}$/);
+    if (im) { const src = /^https?:/.test(im[1]) ? im[1] : SITE + im[1]; return emCaja(`<img src="${esc(src)}" width="510" alt="" style="display:block;width:100%;max-width:510px;height:auto;margin:0 auto;border:0;border-radius:14px">`, "9px"); }
+    // {dato:0.1 s|What the number means}: a big number in a card, like the site's stat cards
+    const da = p.match(/^\{dato:([^|}]+)\|([^}]+)\}$/);
+    if (da) return emCaja(`<div style="text-align:center"><div class="sc" style="font-family:${EM_SANS};font-size:72px;line-height:1;font-weight:300;letter-spacing:-.04em;color:#FFFFFF">${esc(da[1])}</div><div style="margin:12px auto 0;max-width:380px;font-family:${EM_MONO};font-size:12px;line-height:19px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.75)">${esc(da[2])}</div></div>`, "30px 24px");
+    return emTexto(esc(p).split("\n").join("<br>"));
   }).join("");
 }
 
 export function plantilla(contenido: string, baja: string) {
-  return `<!doctype html><html lang="es"><body style="margin:0;background:#F3F1EC;font-family:Helvetica,Arial,sans-serif;color:#16191D">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F3F1EC"><tr><td align="center" style="padding:28px 14px">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:540px;background:#FFFFFF;border-radius:16px;border:1px solid #D3D8DD">
-<tr><td style="padding:30px 30px 18px">
-<p style="margin:0 0 22px;font-size:20px;letter-spacing:-.01em">resalta</p>
-${contenido}
-</td></tr></table>
-<p style="max-width:540px;margin:16px auto 0;font-size:12px;line-height:1.5;color:#5B6470">Te escribimos porque empezaste tu análisis en resalta.co. <a href="${baja}" style="color:#5B6470">No quiero recibir estos correos</a>.</p>
-</td></tr></table></body></html>`;
+  return emShell({ site: SITE, filas: contenido, pie: `Te escribimos porque empezaste tu análisis en resalta.co.<br><a href="${baja}" style="color:#4A5866">No quiero recibir estos correos</a>` });
 }
 
 const nombreDe = (a: Obj, u: Obj) => String(a?.nombre || u?.user_metadata?.full_name || "").trim().split(/\s+/)[0] || "Hola";
@@ -85,7 +117,7 @@ Deno.serve(async (req) => {
   // unsubscribe link from the email footer
   if (req.method === "GET" && url.searchParams.get("baja")) {
     const email = String(url.searchParams.get("baja")).toLowerCase().slice(0, 200), t = url.searchParams.get("t") ?? "";
-    const pagina = (m: string) => html(`<!doctype html><html lang="es"><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#F3F1EC;font-family:Helvetica,Arial,sans-serif;color:#16191D;display:grid;place-items:center;min-height:100vh"><div style="max-width:420px;padding:30px;background:#fff;border:1px solid #D3D8DD;border-radius:16px;margin:20px"><p style="font-size:20px;margin:0 0 14px">resalta</p><p style="font-size:15px;line-height:1.6;margin:0">${m}</p></div></body></html>`);
+    const pagina = (m: string) => html(`<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#FFFFFF;font-family:${EM_SANS};display:grid;place-items:center;min-height:100vh"><div style="max-width:420px;padding:36px 30px;background:#97A6B2;background-image:linear-gradient(180deg,#8B9BA8,#A9B6C0);border-radius:28px;margin:20px;text-align:center;color:#FFFFFF"><img src="${SITE}/assets/img/email/logo-blanco.png" width="136" height="38" alt="resalta" style="display:block;margin:0 auto 22px"><p style="font-size:17px;line-height:1.6;margin:0">${m}</p></div></body></html>`);
     if (t !== await firma(email)) return pagina("Este enlace no es válido.");
     await admin.from("bajas").upsert({ email });
     await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "baja" }).eq("email", email).is("salio_at", null);
