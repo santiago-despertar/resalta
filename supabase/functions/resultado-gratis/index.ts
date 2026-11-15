@@ -26,7 +26,7 @@ function correo(nombre: string, score: number, partes: Parte[], fuerte: string, 
   const mono = "'SFMono-Regular',Menlo,Consolas,monospace";
   const sans = "'Inter','Helvetica Neue',Helvetica,Arial,sans-serif";
   const label = (t: string) => `<p style="margin:0;font-family:${mono};font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.72)">${t}</p>`;
-  const glass = (inner: string, pad = "22px 22px") => `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate"><tr><td bgcolor="#A3B1BC" style="background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:18px;padding:${pad}">${inner}</td></tr></table>`;
+  const glass = (inner: string, pad = "22px 22px") => `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate"><tr><td align="center" bgcolor="#A3B1BC" style="background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:18px;padding:${pad}">${inner}</td></tr></table>`;
   const fila = (p: Parte, i: number) => {
     const v = Math.round(p.v), w = Math.max(4, Math.min(100, v));
     return `<tr><td style="padding:${i ? "14px" : "4px"} 0 0;font-family:${sans};font-size:15px;color:#FFFFFF">${esc(p.k)}</td>
@@ -44,7 +44,7 @@ function correo(nombre: string, score: number, partes: Parte[], fuerte: string, 
   <tr><td align="center" style="padding:0 0 30px"><img src="${site}/assets/img/email/logo-blanco.png" width="129" height="36" alt="resalta" style="display:block;border:0;width:129px;height:36px"></td></tr>
   <tr><td align="center" style="padding:0 0 12px"><span style="display:inline-block;font-family:${mono};font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#FFFFFF;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:7px 14px">Tu calificación facial</span></td></tr>
   <tr><td align="center" style="padding:0 0 26px;font-family:${sans};font-size:30px;line-height:1.15;font-weight:300;letter-spacing:-.02em;color:#FFFFFF">${esc(nombre)}, este es tu resultado</td></tr>
-  ${foto ? `<tr><td style="padding:0 0 16px">${glass(`<img src="${esc(foto)}" width="494" alt="Tu foto con tus medidas" style="display:block;width:100%;max-width:494px;height:auto;border:0;border-radius:12px">`, "8px")}</td></tr>` : ""}
+  ${foto ? `<tr><td style="padding:0 0 16px">${glass(`<img src="${esc(foto)}" width="522" alt="Tu foto con tus medidas" style="display:block;width:100%;max-width:522px;height:auto;margin:0 auto;border:0;border-radius:12px">`, "8px")}</td></tr>` : ""}
   <tr><td style="padding:0 0 16px">${glass(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center">
       ${label("Armonía facial")}
       <p style="margin:10px 0 0;font-family:${sans};font-size:76px;line-height:1;font-weight:300;letter-spacing:-.04em;color:#FFFFFF">${Math.round(score)}<span style="font-size:22px;letter-spacing:0;color:rgba(255,255,255,.7)"> / 100</span></p>
