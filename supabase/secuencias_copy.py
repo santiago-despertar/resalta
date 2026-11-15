@@ -8,136 +8,137 @@ DIAS = [0, 1, 2, 4, 6, 9, 13]
 SEC = {}
 
 SEC["fotos"] = ("Salir mejor en fotos / verme mejor en general", [
-("Te quedaste a un paso, {nombre}", """{nombre}, vi que contestaste todo.
+("la foto del pasaporte", """{nombre}, ¿has visto la foto de tu INE o de tu pasaporte?
 
-Tu edad, tu tipo de piel, lo que te gustaría cambiar.
+Casi nadie se reconoce en ella.
 
-Pero no terminaste tu análisis.
+Y no es porque seas así.
 
-Y entiendo. A veces da nervio ver tu propia cara medida.
+Es porque esa foto rompe todas las reglas: luz plana desde arriba, la cámara a medio metro, cero expresión, la cabeza recta como en un interrogatorio.
 
-Pero déjame decirte algo:
+Es la peor versión posible de cualquier cara.
 
-Si no sales bien en fotos, el problema casi nunca es tu cara.
+Lo curioso es que mucha gente usa esa versión como la referencia de cómo se ve "de verdad".
 
-Es que nadie te ha dicho qué le favorece a TU cara.
+No lo es.
 
-Qué ángulo. Qué luz. Qué corte. Qué lado.
+{imagen:/assets/img/email/medidas.jpg}
 
-Eso es exactamente lo que medimos.
+Tu cara tiene una versión que le favorece: un ángulo, una distancia, un corte, una forma de cejas.
 
-Tus respuestas siguen guardadas. Te faltan solo las fotos.
+La mayoría nunca la encuentra porque nadie se la midió.
 
-{boton:Terminar mi análisis}"""),
-("Por qué no te reconoces en las fotos", """{nombre}, ¿te ha pasado que te ves bien en el espejo…
-
-…y luego alguien te toma una foto y no te reconoces?
-
-No es tu imaginación.
-
-El celular de cerca deforma la cara.
-A 30 centímetros la nariz se ve más grande y la mandíbula más angosta.
-
-Y el espejo te muestra al revés.
-Tu cara no es igual de los dos lados. La de casi nadie lo es.
-
-Por eso hay un lado que te gusta y otro que no soportas.
-
-Ahora imagina saber, con medidas, cuál es tu lado bueno.
-Y qué distancia, qué ángulo y qué luz te hacen ver como te ves en persona.
-
-Eso viene en tu análisis.
-
-{boton:Descubrir mi mejor ángulo}"""),
-("Hay tres caminos", """{nombre}, cuando alguien quiere verse mejor, normalmente toma uno de estos tres caminos:
-
-1. Probar y probar.
-Cortes, filtros, productos, ángulos. A ver qué funciona. Meses así.
-
-2. Ir directo a una consulta.
-Y que alguien que acabas de conocer te diga qué "corregir". Muchas veces, lo que vende.
-
-3. Medir primero.
-Saber con números qué proporciones tienes, qué te favorece y qué conviene cambiar primero.
-
-El tercero es el único donde decides tú, con información.
-
-Es el que empezaste.
-
-{boton:Terminar mi análisis}"""),
-("Lo que vas a ver cuando termines", """{nombre}, esto es lo que hay del otro lado:
-
-Medimos más de 110 rasgos con tus fotos de frente, sonriendo y de perfil.
-
-Y te decimos:
-
-Tu calificación por zona.
-Tus puntos fuertes, los que hay que resaltar.
-Lo que más te suma cambiar primero.
-Lo que no vale la pena tocar.
-Tu mejor ángulo para fotos.
-Y un plan de 90 días, paso a paso.
-[[presupuesto_bajo]]
-Y algo importante: la mayoría de lo que vas a ver en tu plan es gratis o muy barato. Verte mejor no tiene que ser caro.
-[[/presupuesto_bajo]]
-No es una opinión.
-Es medición.
+Tu análisis sigue justo donde lo dejaste.
 
 {boton:Ver mi análisis}"""),
-("Un ejemplo", """{nombre}, te pongo un ejemplo típico.
+("una décima de segundo", """En 2006, dos investigadores de Princeton le enseñaron caras a cientos de personas durante una décima de segundo.
 
-Alguien de 29 años. Odia sus fotos. Cree que es su nariz.
+Ni siquiera alcanzaban a verlas bien.
 
-Mide su cara y resulta que su nariz está dentro de lo normal.
+{dato:0.1 s|Lo que tarda alguien en decidir si le pareces confiable, competente o atractivo}
 
-Lo que pasa es que su cara es un poco más larga de lo común, y su corte de pelo, con volumen arriba, la alarga todavía más.
+Aun así, en ese instante ya habían decidido. Y cuando les dieron más tiempo para mirar, casi nunca cambiaron de opinión.
 
-Cambia el corte. Toma sus fotos un poco más lejos y a la altura de los ojos.
+Eso pasa en cada entrevista, en cada primera cita, en cada foto de perfil que alguien ve antes de decidir si te escribe.
 
-Y de pronto ya no odia sus fotos.
+La buena noticia es que esa primera impresión no la decide tu cara entera.
 
-No tocó nada de su cara.
+La deciden unas cuantas señales: la forma de tus cejas, cómo enmarca tu pelo la cara, la proporción entre los tercios, cómo te ves de lado.
 
-Solo supo qué le favorecía.
+Casi todas se pueden ajustar.
 
-Eso es lo que te falta saber a ti.
+Primero hay que saber cuáles son las tuyas.
 
-{boton:Terminar mi análisis}"""),
-("Lo que más nos preguntan", """{nombre}, antes de terminar, casi todos tienen las mismas dudas:
+{boton:Descubrir mis señales}"""),
+("lo que saben los fotógrafos de famosos", """Hay algo que los fotógrafos de celebridades saben y casi nadie más:
 
-"¿Y si me sale una calificación baja?"
-El número es lo de menos. Lo que importa es el plan: qué subir primero y hasta dónde puedes llegar.
+A 30 centímetros, la cámara del celular agranda la nariz y angosta la cara. Por eso nadie sale bien en una selfie de cerca.
 
-"¿Necesito fotos profesionales?"
-No. Con tu celular y buena luz. Te guiamos foto por foto.
+{dato:30 cm|La distancia a la que la cámara del celular deforma tu cara}
 
-"¿Quién ve mis fotos?"
-Nadie más. Solo se usan para tu análisis y las borras cuando quieras desde tu cuenta.
-[[sin_proc]]
-"¿Me van a recomendar cirugías?"
-No. Nos dijiste que prefieres cambios naturales. Tu plan se queda en eso: estilo, rutina y hábitos.
-[[/sin_proc]]
-[[cirugia]]
-"¿Y si sí quiero saber de procedimientos?"
-El plan Completo te explica cuáles se suelen considerar para una cara como la tuya, qué hace cada uno y qué preguntar antes.
-[[/cirugia]]
-{boton:Terminar mi análisis}"""),
-("Último correo sobre esto", """{nombre}, este es el último correo que te mando sobre tu análisis.
+Ellos nunca disparan así. Se alejan y hacen zoom. Piden barbilla un poco al frente. Ponen la luz a 45 grados, nunca de frente.
 
-Así que te lo digo directo:
+Y antes de la sesión revisan una cosa: cuál lado de la cara se ve mejor.
 
-Puedes seguir adivinando qué te favorece.
-Probando cortes. Borrando fotos.
+Porque casi nadie tiene las dos mitades iguales. Siempre hay un lado bueno.
 
-O puedes saberlo en los próximos 10 minutos.
+Las celebridades no se ven así de forma natural. Simplemente saben qué le funciona a su cara.
 
-Tus respuestas siguen guardadas.
-Solo subes tus fotos y listo.
+Tú también puedes saberlo, con medidas, en lugar de adivinar.
+
+{boton:Encontrar mi lado bueno}"""),
+("dos caras iguales", """Haz esta prueba.
+
+Busca una foto tuya de frente y tapa con la mano todo lo que está arriba de las cejas.
+
+Ahora tapa todo lo que está abajo de la nariz.
+
+Vas a notar que una parte "pesa" más que la otra.
+
+{imagen:/assets/img/email/tercios.jpg}
+
+Eso son los tercios faciales. Cuando están desbalanceados, la cara se ve más larga, más corta o más pesada abajo, aunque cada rasgo por separado esté bien.
+
+Y aquí viene lo interesante: muchas veces no se corrige tocando la cara.
+
+Un corte con más volumen arriba acorta visualmente una frente baja. Una barba bien delineada alarga un mentón corto. Unas cejas un poco más rectas bajan una frente alta.
+
+Dos personas con exactamente la misma cara pueden verse completamente distintas por esas decisiones.
+
+[[proc]]Y si estás pensando en algún tratamiento, conocer tus proporciones primero es lo que separa un resultado natural de uno que se nota.[[/proc]]
+
+Tu análisis te dice qué está pesando más en tu cara y qué lo equilibra.
+
+{boton:Ver mis proporciones}"""),
+("la cuenta de este año", """Una pregunta incómoda, {nombre}.
+
+¿Cuánto has gastado este año en verte mejor?
+
+Cremas, cortes, un tinte, ropa, un perfume, apps de edición, la crema que te recomendó alguien en TikTok.
+
+Casi todo comprado a ciegas. Probando a ver si funciona.
+
+No está mal. Así lo hace casi todo el mundo.
+
+Pero imagina hacer esas mismas compras sabiendo exactamente qué le favorece a tu cara y qué no hace ninguna diferencia.
+
+No gastarías más. Gastarías mejor.
+
+Para eso sirve medir primero: es la compra que hace que todas las demás tengan sentido.
+
+{boton:Medir antes de gastar}"""),
+("¿y si sale bajo?", """Mucha gente no hace su análisis por miedo a una cosa:
+
+"¿Y si me sale bajo?"
+
+Te decimos cómo lo vemos nosotros.
+
+Un número no dice cuánto vales. Dice dónde estás hoy y cuánto margen tienes.
+
+Y las caras con el número más bajo casi siempre son las que más pueden mejorar, porque tienen más cosas fáciles por ajustar.
+
+Lo que de verdad no ayuda es quedarse con la duda. Seguir viéndote en fotos sin entender por qué algo no te convence.
+
+Tu análisis no está hecho para juzgarte. Está hecho para decirte qué hacer primero.
+
+{boton:Ver qué hacer primero}"""),
+("lo último que te escribimos sobre esto", """{nombre}, este es el último correo que te mandamos sobre tu análisis.
+
+Así que vamos a ser directos.
+
+Hay gente que pasa años sintiendo que no sale bien en fotos, que algo de su cara no le convence, sin poder decir qué es.
+
+Y hay gente que un día lo mide, entiende sus proporciones, cambia tres cosas y deja de pensar en eso.
+
+La diferencia entre unos y otros no es la cara con la que nacieron.
+
+Es que unos se quedaron con la duda y otros no.
+
+Tu análisis sigue ahí, con tus respuestas guardadas.
 
 {boton:Terminar mi análisis}
 
-Aquí estaremos cuando quieras.
-Resalta"""),
+P.D. Si ahora no es el momento, no pasa nada. Cuando quieras, entras desde resalta.co con tu correo."""),
 ])
 
 SEC["joven"] = ("Verme más joven", [
