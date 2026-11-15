@@ -210,21 +210,28 @@ Deno.serve(async (req) => {
     }
 
     if (accion === "secuencias") {
-      const [{ data: correos }, { data: ins }, { data: env }, ev] = await Promise.all([
+      const [{ data: correos }, { data: ins0 }, { data: env0 }, ev, { data: insL }, { data: envL }, { data: logs }] = await Promise.all([
         admin.from("secuencia_correos").select("*").order("secuencia").order("paso"),
         admin.from("secuencia_inscritos").select("secuencia,salio_at,motivo,desde"),
         admin.from("secuencia_envios").select("secuencia,paso,ok"),
         eventosDesde(new Date(Date.now() - 90 * DIA), "nombre,vid,utm_medium,utm_campaign"),
+        admin.from("lead_secuencia").select("salio_at,motivo,desde"),
+        admin.from("lead_envios").select("paso,ok"),
+        admin.from("correos_log").select("secuencia,paso,abierto_at,clic_at").eq("tipo", "secuencia"),
       ]);
+      const ins = [...(ins0 ?? []), ...(insL ?? []).map((x: Obj) => ({ ...x, secuencia: "gratis" }))];
+      const env = [...(env0 ?? []), ...(envL ?? []).map((x: Obj) => ({ ...x, secuencia: "gratis" }))];
+      const ab = (c: Obj, k: string) => (logs ?? []).filter((l: Obj) => l.secuencia === c.secuencia && l.paso === c.paso && l[k]).length;
       const clics: Record<string, Set<string>> = {}, compras: Record<string, Set<string>> = {};
       const viaCorreo = new Map<string, string>();
-      for (const e of ev) if (e.utm_medium === "abandono" && e.utm_campaign && e.nombre === "page_view") { (clics[e.utm_campaign] ??= new Set()).add(e.vid); viaCorreo.set(e.vid, e.utm_campaign); }
+      for (const e of ev) if ((e.utm_medium === "abandono" || e.utm_medium === "calificacion") && e.utm_campaign && e.nombre === "page_view") { (clics[e.utm_campaign] ??= new Set()).add(e.vid); viaCorreo.set(e.vid, e.utm_campaign); }
       for (const e of ev) if (e.nombre === "purchase" && viaCorreo.has(e.vid)) (compras[viaCorreo.get(e.vid)!] ??= new Set()).add(e.vid);
       const stats: Obj = {};
-      for (const i of ins ?? []) { const x = (stats[i.secuencia] ??= { inscritos: 0, activos: 0, compraron: 0, bajas: 0, terminaron: 0 }); x.inscritos++; if (!i.salio_at) x.activos++; else if (i.motivo === "compra") x.compraron++; else if (i.motivo === "baja") x.bajas++; else if (i.motivo === "terminó") x.terminaron++; }
+      for (const i of ins) { const x = (stats[i.secuencia] ??= { inscritos: 0, activos: 0, compraron: 0, bajas: 0, terminaron: 0 }); x.inscritos++; if (!i.salio_at) x.activos++; else if (i.motivo === "compra") x.compraron++; else if (i.motivo === "baja") x.bajas++; else if (i.motivo === "terminó") x.terminaron++; }
       return json({ ok: true, stats, correos: (correos ?? []).map((c: Obj) => ({ ...c,
-        enviados: (env ?? []).filter((e: Obj) => e.secuencia === c.secuencia && e.paso === c.paso && e.ok).length,
-        fallidos: (env ?? []).filter((e: Obj) => e.secuencia === c.secuencia && e.paso === c.paso && !e.ok).length,
+        enviados: env.filter((e: Obj) => e.secuencia === c.secuencia && e.paso === c.paso && e.ok).length,
+        fallidos: env.filter((e: Obj) => e.secuencia === c.secuencia && e.paso === c.paso && !e.ok).length,
+        abiertos: ab(c, "abierto_at"), clics_correo: ab(c, "clic_at"),
         clics: clics[`${c.secuencia}-${c.paso}`]?.size ?? 0, compras: compras[`${c.secuencia}-${c.paso}`]?.size ?? 0 })) });
     }
 
@@ -381,7 +388,7 @@ Deno.serve(async (req) => {
         todosLosUsuarios(),
         admin.from("orders").select("id,user_id,status,tier,amount_mxn,paid_at,answers->>nombre,answers->>pais,answers->>edad,answers->>sexo").then((r) => r.data ?? []),
         admin.from("suscripciones").select("user_id,estado,periodo_fin,cancela").then((r) => r.data ?? []),
-        admin.from("leads").select("email,score,created_at").then((r) => r.data ?? []),
+        admin.from("leads").select("email,nombre,score,created_at").then((r) => r.data ?? []),
       ]);
       const filas = usuarios.map((u) => {
         const os = ord.filter((o: Obj) => o.user_id === u.id), pag = os.filter((o: Obj) => o.status === "pagado" || o.status === "listo");
@@ -391,8 +398,19 @@ Deno.serve(async (req) => {
         return { ...resumenUsuario(u), pedidos: os.length, pagados: pag.length, plan: pag.some((o: Obj) => o.tier === "hard") ? "Completo" : pag.length ? "Esencial" : null,
           pagado_mxn: pag.reduce((t: number, o: Obj) => t + (o.amount_mxn ?? 0), 0), suscripcion: s?.estado ?? null,
           puntaje_gratis: l?.score ?? null, pais: o0.pais ?? null, edad: o0.edad ?? null, sexo: o0.sexo ?? null, nombre_form: o0.nombre ?? null };
-      }).sort((a, b2) => (a.creado < b2.creado ? 1 : -1));
-      return json({ ok: true, usuarios: filas });
+      });
+      // people who only did the free rating (no account): one row per email, newest rating
+      const conCuenta = new Set(usuarios.map((u) => (u.email ?? "").toLowerCase()));
+      const soloGratis: Record<string, Obj> = {};
+      for (const l of leads as Obj[]) {
+        const em = String(l.email ?? "").toLowerCase();
+        if (!em || conCuenta.has(em)) continue;
+        const x = soloGratis[em];
+        if (!x) soloGratis[em] = { id: null, email: em, nombre: l.nombre ?? null, creado: l.created_at, ultimo: l.created_at, proveedor: "Solo calificación gratis", anonimo: false, solo_lead: true, pedidos: 0, pagados: 0, plan: null, pagado_mxn: 0, suscripcion: null, puntaje_gratis: l.score ?? null, calificaciones: 1 };
+        else { x.calificaciones++; if (l.created_at > x.ultimo) { x.ultimo = l.created_at; x.puntaje_gratis = l.score ?? x.puntaje_gratis; x.nombre = l.nombre ?? x.nombre; } if (l.created_at < x.creado) x.creado = l.created_at; }
+      }
+      const todas = [...filas, ...Object.values(soloGratis)].sort((a: Obj, b2: Obj) => (a.creado < b2.creado ? 1 : -1));
+      return json({ ok: true, usuarios: todas });
     }
 
     if (accion === "usuario") {
@@ -401,6 +419,7 @@ Deno.serve(async (req) => {
       const { data: ud2 } = await admin.auth.admin.getUserById(id);
       if (!ud2?.user) return json({ error: "No existe" }, 404);
       const u = ud2.user, em = (u.email ?? "").toLowerCase();
+      const correos = em ? (await admin.from("correos_log").select("*").eq("email", em).order("enviado_at", { ascending: false }).limit(200)).data ?? [] : [];
       const [ord, rep, sub, fis, chat, leads, ev, afi, fotos] = await Promise.all([
         admin.from("orders").select("*").eq("user_id", id).order("created_at", { ascending: false }).then((r) => r.data ?? []),
         admin.from("reports").select("order_id,data").eq("user_id", id).then((r) => r.data ?? []),
@@ -423,7 +442,18 @@ Deno.serve(async (req) => {
       });
       const pedidos = ord.map((o: Obj) => ({ ...o, medidas: o.medidas ? { n: (o.medidas.medidas?.length ?? 0) + (o.medidas.perfil?.medidas?.length ?? 0), resumen: o.medidas.resumen ?? null, avisos: o.medidas.avisos ?? null, ajustado: o.medidas.ajustado ?? null } : null }));
       return json({ ok: true, usuario: { ...resumenUsuario(u), confirmado: u.email_confirmed_at, telefono: u.phone || null, metadata: u.user_metadata },
-        pedidos, reportes, suscripcion: sub, fisico: fis, chat, leads, eventos: [...ev, ...antes].sort((a: Obj, b2: Obj) => (a.ts < b2.ts ? 1 : -1)), afiliado: afi, fotos });
+        pedidos, reportes, suscripcion: sub, fisico: fis, chat, leads, eventos: [...ev, ...antes].sort((a: Obj, b2: Obj) => (a.ts < b2.ts ? 1 : -1)), afiliado: afi, fotos, correos });
+    }
+
+    if (accion === "correos") {
+      const desde = new Date(Date.now() - 180 * DIA).toISOString();
+      const [{ data: correos }, usuarios] = await Promise.all([
+        admin.from("correos_log").select("*").gt("enviado_at", desde).order("enviado_at", { ascending: false }).limit(10000),
+        todosLosUsuarios(),
+      ]);
+      const cuentas: Record<string, string> = {};
+      for (const u of usuarios) if (u.email) cuentas[String(u.email).toLowerCase()] = u.id;
+      return json({ ok: true, correos: correos ?? [], cuentas });
     }
 
     if (accion === "leads") {
