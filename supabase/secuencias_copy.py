@@ -22,8 +22,6 @@ Lo curioso es que mucha gente usa esa versión como la referencia de cómo se ve
 
 No lo es.
 
-{imagen:/assets/img/email/medidas.jpg}
-
 Tu cara tiene una versión que le favorece: un ángulo, una distancia, un corte, una forma de cejas.
 
 La mayoría nunca la encuentra porque nadie se la midió.
