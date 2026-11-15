@@ -22,8 +22,13 @@ async function firma(email: string) {
   return [...new Uint8Array(d)].slice(0, 12).map((x) => x.toString(16).padStart(2, "0")).join("");
 }
 
-// which sequence fits best: the most specific goal wins
-export function elegir(objetivo: string) {
+// Everyone gets the same general sequence for now. Once we see in the admin ("Qué quiere mejorar")
+// which goals people actually pick, the most common ones get their own sequence again. The old
+// per-goal routing is kept below so it can be switched back on.
+export function elegir(_objetivo: string) {
+  return "general";
+}
+export function elegirPorObjetivo(objetivo: string) {
   const o = (objetivo || "").toLowerCase();
   if (/mand[ií]bula|perfil/.test(o)) return "mandibula";
   if (/piel/.test(o)) return "piel";
