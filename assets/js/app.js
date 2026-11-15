@@ -1339,6 +1339,7 @@
     const fecha = d => new Date(d).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" });
     const pausa = ms => new Promise(r => setTimeout(r, ms));
     let user, abierto = null, todos = [], prog = null;
+    const chatHist = {};
 
     (async () => {
       if (!sb) { $("#orders").innerHTML = '<p class="hint" style="padding:18px 0">Estamos terminando de preparar tu cuenta.</p>'; return; }
@@ -1413,6 +1414,7 @@
 
     async function abrir(o, scroll) {
       abierto = o.id;
+      histChat(o.id); // start loading the chat history now, so "Preguntar" opens with it ready
       $("#reportArea").hidden = false;
       $("#repPlan").textContent = (C.PLAN_NAMES || {})[o.tier] || "Tu reporte";
       $("#repDate").textContent = fecha(o.paid_at || o.created_at);
@@ -1593,15 +1595,24 @@
       if (sim && !quien.includes("pensando")) botonSim(d, sim);
     };
     const burbuja = (t, quien) => { const d = document.createElement("div"); d.className = "chat-m " + quien; poner(d, t, quien); $("#chatLog").appendChild(d); $("#chatLog").scrollTop = 1e6; return d; };
+
+    function histChat(id) {
+      if (!chatHist[id]) chatHist[id] = fnCall("chat", { order_id: id, accion: "historial" }).then(r => r.mensajes || []).catch(() => { delete chatHist[id]; return null; });
+      return chatHist[id];
+    }
     async function abrirChat() {
       if (chatDe === abierto) return;
-      chatDe = abierto; $("#chatLog").innerHTML = "";
-      try {
-        const { mensajes } = await fnCall("chat", { order_id: abierto, accion: "historial" });
-        if (chatDe !== abierto) return;
-        (mensajes || []).forEach(m => burbuja(m.texto, m.rol === "user" ? "yo" : "re"));
-        $("#chatSug").hidden = (mensajes || []).length > 0;
-      } catch (e) {}
+      const id = chatDe = abierto; $("#chatLog").innerHTML = "";
+      // hide the suggestions until we know there is no earlier conversation, so they never flash
+      $("#chatSug").hidden = true; $("#chatForm").classList.add("cargando");
+      const ld = document.createElement("div"); ld.className = "chat-load"; ld.setAttribute("aria-label", "Cargando tu conversación"); ld.innerHTML = "<i></i><i></i><i></i>";
+      $("#chatLog").appendChild(ld);
+      const mensajes = await histChat(id);
+      if (chatDe !== id) return;
+      ld.remove(); $("#chatForm").classList.remove("cargando");
+      (mensajes || []).forEach(m => burbuja(m.texto, m.rol === "user" ? "yo" : "re"));
+      $("#chatSug").hidden = (mensajes || []).length > 0;
+      if (!mensajes) chatDe = null; // failed to load: try again next time the tab opens
     }
     async function preguntar(texto) {
       texto = (texto || "").trim(); if (!texto || chatOcupado || !abierto) return;
@@ -1611,6 +1622,7 @@
       try {
         const r = await fnCall("chat", { order_id: abierto, mensaje: texto });
         espera.classList.remove("pensando"); poner(espera, r.respuesta, "re");
+        delete chatHist[abierto];
       } catch (e) {
         espera.classList.remove("pensando");
         espera.textContent = /l[ií]mite/i.test(e.message) || e.message === "limite" ? "Llegaste al límite de preguntas por hoy. Mañana puedes seguir." : "No pude responder ahorita. Inténtalo de nuevo en un momento.";
