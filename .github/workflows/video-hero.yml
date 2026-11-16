@@ -24,7 +24,7 @@ jobs:
           X="-an -c:v libx264 -preset slow -profile:v high -pix_fmt yuv420p -movflags +faststart"
           # Desktop: man as is; woman moved right so both faces sit in the same place.
           ffmpeg -y -i m.mp4 -vf "scale=1600:900:flags=lanczos" $X -crf 23 -maxrate 3500k -bufsize 7000k assets/video/hero-m.mp4
-          ffmpeg -y -i w.mp4 -filter_complex "[0:v]split[a][b];[b]crop=460:1080:0:0,hflip[l];[a]crop=1460:1080:0:0[r];[l][r]hstack,scale=1600:900:flags=lanczos" $X -crf 23 -maxrate 3500k -bufsize 7000k assets/video/hero-w.mp4
+          ffmpeg -y -i w.mp4 -filter_complex "[0:v]split[a][b];[b]crop=60:1080:0:0,scale=460:1080,boxblur=8:1[l];[a]crop=1460:1080:0:0[r];[l][r]hstack,scale=1600:900:flags=lanczos" $X -crf 23 -maxrate 3500k -bufsize 7000k assets/video/hero-w.mp4
           # Mobile: face centered.
           ffmpeg -y -i m.mp4 -vf "crop=972:1080:944:0,scale=720:800:flags=lanczos" $X -crf 24 -maxrate 2200k -bufsize 4400k assets/video/hero-m-movil.mp4
           ffmpeg -y -i w.mp4 -vf "crop=972:1080:474:0,scale=720:800:flags=lanczos" $X -crf 24 -maxrate 2200k -bufsize 4400k assets/video/hero-w-movil.mp4
