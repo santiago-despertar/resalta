@@ -220,7 +220,7 @@ Deno.serve(async (req) => {
     const pasos = porSec[ins.secuencia] ?? [];
     const sig = pasos.find((c) => !enviados.has(`${ins.user_id}|${ins.secuencia}|${c.paso}`));
     if (!sig) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "terminó" }).eq("user_id", ins.user_id); continue; }
-    if (ahora < new Date(ins.desde).getTime() + Number(sig.dias) * 864e5) continue;
+    if (ahora + 120000 < new Date(ins.desde).getTime() + Number(sig.dias) * 864e5) continue;
     // never two emails on the same day
     const { data: ult } = await admin.from("secuencia_envios").select("enviado_at").eq("user_id", ins.user_id).eq("ok", true).order("enviado_at", { ascending: false }).limit(1);
     if (ult?.[0] && ahora - new Date(ult[0].enviado_at).getTime() < 20 * 3600e3) continue;
@@ -268,7 +268,7 @@ Deno.serve(async (req) => {
       if (estado) { await sale(String(estado)); resumen.salieron++; continue; }
       const sig = gratis.find((c) => !hechoL.has(`${ins.email}|${c.paso}`));
       if (!sig) { await sale("terminó"); continue; }
-      if (ahora < new Date(ins.desde).getTime() + Number(sig.dias) * 864e5) continue;
+      if (ahora + 120000 < new Date(ins.desde).getTime() + Number(sig.dias) * 864e5) continue;
       if (ahora - (ultimoL[ins.email] ?? 0) < 20 * 3600e3) continue;
       // their most recent rating: if they repeated it, the emails talk about the newest number
       const { data: ls } = await admin.from("leads").select("nombre,score,metrics").eq("email", ins.email).eq("source", "calificacion").order("created_at", { ascending: false }).limit(1);
