@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="p:domain_verify" content="e08fbd722a048a9a01b25868d21afbb3"/>
 <title>Resalta · Análisis facial con método</title>
 <meta name="description" content="Medimos tu rostro de frente y de perfil, con más de 110 evaluaciones, y te damos un plan personalizado para mejorar tu apariencia.">
-  <meta name="p:domain_verify" content="e08fbd722a048a9a01b25868d21afbb3"/>
 <meta property="og:title" content="Resalta · Análisis facial con método">
 <meta property="og:description" content="Medimos tu rostro de frente y de perfil, con más de 110 evaluaciones, y te damos un plan personalizado para mejorar tu apariencia.">
 <meta property="og:image" content="https://resalta.co/assets/img/og/index.jpg">
@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/site.css?v=1794854249">
+<link rel="stylesheet" href="/assets/css/site.css?v=1794856065">
 <script>try{var _q=new URLSearchParams(location.search),_u={};["utm_source","utm_medium","utm_campaign","utm_content"].forEach(function(k){if(_q.get(k))_u[k]=_q.get(k).slice(0,80)});if(!_u.utm_source&&_q.get("fbclid")){_u.utm_source="facebook";_u.utm_medium=_u.utm_medium||"paid"}if(!_u.utm_source&&_q.get("gclid")){_u.utm_source="google";_u.utm_medium=_u.utm_medium||"cpc"}if(!_u.utm_source&&_q.get("ttclid")){_u.utm_source="tiktok";_u.utm_medium=_u.utm_medium||"paid"}if(_u.utm_source||_u.utm_campaign)sessionStorage.setItem("rs_utm",JSON.stringify(_u))}catch(e){}</script>
 <script>try{var _p=location.pathname;if(/\.html$/.test(_p))history.replaceState(null,"",((/\/index\.html$/.test(_p)?_p.slice(0,-10):_p.slice(0,-5))||"/")+location.search+location.hash)}catch(e){}</script>
 <script>try{var _d=document.documentElement;if(document.fonts&&document.fonts.load){_d.classList.add("fload");var _ok=function(){_d.classList.remove("fload")};Promise.all([document.fonts.load("300 40px Inter"),document.fonts.load("400 16px Inter"),document.fonts.load("600 16px Inter")]).then(_ok,_ok);setTimeout(_ok,900)}}catch(e){}</script>
@@ -60,8 +60,9 @@
 
 <!-- 1. HERO -->
 <section class="hero2" id="inicio">
-  <style>.hero-media video{transition:opacity .15s linear!important}</style>
-  <div class="hero-media" data-clips="https://d8j0ntlcm91z4.cloudfront.net/user_3I9QtNdHrbtOUuHefeCs3sYAPrI/hf_20261116_182456_aed6c2e1-76ba-48bb-a9fb-1e06e37d6655.mp4,https://d8j0ntlcm91z4.cloudfront.net/user_3I9QtNdHrbtOUuHefeCs3sYAPrI/hf_20261116_183128_960b8df1-1f6e-4e69-9907-d54ed4e96d93.mp4" data-stills="/assets/img/hero/m0.jpg,/assets/img/hero/m1.jpg,/assets/img/hero/m2.jpg,/assets/img/hero/w0.jpg,/assets/img/hero/w1.jpg,/assets/img/hero/w2.jpg" data-still-group="3" data-hold="1500" data-group="1" aria-hidden="true"><img class="hero-poster" src="/assets/img/hero-poster.jpg" alt=""><video muted playsinline webkit-playsinline preload="auto"></video><video muted playsinline webkit-playsinline preload="auto"></video></div>
+  <style>.hero-media video{transition:opacity .15s linear!important}@media (max-width:900px){.hero-media video{object-position:center top!important}}</style>
+  <div class="hero-media" data-clips="/assets/video/hero-m.mp4,/assets/video/hero-w.mp4" data-clips-mobile="/assets/video/hero-m-movil.mp4,/assets/video/hero-w-movil.mp4" data-stills="/assets/img/hero/m0.jpg,/assets/img/hero/m1.jpg,/assets/img/hero/m2.jpg,/assets/img/hero/w0.jpg,/assets/img/hero/w1.jpg,/assets/img/hero/w2.jpg" data-still-group="3" data-hold="1500" data-group="1" aria-hidden="true"><img class="hero-poster" src="/assets/img/hero-poster.jpg" alt=""><video muted playsinline webkit-playsinline preload="auto"></video><video muted playsinline webkit-playsinline preload="auto"></video></div>
+  <script>(function(){var h=document.querySelector(".hero-media");if(h&&h.dataset.clipsMobile&&matchMedia("(max-width:900px)").matches)h.dataset.clips=h.dataset.clipsMobile})()</script>
   <div class="inner">
     <p class="kicker">Análisis facial personalizado</p>
     <h1>Descubre tu <span class="muted">mejor versión</span></h1>
@@ -539,8 +540,8 @@
   </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="/assets/js/config.js?v=1794854249"></script>
-<script src="/assets/js/app.js?v=1794854249"></script>
+<script src="/assets/js/config.js?v=1794856065"></script>
+<script src="/assets/js/app.js?v=1794856065"></script>
 
 </body>
 </html>
