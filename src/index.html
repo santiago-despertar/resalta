@@ -2,8 +2,9 @@
 
 <!-- 1. HERO -->
 <section class="hero2" id="inicio">
-  <style>.hero-media video{transition:opacity .15s linear!important}</style>
-  <div class="hero-media" data-clips="https://d8j0ntlcm91z4.cloudfront.net/user_3I9QtNdHrbtOUuHefeCs3sYAPrI/hf_20261116_182456_aed6c2e1-76ba-48bb-a9fb-1e06e37d6655.mp4,https://d8j0ntlcm91z4.cloudfront.net/user_3I9QtNdHrbtOUuHefeCs3sYAPrI/hf_20261116_183128_960b8df1-1f6e-4e69-9907-d54ed4e96d93.mp4" data-stills="/assets/img/hero/m0.jpg,/assets/img/hero/m1.jpg,/assets/img/hero/m2.jpg,/assets/img/hero/w0.jpg,/assets/img/hero/w1.jpg,/assets/img/hero/w2.jpg" data-still-group="3" data-hold="1500" data-group="1" aria-hidden="true"><img class="hero-poster" src="/assets/img/hero-poster.jpg" alt=""><video muted playsinline webkit-playsinline preload="auto"></video><video muted playsinline webkit-playsinline preload="auto"></video></div>
+  <style>.hero-media video{transition:opacity .15s linear!important}@media (max-width:900px){.hero-media video{object-position:center top!important}}</style>
+  <div class="hero-media" data-clips="/assets/video/hero-m.mp4,/assets/video/hero-w.mp4" data-clips-mobile="/assets/video/hero-m-movil.mp4,/assets/video/hero-w-movil.mp4" data-stills="/assets/img/hero/m0.jpg,/assets/img/hero/m1.jpg,/assets/img/hero/m2.jpg,/assets/img/hero/w0.jpg,/assets/img/hero/w1.jpg,/assets/img/hero/w2.jpg" data-still-group="3" data-hold="1500" data-group="1" aria-hidden="true"><img class="hero-poster" src="/assets/img/hero-poster.jpg" alt=""><video muted playsinline webkit-playsinline preload="auto"></video><video muted playsinline webkit-playsinline preload="auto"></video></div>
+  <script>(function(){var h=document.querySelector(".hero-media");if(h&&h.dataset.clipsMobile&&matchMedia("(max-width:900px)").matches)h.dataset.clips=h.dataset.clipsMobile})()</script>
   <div class="inner">
     <p class="kicker">Análisis facial personalizado</p>
     <h1>Descubre tu <span class="muted">mejor versión</span></h1>
