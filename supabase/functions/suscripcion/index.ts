@@ -76,6 +76,13 @@ async function usado(userId: string, desde: string) {
   return (count ?? 0) > 0;
 }
 
+// Test accounts (table "testers") pay $10 MXN for everything and get a 1-day free month, so live charges can be tested cheaply.
+const PRUEBA_MXN = 1000;
+async function esTester(db: any, userId: string) {
+  const { data } = await db.from("testers").select("user_id").eq("user_id", userId).maybeSingle();
+  return !!data;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   try {
@@ -93,6 +100,12 @@ Deno.serve(async (req) => {
       const p = await stripe.prices.retrieve(Deno.env.get("STRIPE_PRICE_SUB")!);
       item = { price_data: { currency: moneda.toLowerCase(), product: typeof p.product === "string" ? p.product : p.product.id, unit_amount: PRECIOS[moneda].sub, recurring: { interval: "month" } } };
     }
+    const tester = ["activar", "suscribir"].includes(accion) && await esTester(admin, user.id);
+    if (tester) {
+      const p = await stripe.prices.retrieve(Deno.env.get("STRIPE_PRICE_SUB")!);
+      item = { price_data: { currency: "mxn", product: typeof p.product === "string" ? p.product : p.product.id, unit_amount: PRUEBA_MXN, recurring: { interval: "month" } } };
+    }
+    const DIAS = tester ? 1 : 30;
     const site = Deno.env.get("SITE_URL") ?? "https://resalta.co";
 
     // One click right after paying for an analysis: subscribe on the card saved at that checkout,
@@ -120,9 +133,9 @@ Deno.serve(async (req) => {
             default_payment_method: pm,
             metadata: { user_id: user.id, origen: "upsell" },
             // Plan Completo: first month free, the card is charged when it ends. Otherwise charged right away.
-            ...(gratis ? { trial_period_days: 30 } : {}),
+            ...(gratis ? { trial_period_days: DIAS } : {}),
             payment_behavior: "error_if_incomplete" as const, off_session: true,
-          }, { idempotencyKey: `sub-${user.id}-${order!.id}${gratis ? "-g" : ""}` });
+          }, { idempotencyKey: `sub-${user.id}-${order!.id}${gratis ? "-g" : ""}${tester ? "-t" : ""}` });
           if (ACTIVAS.includes(nueva.status)) {
             await guardarFila(user.id, nueva);
             return json({ ok: true, prueba: gratis, siguiente_cobro: new Date(((nueva.trial_end ?? nueva.current_period_end)) * 1000).toISOString() });
@@ -136,7 +149,7 @@ Deno.serve(async (req) => {
         ...(row?.stripe_customer ? { customer: row.stripe_customer } : customer ? { customer } : { customer_email: user.email }),
         client_reference_id: user.id,
         metadata: { user_id: user.id, tipo: "suscripcion" },
-        subscription_data: { metadata: { user_id: user.id }, ...(gratis ? { trial_period_days: 30 } : {}) },
+        subscription_data: { metadata: { user_id: user.id }, ...(gratis ? { trial_period_days: DIAS } : {}) },
         locale: "es-419",
         success_url: `${site}/panel?suscripcion=ok`,
         cancel_url: `${site}/gracias?pedido=${body.order_id ?? ""}`,
@@ -154,7 +167,7 @@ Deno.serve(async (req) => {
         ...(row?.stripe_customer ? { customer: row.stripe_customer } : { customer_email: user.email }),
         client_reference_id: user.id,
         metadata: { user_id: user.id, tipo: "suscripcion" },
-        subscription_data: { metadata: { user_id: user.id }, ...(gratis ? { trial_period_days: 30 } : {}) },
+        subscription_data: { metadata: { user_id: user.id }, ...(gratis ? { trial_period_days: DIAS } : {}) },
         locale: "es-419",
         success_url: `${site}/panel?suscripcion=ok`,
         cancel_url: `${site}/panel`,
