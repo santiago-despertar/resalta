@@ -26,6 +26,13 @@ const aPesos = (amount: number | null | undefined, currency: string | null | und
   return c === "MXN" ? Math.round(amount / 100) : Math.round(amount * 1499 / PRECIOS[c].soft);
 };
 
+// Test accounts (table "testers") pay $10 MXN for everything and get a 1-day free month, so live charges can be tested cheaply.
+const PRUEBA_MXN = 1000;
+async function esTester(db: any, userId: string) {
+  const { data } = await db.from("testers").select("user_id").eq("user_id", userId).maybeSingle();
+  return !!data;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   try {
@@ -79,6 +86,11 @@ Deno.serve(async (req) => {
       const precio = await stripe.prices.retrieve(priceId);
       const product = typeof precio.product === "string" ? precio.product : precio.product.id;
       linea = { quantity: 1, price_data: { currency: moneda.toLowerCase(), product, unit_amount: PRECIOS[moneda][tier] } };
+    }
+    if (await esTester(admin, user.id)) {
+      const precio = await stripe.prices.retrieve(priceId);
+      const product = typeof precio.product === "string" ? precio.product : precio.product.id;
+      linea = { quantity: 1, price_data: { currency: "mxn", product, unit_amount: PRUEBA_MXN } };
     }
     // Months without interest only exist for Mexican cards in pesos.
     const cuotas = moneda === "MXN" ? { installments: { enabled: true } } : {};
