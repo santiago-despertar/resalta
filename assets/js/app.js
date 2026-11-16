@@ -1052,8 +1052,9 @@
       try {
         const k = "resalta_compra_" + id;
         if (!localStorage.getItem(k)) {
-          const { data: od } = await sb.from("orders").select("tier,status").eq("id", id).maybeSingle();
-          if (od && (od.status === "pagado" || od.status === "listo")) {
+          const { data: od } = await sb.from("orders").select("tier,status,amount_mxn").eq("id", id).maybeSingle();
+          // Test-account orders ($10) are never reported as sales.
+          if (od && (od.status === "pagado" || od.status === "listo") && !(od.amount_mxn > 0 && od.amount_mxn <= 10)) {
             track("purchase", { transaction_id: id, currency: moneda, value: precio(od.tier), items: [{ item_id: od.tier, item_name: (C.PLAN_NAMES || {})[od.tier] }] });
             localStorage.setItem(k, "1");
           }
