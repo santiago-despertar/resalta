@@ -1,0 +1,36 @@
+# One-off: downloads the homepage hero videos from Higgsfield and makes light versions
+# (desktop 1600x900 and mobile, face centered) that start fast on phones. Run it by hand.
+name: Video del inicio
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  video:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descargar
+        run: |
+          B=https://d8j0ntlcm91z4.cloudfront.net/user_3I9QtNdHrbtOUuHefeCs3sYAPrI/hf_20261116_
+          curl -sSfL -o m.mp4 "${B}182456_aed6c2e1-76ba-48bb-a9fb-1e06e37d6655.mp4"
+          curl -sSfL -o w.mp4 "${B}183128_960b8df1-1f6e-4e69-9907-d54ed4e96d93.mp4"
+          ffprobe -v error -show_entries stream=width,height -of csv=p=0 m.mp4 w.mp4
+      - name: Comprimir
+        run: |
+          mkdir -p assets/video
+          X="-an -c:v libx264 -preset slow -profile:v high -pix_fmt yuv420p -movflags +faststart"
+          # Desktop: man as is; woman moved right so both faces sit in the same place.
+          ffmpeg -y -i m.mp4 -vf "scale=1600:900:flags=lanczos" $X -crf 23 -maxrate 3500k -bufsize 7000k assets/video/hero-m.mp4
+          ffmpeg -y -i w.mp4 -filter_complex "[0:v]split[a][b];[b]crop=460:1080:0:0,hflip[l];[a]crop=1460:1080:0:0[r];[l][r]hstack,scale=1600:900:flags=lanczos" $X -crf 23 -maxrate 3500k -bufsize 7000k assets/video/hero-w.mp4
+          # Mobile: face centered.
+          ffmpeg -y -i m.mp4 -vf "crop=972:1080:944:0,scale=720:800:flags=lanczos" $X -crf 24 -maxrate 2200k -bufsize 4400k assets/video/hero-m-movil.mp4
+          ffmpeg -y -i w.mp4 -vf "crop=972:1080:474:0,scale=720:800:flags=lanczos" $X -crf 24 -maxrate 2200k -bufsize 4400k assets/video/hero-w-movil.mp4
+          ls -la assets/video
+      - name: Guardar
+        run: |
+          git config user.name "resalta-bot"
+          git config user.email "resalta-bot@users.noreply.github.com"
+          git add assets/video
+          git commit -m "Video del inicio en versiones ligeras" || echo "Sin cambios"
+          git push
