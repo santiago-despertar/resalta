@@ -716,7 +716,7 @@
       }
       const fn = $("#aboutForm").nombre;
       if (fn && !fn.value && user.user_metadata && user.user_metadata.full_name) fn.value = user.user_metadata.full_name;
-      if (quiz) quiz.refrescar(false, order && order.answers); // stay on the name step, already filled in, so nothing flashes
+      if (quiz) quiz.refrescar(true, order && order.answers); // we already know their name from sign-up: start at the next question
     })();
 
     $("#aboutForm").addEventListener("submit", async (ev) => {
