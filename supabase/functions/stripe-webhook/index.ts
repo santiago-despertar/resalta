@@ -33,6 +33,8 @@ async function sha256(t: string) {
 async function capi(nombre: string, id: string, s: Stripe.Checkout.Session, userId?: string | null) {
   const token = Deno.env.get("META_CAPI_TOKEN");
   if (!token || !s.amount_total) return;
+  // Test-account charges ($10 MXN) are not sales.
+  if ((s.currency ?? "mxn") === "mxn" && s.amount_total <= 1000) return;
   try {
     const moneda = (s.currency ?? "mxn").toUpperCase();
     const valor = moneda === "CLP" ? s.amount_total : s.amount_total / 100;
