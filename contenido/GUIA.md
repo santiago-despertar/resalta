@@ -11,13 +11,17 @@ La `fecha` del artículo es la del calendario, no la de hoy. Cada mañana un pro
 - Un archivo nuevo: `src/blog/<slug>.html`, con el `slug` del calendario.
 - Copia la estructura de `src/blog/simetria-facial.html` y reutiliza sus clases tal cual (post, post-hero, post-back, tag, post-lead, post-meta, post-fig, post-toc, post-body, post-cta, faq, post-nota, final-cta post-final). No inventes estilos nuevos.
 - Primera línea, obligatoria, en una sola línea:
-  `<!--post {"titulo": "...", "descripcion": "...", "pilar": "...", "resumen": "...", "minutos": 6, "fecha": "YYYY-MM-DD", "imagen": "/assets/img/analysis-face.jpg"} -->`
+  `<!--post {"titulo": "...", "descripcion": "...", "pilar": "...", "resumen": "...", "minutos": 6, "fecha": "YYYY-MM-DD", "imagen": "/assets/img/blog/<slug>.jpg"} -->`
   - titulo: el título del calendario (puedes pulirlo, que incluya la palabra clave).
   - descripcion: meta description de 140 a 160 caracteres con la palabra clave.
   - pilar: el del calendario.
   - resumen: 1 o 2 frases para la tarjeta del blog.
   - fecha: la del calendario para ese artículo (formato YYYY-MM-DD).
-  - imagen: una imagen que ya exista en /assets/img (analysis-face.jpg, analysis-face-w.jpg, hero/m1.jpg, hero/w1.jpg, thumbs/perfil.jpg, thumbs/angulos.jpg, etc.).
+  - imagen: `/assets/img/blog/<slug>.jpg`. Es la foto del artículo y también su miniatura en /blog y su imagen al compartir (Open Graph).
+- Cada artículo lleva una foto propia, simple, que represente el tema: estilo estudio, fondo gris azulado liso, camiseta negra, luz suave, sin texto, sin líneas ni anotaciones encima. 1600x1063 px, JPG de menos de 320 KB, en `assets/img/blog/<slug>.jpg`. Va justo después del `</header>`:
+  `<figure class="post-fig"><img src="/assets/img/blog/<slug>.jpg" width="1600" height="1063" alt="..."></figure>`
+- No dibujes figuras SVG con líneas o puntos sobre fotos.
+- Si existe `assets/img/og/blog-<slug>.jpg` (1200x630), se usa como imagen al compartir; si no, se usa la foto del artículo.
 - `build.py` lo convierte en página, lo agrega a /blog y a sitemap.xml solo. No toques build.py.
 
 ## Cómo escribir
@@ -31,7 +35,6 @@ La `fecha` del artículo es la del calendario, no la de hoy. Cada mañana un pro
 - 3 a 5 preguntas frecuentes reales en `<details>`.
 - 2 o 3 enlaces internos a otros artículos del mismo pilar que ya estén escritos o publicados y cuya fecha sea ANTERIOR a la de este artículo (así el enlace ya existe cuando este se publique).
 - Temas médicos o de procedimientos: informativo, sin prometer resultados, y termina con el `post-nota` que dice que no sustituye la valoración de un médico.
-- Opcional: una figura SVG sencilla como en el artículo de simetría (líneas y puntos sobre /assets/img/analysis-face.jpg) cuando ayude a explicar una medida.
 
 ## Antes de publicar
 - `python3 build.py` corre sin errores. Para revisar cómo se ve un artículo con fecha futura, cambia su fecha temporalmente a hoy, construye, revisa y regrésala.
