@@ -27,6 +27,13 @@ const aPesos = (amount: number | null | undefined, currency: string | null | und
   return c === "MXN" ? Math.round(amount / 100) : Math.round(amount * 1499 / PRECIOS[c].soft);
 };
 
+// Test accounts (table "testers") pay $10 MXN for everything and get a 1-day free month, so live charges can be tested cheaply.
+const PRUEBA_MXN = 1000;
+async function esTester(db: any, userId: string) {
+  const { data } = await db.from("testers").select("user_id").eq("user_id", userId).maybeSingle();
+  return !!data;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   try {
@@ -50,7 +57,8 @@ Deno.serve(async (req) => {
     const pm = pi && (typeof pi.payment_method === "string" ? pi.payment_method : pi.payment_method?.id);
     // Charged in the same currency as the first payment. In pesos the UPGRADE_PRICE_MXN secret can override it.
     const moneda = monedaDe(session.currency);
-    const diff = moneda === "MXN" ? Math.round(Number(Deno.env.get("UPGRADE_PRICE_MXN") ?? "999") * 100) : PRECIOS[moneda].up;
+    const tester = moneda === "MXN" && await esTester(admin, user.id);
+    const diff = tester ? PRUEBA_MXN : moneda === "MXN" ? Math.round(Number(Deno.env.get("UPGRADE_PRICE_MXN") ?? "999") * 100) : PRECIOS[moneda].up;
     if (!(diff > 0)) return json({ error: "Mejora no disponible" }, 400);
     const pesos = aPesos(diff, moneda);
 
@@ -65,7 +73,7 @@ Deno.serve(async (req) => {
           confirm: true,
           description: "Resalta: análisis avanzado",
           metadata: { order_id: order.id, user_id: user.id, upgrade: "true" },
-        }, { idempotencyKey: `upgrade-${order.id}` });
+        }, { idempotencyKey: `upgrade-${order.id}${tester ? "-t" : ""}` });
         if (charge.status === "succeeded") {
           await admin.from("orders").update({ tier: "hard", amount_mxn: (order.amount_mxn ?? 0) + pesos })
             .eq("id", order.id).eq("tier", "soft");
