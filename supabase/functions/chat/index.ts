@@ -41,13 +41,17 @@ Deno.serve(async (req) => {
     const orderId = String(body.order_id || "");
 
     // the user's own order and report only (RLS on the user's client)
-    const { data: order } = await supabase.from("orders").select("id,tier,answers,medidas,status").eq("id", orderId).maybeSingle();
+    const { data: order } = await supabase.from("orders").select("id,tier,answers,medidas,status,paid_at").eq("id", orderId).maybeSingle();
     if (!order || !["pagado", "listo"].includes(order.status)) return json({ error: "Pedido no válido" }, 400);
 
     if (body.accion === "historial") {
       const { data } = await admin.from("chat").select("rol,texto,creado").eq("order_id", orderId).eq("user_id", user.id).order("creado", { ascending: true }).limit(60);
       return json({ mensajes: data ?? [] });
     }
+
+    // The chat is part of the Plan Completo; Esencial orders paid before 17-nov-2026 keep it.
+    if (order.tier === "soft" && !(order.paid_at && new Date(order.paid_at) < new Date("2026-11-17T06:00:00Z")))
+      return json({ error: "El chat viene con el plan Completo" }, 403);
 
     const texto = String(body.mensaje || "").trim().slice(0, 1500);
     if (!texto) return json({ error: "Mensaje vacío" }, 400);
