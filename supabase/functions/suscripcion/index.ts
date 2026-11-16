@@ -58,6 +58,18 @@ async function leer(userId: string) {
   return { row: { ...row, ...upd }, sub };
 }
 
+// The Plan Completo includes the first month of the follow-up, once per person (never a second free month).
+async function mesGratis(userId: string, row: { stripe_subscription?: string | null } | null, esperar = false) {
+  if (row?.stripe_subscription) return false;
+  for (let i = 0; i < (esperar ? 6 : 1); i++) {
+    const { count } = await admin.from("orders").select("id", { count: "exact", head: true })
+      .eq("user_id", userId).eq("tier", "hard").in("status", ["pagado", "listo"]).or("origen.is.null,origen.neq.suscripcion");
+    if ((count ?? 0) > 0) return true;
+    if (esperar) await new Promise((r) => setTimeout(r, 1500)); // an upgrade paid on Stripe's page can take a moment to land
+  }
+  return false;
+}
+
 async function usado(userId: string, desde: string) {
   const { count } = await admin.from("orders").select("id", { count: "exact", head: true })
     .eq("user_id", userId).eq("origen", "suscripcion").gte("paid_at", desde);
@@ -88,6 +100,7 @@ Deno.serve(async (req) => {
     if (accion === "activar") {
       const { row, sub } = await leer(user.id);
       if (sub && ACTIVAS.includes(sub.status)) return json({ ya: true });
+      const gratis = await mesGratis(user.id, row, !!body.mejora);
       const { data: order } = await supabase.from("orders").select("id,status,stripe_session_id").eq("id", body.order_id).single();
       let customer: string | undefined, pm: string | undefined;
       if (order?.stripe_session_id) {
@@ -106,12 +119,13 @@ Deno.serve(async (req) => {
             items: [item],
             default_payment_method: pm,
             metadata: { user_id: user.id, origen: "upsell" },
-            // no free month: the first month is charged right away on the saved card
+            // Plan Completo: first month free, the card is charged when it ends. Otherwise charged right away.
+            ...(gratis ? { trial_period_days: 30 } : {}),
             payment_behavior: "error_if_incomplete" as const, off_session: true,
-          }, { idempotencyKey: `sub-${user.id}-${order!.id}` });
+          }, { idempotencyKey: `sub-${user.id}-${order!.id}${gratis ? "-g" : ""}` });
           if (ACTIVAS.includes(nueva.status)) {
             await guardarFila(user.id, nueva);
-            return json({ ok: true, prueba: false, siguiente_cobro: new Date(nueva.current_period_end * 1000).toISOString() });
+            return json({ ok: true, prueba: gratis, siguiente_cobro: new Date(((nueva.trial_end ?? nueva.current_period_end)) * 1000).toISOString() });
           }
           await stripe.subscriptions.cancel(nueva.id).catch(() => {});
         } catch (e) { console.error("one-click subscription failed, sending to checkout", e); }
@@ -122,7 +136,7 @@ Deno.serve(async (req) => {
         ...(row?.stripe_customer ? { customer: row.stripe_customer } : customer ? { customer } : { customer_email: user.email }),
         client_reference_id: user.id,
         metadata: { user_id: user.id, tipo: "suscripcion" },
-        subscription_data: { metadata: { user_id: user.id } },
+        subscription_data: { metadata: { user_id: user.id }, ...(gratis ? { trial_period_days: 30 } : {}) },
         locale: "es-419",
         success_url: `${site}/panel?suscripcion=ok`,
         cancel_url: `${site}/gracias?pedido=${body.order_id ?? ""}`,
@@ -133,13 +147,14 @@ Deno.serve(async (req) => {
     if (accion === "suscribir") {
       const { row, sub } = await leer(user.id);
       if (sub && ACTIVAS.includes(sub.status)) return json({ ya: true });
+      const gratis = await mesGratis(user.id, row);
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
         line_items: [{ ...item, quantity: 1 }],
         ...(row?.stripe_customer ? { customer: row.stripe_customer } : { customer_email: user.email }),
         client_reference_id: user.id,
         metadata: { user_id: user.id, tipo: "suscripcion" },
-        subscription_data: { metadata: { user_id: user.id } },
+        subscription_data: { metadata: { user_id: user.id }, ...(gratis ? { trial_period_days: 30 } : {}) },
         locale: "es-419",
         success_url: `${site}/panel?suscripcion=ok`,
         cancel_url: `${site}/panel`,
@@ -159,6 +174,8 @@ Deno.serve(async (req) => {
         // the free month is covered by the analysis they bought; the first monthly rescan opens when billing starts
         disponible: activa && sub?.status !== "trialing" ? !(await usado(user.id, row!.periodo_inicio)) : false,
         nuevo: !row?.stripe_subscription,
+        // the Plan Completo includes the first month (only if they never had the follow-up)
+        mes_gratis: !activa && await mesGratis(user.id, row),
       });
     }
 
