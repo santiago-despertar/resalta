@@ -221,7 +221,7 @@ async function cerrarCorreo(db: any, id: string | undefined, ok: boolean) {
 
 // "Your analysis is ready" email, through Sender. Secret: SENDER_API_KEY (without it nothing is sent).
 // deno-lint-ignore no-explicit-any
-async function avisarListo(db: any, email: string, nombre: string, general: unknown) {
+async function avisarListo(db: any, email: string, nombre: string, general: unknown, tier = "soft") {
   const key = Deno.env.get("SENDER_API_KEY");
   if (!key) return;
   const site = Deno.env.get("SITE_URL") ?? "https://resalta.co";
@@ -234,7 +234,8 @@ async function avisarListo(db: any, email: string, nombre: string, general: unkn
     preview: "Tus puntajes por zona, qué cambiar primero y tu plan paso a paso.",
     filas: emTexto(`<div style="text-align:center;color:${EM_SUAVE}">Ya revisamos tus fotos y tus medidas. En tu panel tienes tus puntajes por zona, lo que más te conviene cambiar primero y tu plan paso a paso.</div>`)
       + nota + emBoton("Ver mi análisis", `${site}/panel?utm_source=email&utm_medium=reporte&utm_campaign=listo`)
-      + emTexto(`<div style="text-align:center;font-size:14px;line-height:22px;color:${EM_SUAVE}">Entra con el mismo correo con el que compraste. Tu análisis se queda guardado en tu cuenta.</div>`),
+      + emTexto(`<div style="text-align:center;font-size:14px;line-height:22px;color:${EM_SUAVE}">Entra con el mismo correo con el que compraste. Tu análisis se queda guardado en tu cuenta.</div>`)
+      + emCaja(`<div style="text-align:center;font-size:15px;line-height:24px;color:#FFFFFF"><b>Siguiente paso: mide tu avance.</b><br>${tier === "hard" ? "Tu Plan Completo incluye tu primer mes de seguimiento: un escaneo nuevo cada mes, tu progreso y tu plan de nutrición y ejercicio. Lo activas desde tu cuenta." : "Con el seguimiento mensual haces un escaneo nuevo cada mes, ves tu progreso y recibes tu plan de nutrición y ejercicio. Lo activas desde tu cuenta cuando quieras."}</div>`, "22px 22px"),
     pie: "Resalta · resalta.co<br>Si tienes dudas, responde a este correo.",
   });
   const asunto = primero ? `${primero}, tu análisis facial está listo` : "Tu análisis facial está listo";
@@ -408,7 +409,7 @@ En dimorfismo, califica qué tanto ese rasgo se acerca a lo que se percibe como 
         await admin.from("reports").update({ data }).eq("order_id", order.id);
         const { data: entregado } = await admin.from("orders").update({ status: "listo", delivered_at: new Date().toISOString() }).eq("id", order.id).eq("status", "pagado").select("id");
         // first delivery only: let them know by email, in case they closed the page while it was being written
-        if (entregado?.length && user.email) await avisarListo(admin, user.email, String((order.answers ?? {}).nombre || user.user_metadata?.full_name || ""), puntajes.general);
+        if (entregado?.length && user.email) await avisarListo(admin, user.email, String((order.answers ?? {}).nombre || user.user_metadata?.full_name || ""), puntajes.general, String(order.tier || "soft"));
       } catch (e) {
         console.error(e);
         await fallar("excepcion");
