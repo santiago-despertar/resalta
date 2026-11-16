@@ -11,7 +11,7 @@ Saber que pierdes puntos en {debil} es como saber que tienes fiebre. Sirve para 
 
 Para eso necesitas la causa. ¿Es la forma de tu cara, la grasa, la piel, el corte, el ángulo de tus fotos? Cada causa tiene una solución distinta, y elegir la equivocada es tirar tiempo y dinero.
 
-Eso es lo que hacemos en el análisis completo de Resalta. Más de 120 evaluaciones con tres fotos: de frente, sonriendo y de perfil.
+Eso es lo que hacemos en el análisis completo de Resalta. Más de 110 rasgos revisados con tres fotos: de frente, sonriendo y de perfil.
 
 Y al final no te damos solo un número. Te damos un plan: qué resaltar, qué corregir, qué ignorar y en qué orden, para los próximos 90 días.
 
@@ -54,7 +54,7 @@ La diferencia casi nunca está entre gente "guapa" y gente "fea". Está en detal
 
 Cosas que se pueden ajustar. La mayoría sin gastar mucho y sin tocarte nada.
 
-Tu calificación ya te dio una pista: lo que más te resta está en {debil}. En el análisis completo de Resalta hacemos más de 120 evaluaciones y te decimos exactamente qué hacer con eso, y con todo lo demás.
+Tu calificación ya te dio una pista: lo que más te resta está en {debil}. En el análisis completo de Resalta revisamos más de 110 rasgos y te decimos exactamente qué hacer con eso, y con todo lo demás.
 
 {boton:Ver qué me está restando}
 
@@ -77,7 +77,7 @@ Y de frente, cada proporción con su rango ideal y su calificación:
 
 [[hombre]]{imagen:https://d2ol7oe51mr4n9.cloudfront.net/user_3I9QtNdHrbtOUuHefeCs3sYAPrI/463a1be2-7ba3-435a-8ef4-9c4535b33233.jpg}[[/hombre]][[mujer]]{imagen:https://d2ol7oe51mr4n9.cloudfront.net/user_3I9QtNdHrbtOUuHefeCs3sYAPrI/893673fc-8484-4984-9cfe-32716e5f1784.jpg}[[/mujer]]
 
-En total hacemos más de 120 evaluaciones con tres fotos: de frente, sonriendo y de perfil. La calificación gratis hace 7.
+En total revisamos más de 110 rasgos con tres fotos: de frente, sonriendo y de perfil. La calificación gratis mide 7.
 
 Es la diferencia entre ver tu cara en la foto de tu pasaporte y verla como la ve todo el mundo.
 
@@ -117,7 +117,7 @@ Un número no dice cuánto vales. Dice dónde estás hoy y cuánto margen tienes
 
 Además, la calificación gratis ve tu cara con una sola foto y 7 medidas. Un ángulo o una expresión pueden mover el número.
 
-El análisis completo usa tres fotos y más de 120 evaluaciones, y te dice qué parte de tu número es tu cara y qué parte se arregla fácil.[[/bajo]]
+El análisis completo usa tres fotos, revisa más de 110 rasgos, y te dice qué parte de tu número es tu cara y qué parte se arregla fácil.[[/bajo]]
 
 Sea cual sea tu número, lo que importa es lo que haces con él.
 

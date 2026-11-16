@@ -67,7 +67,7 @@ Cosas que se pueden ajustar. La mayoría sin gastar mucho y sin tocarte nada.
 
 El problema es saber cuáles son las tuyas. A simple vista nadie lo sabe.
 
-Para eso existe Resalta. Hacemos más de 120 evaluaciones de tu cara y te decimos qué te está restando puntos y qué hacer primero.
+Para eso existe Resalta. Revisamos más de 110 rasgos de tu cara y te decimos qué te está restando puntos y qué hacer primero.
 
 Ya contestaste las preguntas. Solo te falta terminar.
 
@@ -86,7 +86,7 @@ Por eso en Resalta medimos primero.
 
 {imagen:/assets/img/email/medidas.jpg}
 
-Hacemos más de 120 evaluaciones de tu cara con tus fotos de frente, sonriendo y de perfil. Tu simetría, tus tercios, tus ángulos, tu piel, tu edad visual.
+Revisamos más de 110 rasgos de tu cara con tus fotos de frente, sonriendo y de perfil. Tu simetría, tus tercios, tus ángulos, tu piel, tu edad visual.
 
 Y con eso te decimos tres cosas:
 
