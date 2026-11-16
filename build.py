@@ -14,7 +14,15 @@ HEAD = r"""<!doctype html>
 <meta name="description" content="{desc}">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
-<meta property="og:image" content="https://resalta.co/assets/img/og.png">
+<meta property="og:image" content="https://resalta.co{og}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:type" content="{og_type}">
+<meta property="og:site_name" content="Resalta">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{title}">
+<meta name="twitter:description" content="{desc}">
+<meta name="twitter:image" content="https://resalta.co{og}">
 <meta property="og:url" content="https://resalta.co/{path}">
 <link rel="canonical" href="https://resalta.co/{path}">
 <meta name="theme-color" content="#6E7E8E">
@@ -165,7 +173,12 @@ for fname, title, desc, extra in PAGES:
     if fname == "blog.html":
         body = body.replace("<!--POSTS-->", CARDS)
     page = fname.replace(".html", "").replace("/", "-")
-    html = HEAD.format(title=title, desc=desc, path="" if fname == "index.html" else fname[:-5], page=page, extra_head=GATES.get(page, ""))
+    # Open Graph image: assets/img/og/<page>.jpg when it exists. Blog posts fall back to their own photo.
+    og = f"/assets/img/og/{page}.jpg"
+    if not (ROOT / og.lstrip("/")).exists():
+        _post = next((p for p in POSTS if f"blog/{p['slug']}.html" == fname), None)
+        og = (_post.get("imagen") if _post else None) or "/assets/img/og.png"
+    html = HEAD.format(title=title, desc=desc, path="" if fname == "index.html" else fname[:-5], page=page, extra_head=GATES.get(page, ""), og=og, og_type="article" if fname.startswith("blog/") else "website")
     html += HEADER + body + FOOTER + SCRIPTS.format(extra_scripts=extra)
     html = html.replace("__V__", str(int(time.time())))
     (ROOT / fname).write_text(html, encoding="utf-8")
@@ -209,7 +222,7 @@ P_FOOTER = """<footer class="site-footer">
   </div>
 </footer>
 """
-head = HEAD.format(title="Programa de afiliados · Resalta", desc="Gana 50% por cada análisis de Resalta que recomiendes con tu link.", path="", page="portal", extra_head="")
+head = HEAD.format(title="Programa de afiliados · Resalta", desc="Gana 50% por cada análisis de Resalta que recomiendes con tu link.", path="", page="portal", extra_head="", og="/assets/img/og/creadores.jpg", og_type="website")
 head = head.replace('href="https://resalta.co/"', 'href="https://afiliados.resalta.co/"').replace('content="https://resalta.co/"', 'content="https://afiliados.resalta.co/"')
 head = head.replace('href="/assets/', 'href="https://resalta.co/assets/')
 head = _re.sub(r'<script>try\{\{if\(localStorage.*?</script>\n', '', head)
