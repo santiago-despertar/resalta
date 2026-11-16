@@ -1430,8 +1430,9 @@
     }
     const completo = (r, o) => r && r.resumen && r.v === 2 && !(o.tier === "hard" && r.tier !== "hard");
 
+    let abiertaO = null;
     async function abrir(o, scroll) {
-      abierto = o.id;
+      abierto = o.id; abiertaO = o;
       histChat(o.id); // start loading the chat history now, so "Preguntar" opens with it ready
       $("#reportArea").hidden = false;
       $("#repPlan").textContent = (C.PLAN_NAMES || {})[o.tier] || "Tu reporte";
@@ -1618,9 +1619,24 @@
       if (!chatHist[id]) chatHist[id] = fnCall("chat", { order_id: id, accion: "historial" }).then(r => r.mensajes || []).catch(() => { delete chatHist[id]; return null; });
       return chatHist[id];
     }
+    // The chat is part of the Plan Completo. Esencial orders paid before it moved there keep it.
+    const CHAT_DESDE = new Date("2026-11-17T06:00:00Z");
+    const chatIncluido = o => !o || o.tier !== "soft" || (o.paid_at && new Date(o.paid_at) < CHAT_DESDE);
     async function abrirChat() {
       if (chatDe === abierto) return;
       const id = chatDe = abierto; $("#chatLog").innerHTML = "";
+      $("#chatForm").hidden = false;
+      if (!chatIncluido(abiertaO)) {
+        $("#chatSug").hidden = true; $("#chatForm").hidden = true;
+        const U = C.UPSELL || {};
+        $("#chatLog").innerHTML = `<div class="card rep-lock"><div><p class="label">Plan Completo</p><h3 class="rep-lock-h">Pregúntale a tu reporte</h3><p class="hint">Un asesor que conoce tus medidas: qué corte te queda, qué barba te conviene o qué trabajar primero, con base en tu cara. Viene con el simulador, la parte de procedimientos y tu primer mes de seguimiento gratis.</p></div><div class="rep-lock-r"><p class="mono rep-lock-p">${U.was ? `<s>${esc(U.was)}</s> ` : ""}${esc(U.now || "")}${SUFIJO ? " " + SUFIJO : ""}</p><button class="btn btn-primary" id="chatUp">Agregar el Plan Completo</button><div class="msg" id="chatUpMsg"></div></div></div>`;
+        $("#chatUp").onclick = async () => {
+          const b = $("#chatUp"), mm = $("#chatUpMsg"); clearMsg(mm); b.disabled = true; b.textContent = "Procesando…";
+          try { const x = await fnCall("upgrade-order", { order_id: id }); if (x.url) { location.href = x.url; return; } location.reload(); }
+          catch (e) { b.disabled = false; b.textContent = "Agregar el Plan Completo"; msg(mm, "No pudimos agregarlo. Inténtalo de nuevo en un momento."); }
+        };
+        return;
+      }
       // hide the suggestions until we know there is no earlier conversation, so they never flash
       $("#chatSug").hidden = true; $("#chatForm").classList.add("cargando");
       const ld = document.createElement("div"); ld.className = "chat-load"; ld.setAttribute("aria-label", "Cargando tu conversación"); ld.innerHTML = "<i></i><i></i><i></i>";
