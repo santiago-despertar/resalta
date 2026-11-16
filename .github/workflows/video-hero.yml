@@ -17,7 +17,7 @@ jobs:
           B=https://d8j0ntlcm91z4.cloudfront.net/user_3I9QtNdHrbtOUuHefeCs3sYAPrI/hf_20261116_
           curl -sSfL -o m.mp4 "${B}182456_aed6c2e1-76ba-48bb-a9fb-1e06e37d6655.mp4"
           curl -sSfL -o w.mp4 "${B}183128_960b8df1-1f6e-4e69-9907-d54ed4e96d93.mp4"
-          ffprobe -v error -show_entries stream=width,height -of csv=p=0 m.mp4 w.mp4
+          ls -la m.mp4 w.mp4
       - name: Comprimir
         run: |
           mkdir -p assets/video
