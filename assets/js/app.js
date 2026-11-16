@@ -1061,14 +1061,14 @@
       } catch (e) {}
 
       const fecha = d => d.toLocaleDateString("es-MX", { day: "numeric", month: "long" });
-      const listoSub = () => "Tu seguimiento está activo. En tu cuenta, en la sección Cuerpo, llena tus datos para recibir tu plan de nutrición y ejercicio.";
+      const listoSub = r => (r && r.prueba ? "Tu seguimiento está activo y tu primer mes es gratis." : "Tu seguimiento está activo.") + " En tu cuenta, en la sección Cuerpo, llena tus datos para recibir tu plan de nutrición y ejercicio.";
 
-      // Coming back from the upgrade checkout: if they also picked the follow-up, finish it now.
+      // Coming back from the upgrade checkout: if they also picked the follow-up, finish it now (its first month is free with the Completo).
       if (q.get("mejora") === "1") {
         msg(done, "Listo. Tu análisis ahora incluye el Plan Completo.", "ok");
         if (q.get("sub") === "1") {
           try {
-            const r = await fnCall("suscripcion", { accion: "activar", order_id: id, moneda });
+            const r = await fnCall("suscripcion", { accion: "activar", order_id: id, moneda, mejora: true });
             if (r.url) { location.href = r.url; return; }
             msg(done, "Listo. Tu análisis ahora incluye el Plan Completo. " + listoSub(r), "ok");
           } catch (e) { msg(done, "Tu análisis ya incluye el Plan Completo, pero no pudimos activar tu seguimiento. Puedes activarlo desde tu cuenta."); }
@@ -1089,20 +1089,29 @@
       const conUp = o.tier === "soft" && q.get("mejora") !== "1", conSub = !st.activa;
       if (!conUp && !conSub) return;
 
-      // One offer with both things ticked: the upgrade and the monthly follow-up. Untick what you don't want.
+      // The upgrade comes ticked (a one-time price). The monthly follow-up is never pre-ticked: it is a recurring charge.
+      // With the Plan Completo (bought now or before) the follow-up's first month is free.
       const up = $("#ofUp"), sub = $("#ofSub"), cUp = up.querySelector("input"), cSub = sub.querySelector("input");
       up.hidden = !conUp; cUp.checked = conUp;
-      sub.hidden = !conSub; cSub.checked = conSub;
-      $("#ofSubPrecio").textContent = conCodigo(SUB) + " al mes";
-      listaValor($("#ofValor"), $("#ofTotal"), `<b class="mono">${conCodigo(SUB)}</b> al mes`);
+      sub.hidden = !conSub; cSub.checked = false;
+      const yaGratis = o.tier === "hard" || !!st.mes_gratis;
+      const nuevoSub = st.nuevo !== false;
+      const gratisAhora = () => nuevoSub && (yaGratis || (conUp && cUp.checked));
+      $("#ofIntro").textContent = conUp ? "El Plan Completo ya viene marcado. Si no lo quieres, quítale la palomita." : "Tu Plan Completo incluye tu primer mes de seguimiento. Actívalo aquí.";
       const yes = $("#ofYes");
       const pintar = () => {
-        const hoy = (cUp.checked ? numero(U.now) : 0) + (cSub.checked ? numero(SUB) : 0);
+        const g = gratisAhora();
+        $("#ofSubPrecio").textContent = g ? "1er mes gratis" : conCodigo(SUB) + " al mes";
+        $("#ofSubNota").textContent = g
+          ? `Incluido con tu Plan Completo. Después son ${conCodigo(SUB)} al mes en la misma tarjeta, y te avisamos 3 días antes del primer cobro. Cancelas cuando quieras.`
+          : "Se cobra hoy y cada mes en la misma tarjeta. Cancelas cuando quieras desde tu cuenta.";
+        listaValor($("#ofValor"), $("#ofTotal"), g ? `<b>$0</b> el primer mes y luego <b class="mono">${conCodigo(SUB)}</b> al mes` : `<b class="mono">${conCodigo(SUB)}</b> al mes`);
+        const hoy = (conUp && cUp.checked ? numero(U.now) : 0) + (cSub.checked && !g ? numero(SUB) : 0);
         $("#ofHoy").textContent = dinero(hoy);
-        yes.textContent = !cUp.checked && !cSub.checked ? "Continuar sin agregar"
-          : cUp.checked && cSub.checked ? "Agregar los dos"
-          : cUp.checked ? `Agregar Plan Completo por ${conCodigo(U.now)}`
-          : `Activar por ${conCodigo(SUB)} al mes`;
+        yes.textContent = !(conUp && cUp.checked) && !cSub.checked ? "Continuar sin agregar"
+          : conUp && cUp.checked && cSub.checked ? "Agregar los dos"
+          : conUp && cUp.checked ? `Agregar Plan Completo por ${conCodigo(U.now)}`
+          : g ? "Activar mi mes gratis" : `Activar por ${conCodigo(SUB)} al mes`;
       };
       cUp.addEventListener("change", pintar); cSub.addEventListener("change", pintar); pintar();
       box.hidden = false;
@@ -1114,23 +1123,31 @@
         if (!quiereUp && !quiereSub) { box.hidden = true; return; }
         yes.disabled = true; yes.textContent = "Procesando…";
         const hechos = [];
-        let subUrl = null, fallo = false;
-        // The follow-up first: on the saved card its free month needs no charge, so it almost never needs the bank.
-        if (quiereSub) {
-          try { const r = await fnCall("suscripcion", { accion: "activar", order_id: id, moneda }); if (r.url) subUrl = r.url; else hechos.push(listoSub(r)); }
-          catch (e) { fallo = true; }
-        }
+        let fallo = false, subHecho = false, upHecho = false;
+        // The upgrade first, so the follow-up that comes after it gets its free month.
         if (quiereUp) {
           try {
-            const r = await fnCall("upgrade-order", { order_id: id, luego: subUrl ? "sub" : "" });
-            if (r.url) { location.href = r.url; return; } // the follow-up checkout comes right after, from the return link
-            hechos.unshift("Tu análisis ahora incluye el Plan Completo.");
+            const r = await fnCall("upgrade-order", { order_id: id, luego: quiereSub ? "sub" : "" });
+            if (r.url) { location.href = r.url; return; } // the follow-up is activated on the way back
+            hechos.push("Tu análisis ahora incluye el Plan Completo."); upHecho = true;
           } catch (e) { fallo = true; }
         }
-        if (subUrl) { location.href = subUrl; return; }
+        if (quiereSub && !(quiereUp && fallo)) {
+          try {
+            const r = await fnCall("suscripcion", { accion: "activar", order_id: id, moneda, mejora: upHecho });
+            if (r.url) { location.href = r.url; return; }
+            hechos.push(listoSub(r)); subHecho = true;
+          } catch (e) { fallo = true; }
+        }
         box.hidden = !fallo;
         if (hechos.length) msg(done, "Listo. " + hechos.join(" "), "ok");
-        if (fallo) { yes.disabled = false; pintar(); msg(m, hechos.length ? "Una parte no se pudo completar. Inténtalo de nuevo." : "No pudimos completarlo. Inténtalo de nuevo en un momento."); if (hechos.length) { if (quiereSub && !subUrl && hechos.some(h => h.includes("seguimiento"))) { sub.hidden = true; cSub.checked = false; } if (quiereUp && hechos.some(h => h.includes("Plan Completo"))) { up.hidden = true; cUp.checked = false; } pintar(); } }
+        if (fallo) {
+          yes.disabled = false;
+          if (upHecho) { up.hidden = true; cUp.checked = false; }
+          if (subHecho) { sub.hidden = true; cSub.checked = false; }
+          pintar();
+          msg(m, hechos.length ? "Una parte no se pudo completar. Inténtalo de nuevo." : "No pudimos completarlo. Inténtalo de nuevo en un momento.");
+        }
       };
     })();
   }
@@ -1666,8 +1683,8 @@
         box.innerHTML = `<div class="card cu-card"><p class="label">Incluido en tu seguimiento mensual</p><h3 class="cu-h">Tu plan de nutrición y ejercicio</h3>
           <p class="hint">Con tus datos y fotos de físico te armamos un plan para bajar grasa y definir tu cara, y cada mes lo ajustamos con tu avance.</p>
           <ul class="of-valor" id="cuValor"></ul><span class="of-total" id="cuTotal"></span><div class="msg" id="cuMsg"></div>
-          <button type="button" class="btn btn-primary" id="cuActivar" style="margin-top:16px">Activar mi seguimiento</button></div>`;
-        listaValor($("#cuValor"), $("#cuTotal"), `<b class="mono">${conCodigo(C.SUB_PRICE || "$349")}</b> al mes`);
+          <button type="button" class="btn btn-primary" id="cuActivar" style="margin-top:16px">${st.mes_gratis ? "Activar mi mes gratis" : "Activar mi seguimiento"}</button></div>`;
+        listaValor($("#cuValor"), $("#cuTotal"), st.mes_gratis ? `<b>$0</b> el primer mes con tu Plan Completo y luego <b class="mono">${conCodigo(C.SUB_PRICE || "$349")}</b> al mes` : `<b class="mono">${conCodigo(C.SUB_PRICE || "$349")}</b> al mes`);
         $("#cuActivar").onclick = async function () {
           this.disabled = true; this.textContent = "Un momento…";
           try { const r = await fnCall("suscripcion", { accion: "suscribir", moneda }); if (r.url) { location.href = r.url; return; } subEstado = null; cuerpo(); }
@@ -1840,9 +1857,11 @@
         catch (e) { b.disabled = false; b.textContent = t; msg($("#subMsg"), "No se pudo completar. Inténtalo de nuevo en un momento."); }
       };
       if (!st.activa) {
-        $("#subL").textContent = "Seguimiento mensual"; $("#subT").textContent = "Mide tu avance cada mes";
-        $("#subX").innerHTML = `Un escaneo completo cada mes con reporte nuevo, tu plan de nutrición y ejercicio, y tu progreso de cara y físico. <b class="mono">${esc(precio)}</b>${SUFIJO ? " " + SUFIJO : ""} al mes y cancelas cuando quieras.`;
-        boton("Activar seguimiento", "btn btn-primary", function () { accion(this, "suscribir"); });
+        $("#subL").textContent = "Seguimiento mensual"; $("#subT").textContent = st.mes_gratis ? "Tu primer mes va incluido" : "Mide tu avance cada mes";
+        $("#subX").innerHTML = `Un escaneo completo cada mes con reporte nuevo, tu plan de nutrición y ejercicio, y tu progreso de cara y físico. ` + (st.mes_gratis
+          ? `Con tu Plan Completo el primer mes es gratis. Después son <b class="mono">${esc(precio)}</b>${SUFIJO ? " " + SUFIJO : ""} al mes, te avisamos antes del primer cobro y cancelas cuando quieras.`
+          : `<b class="mono">${esc(precio)}</b>${SUFIJO ? " " + SUFIJO : ""} al mes y cancelas cuando quieras.`);
+        boton(st.mes_gratis ? "Activar mi mes gratis" : "Activar seguimiento", "btn btn-primary", function () { accion(this, "suscribir"); });
         enlace("Un escaneo suelto", "/analisis", "btn btn-ghost");
       } else {
         $("#subL").textContent = "Tu seguimiento mensual";
@@ -1911,6 +1930,19 @@
       a.onchange = b.onchange = pintarCmp; pintarCmp();
     }
     function abrirSim() {
+      // The simulator is part of the Plan Completo. With the Esencial it shows what it is and offers the upgrade.
+      if (actual && actual.tier === "soft") {
+        $("#simWait").hidden = true; $("#simBox").hidden = true;
+        const m = $("#simMsg"); if (m.querySelector(".rep-lock")) return;
+        const U = C.UPSELL || {};
+        m.className = "msg"; m.innerHTML = `<div class="card rep-lock"><div><p class="label">Plan Completo</p><h3 class="rep-lock-h">Simula los cambios en tu cara</h3><p class="hint">Mueve los controles y ve tu cara de frente y de perfil con cada cambio: corte, barba, piel, menos grasa y tratamientos de ejemplo, y cómo cambian tus medidas. Incluye la parte de procedimientos y tu primer mes de seguimiento gratis.</p></div><div class="rep-lock-r"><p class="mono rep-lock-p">${U.was ? `<s>${esc(U.was)}</s> ` : ""}${esc(U.now || "")}${SUFIJO ? " " + SUFIJO : ""}</p><button class="btn btn-primary" id="simUp">Agregar el Plan Completo</button><div class="msg" id="simUpMsg"></div></div></div>`;
+        $("#simUp").onclick = async () => {
+          const b = $("#simUp"), mm = $("#simUpMsg"); clearMsg(mm); b.disabled = true; b.textContent = "Procesando…";
+          try { const x = await fnCall("upgrade-order", { order_id: actual.id }); if (x.url) { location.href = x.url; return; } location.reload(); }
+          catch (e) { b.disabled = false; b.textContent = "Agregar el Plan Completo"; msg(mm, "No pudimos agregarlo. Inténtalo de nuevo en un momento."); }
+        };
+        return;
+      }
       if (!sim && actual) {
         sim = import("/assets/js/simular.js?v=26").then(m => m.iniciar(actual)).then(() => { $("#simWait").hidden = true; $("#simBox").hidden = false; })
           .catch(e => { sim = null; $("#simWait").hidden = true; msg($("#simMsg"), e && e.message === "sin_foto" ? "No encontramos tu foto de frente para simular." : "No pudimos preparar el simulador. Vuelve a intentarlo en un momento."); });
@@ -2021,7 +2053,7 @@
         $("#repCuenta").textContent = n + " medidas en " + (pf ? "frente y perfil" : "tu foto de frente");
         if (foto) $("#dFoto").style.backgroundImage = `url("${foto}")`;
         const otra = !actual || actual.id !== o.id;
-        actual = { id: o.id, url: foto, urlPerfil: fotoP || null, fotoPerfil: pf ? (pf.foto || "perfil_izq") : null, sexo: (o.answers || {}).sexo, ia: b => fnCall("proyeccion", b) };
+        actual = { id: o.id, tier: o.tier, url: foto, urlPerfil: fotoP || null, fotoPerfil: pf ? (pf.foto || "perfil_izq") : null, sexo: (o.answers || {}).sexo, ia: b => fnCall("proyeccion", b) };
         if (otra) { sim = null; $("#simBox").hidden = true; $("#simWait").hidden = false; }
         // someone may have opened Simular before the photo was ready
         if ($('.dash-tab[data-tab="simular"]').classList.contains("active")) abrirSim();
@@ -2082,7 +2114,7 @@
         traerProyeccion(o, "hard", av.querySelector(".rp-hard .rp-pend"));
       } else if (o.tier === "soft") {
         const U = C.UPSELL || {};
-        av.innerHTML = `<div class="card rep-lock"><div><p class="label">Plan Completo</p><h3 class="rep-lock-h">La parte de procedimientos</h3><p class="hint">Qué procedimientos se suelen considerar para un rostro con tus proporciones, qué hace cada uno y qué pensar antes de una consulta.</p></div><div class="rep-lock-r"><p class="mono rep-lock-p">${U.was ? `<s>${esc(U.was)}</s> ` : ""}${esc(U.now || "")}${SUFIJO ? " " + SUFIJO : ""}</p><button class="btn btn-primary" id="repUp">Agregar a mi reporte</button><div class="msg" id="repUpMsg"></div></div></div>`;
+        av.innerHTML = `<div class="card rep-lock"><div><p class="label">Plan Completo</p><h3 class="rep-lock-h">Simulador y procedimientos</h3><p class="hint">El simulador para ver tu cara con cada cambio, qué procedimientos se suelen considerar para un rostro con tus proporciones y qué pensar antes de una consulta. Incluye tu primer mes de seguimiento gratis.</p></div><div class="rep-lock-r"><p class="mono rep-lock-p">${U.was ? `<s>${esc(U.was)}</s> ` : ""}${esc(U.now || "")}${SUFIJO ? " " + SUFIJO : ""}</p><button class="btn btn-primary" id="repUp">Agregar a mi reporte</button><div class="msg" id="repUpMsg"></div></div></div>`;
         $("#repUp").onclick = async () => {
           const b = $("#repUp"), m = $("#repUpMsg"); clearMsg(m); b.disabled = true; b.textContent = "Procesando…";
           try {
