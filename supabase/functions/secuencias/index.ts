@@ -289,5 +289,76 @@ Deno.serve(async (req) => {
       if (!ok) break;
     }
   }
+  // 3) the free month of the follow-up (Plan Completo) ends in 3 days: say when the first charge comes and how to cancel
+  const fmtFecha = (d: string) => new Date(d).toLocaleDateString("es-MX", { day: "numeric", month: "long", timeZone: "America/Mexico_City" });
+  const yaMandado = async (email: string, sec: string, desde?: string) => {
+    let q = admin.from("correos_log").select("id", { count: "exact", head: true }).eq("email", email).eq("secuencia", sec);
+    if (desde) q = q.gte("enviado_at", desde);
+    const { count } = await q; return (count ?? 0) > 0;
+  };
+  const precioSub = async (subId: string) => {
+    const k = Deno.env.get("STRIPE_SECRET_KEY"); if (!k) return "";
+    try {
+      const r = await fetch(`https://api.stripe.com/v1/subscriptions/${subId}`, { headers: { Authorization: `Bearer ${k}` } });
+      const j = await r.json(); const p = j?.items?.data?.[0]?.price; if (!p) return "";
+      const cur = String(p.currency).toUpperCase(), n = cur === "CLP" ? p.unit_amount : p.unit_amount / 100;
+      return new Intl.NumberFormat("es-MX", { style: "currency", currency: cur, maximumFractionDigits: n % 1 ? 2 : 0 }).format(n) + (["MXN", "COP", "CLP"].includes(cur) ? " " + cur : "");
+    } catch { return ""; }
+  };
+  if (cuenta < MAX_POR_CORRIDA) {
+    const en3 = new Date(ahora + 3.2 * 864e5).toISOString();
+    const { data: pruebas } = await admin.from("suscripciones").select("user_id,stripe_subscription,periodo_inicio,periodo_fin,cancela,estado")
+      .eq("estado", "trialing").eq("cancela", false).gt("periodo_fin", new Date(ahora).toISOString()).lt("periodo_fin", en3);
+    for (const s of pruebas ?? []) {
+      if (cuenta >= MAX_POR_CORRIDA) break;
+      const { data: ud } = await admin.auth.admin.getUserById(s.user_id);
+      const email = (ud?.user?.email ?? "").toLowerCase(); if (!email) continue;
+      if (await yaMandado(email, "aviso_prueba", s.periodo_inicio)) continue;
+      const nombre = nombreDe({}, ud?.user ?? {}), fecha = fmtFecha(s.periodo_fin), precio = await precioSub(s.stripe_subscription);
+      const asunto = `Tu mes gratis de seguimiento termina el ${fecha}`;
+      const cuerpo = emShell({ site: SITE, etiqueta: "Tu seguimiento", titulo: "Tu mes gratis termina pronto", preview: `El ${fecha} empieza tu seguimiento mensual.`,
+        filas: emTexto(`${nombre !== "Hola" ? esc(nombre) + ", tu" : "Tu"} primer mes de seguimiento, el que venía con tu Plan Completo, termina el <b>${fecha}</b>. Ese día se hace el primer cobro${precio ? ` de <b>${esc(precio)}</b> al mes` : ""} en la misma tarjeta y se libera tu escaneo para comparar tu avance con tu primer análisis.`)
+          + emTexto("Si quieres seguir, no tienes que hacer nada. Si prefieres no seguir, cancélalo desde tu cuenta antes de esa fecha y no se te cobra nada.")
+          + emBoton("Ir a mi cuenta", `${SITE}/panel?utm_source=email&utm_medium=aviso&utm_campaign=fin-prueba`),
+        pie: "Resalta · resalta.co<br>Te escribimos porque activaste el seguimiento mensual. Si tienes dudas, responde a este correo." });
+      const idc = await registrarCorreo(admin, { email, tipo: "aviso", secuencia: "aviso_prueba", paso: 1, asunto });
+      const ok = await enviar(key, email, asunto, rastrear(cuerpo, idc), nombre);
+      await cerrarCorreo(admin, idc, ok); cuenta++; ok ? resumen.enviados++ : resumen.fallidos++;
+    }
+  }
+
+  // 4) about five weeks after their analysis, people without the follow-up get one note: time for a second scan
+  if (cuenta < MAX_POR_CORRIDA) {
+    const d45 = new Date(ahora - 45 * 864e5).toISOString(), d35 = new Date(ahora - 35 * 864e5).toISOString();
+    const { data: viejos } = await admin.from("orders").select("user_id,tier,origen,paid_at").eq("status", "listo")
+      .gt("paid_at", d45).lt("paid_at", d35).order("paid_at", { ascending: false }).limit(300);
+    const { data: subs } = await admin.from("suscripciones").select("user_id,estado,stripe_subscription");
+    const conSub = new Map((subs ?? []).map((x: Obj) => [x.user_id, x]));
+    const vistos = new Set<string>();
+    for (const o of viejos ?? []) {
+      if (cuenta >= MAX_POR_CORRIDA) break;
+      if (o.origen === "suscripcion" || vistos.has(o.user_id)) continue; vistos.add(o.user_id);
+      const sx = conSub.get(o.user_id) as Obj | undefined;
+      if (sx && ["active", "trialing", "past_due"].includes(sx.estado)) continue;
+      const { data: ud } = await admin.auth.admin.getUserById(o.user_id);
+      const email = (ud?.user?.email ?? "").toLowerCase();
+      if (!email || bajas.has(email) || await yaMandado(email, "segundo_escaneo")) continue;
+      const { count: hard } = await admin.from("orders").select("id", { count: "exact", head: true }).eq("user_id", o.user_id).eq("tier", "hard").in("status", ["pagado", "listo"]).or("origen.is.null,origen.neq.suscripcion");
+      const gratis = (hard ?? 0) > 0 && !sx?.stripe_subscription;
+      const nombre = nombreDe({}, ud?.user ?? {});
+      const asunto = `${nombre !== "Hola" ? nombre + ", ya" : "Ya"} puedes ver si está funcionando`;
+      const baja = `${Deno.env.get("SUPABASE_URL")}/functions/v1/secuencias?baja=${encodeURIComponent(email)}&t=${await firma(email)}`;
+      const cuerpo = plantilla(
+        emTexto(`${nombre !== "Hola" ? esc(nombre) + ", ya" : "Ya"} pasó más de un mes desde tu análisis. Es justo cuando los cambios de piel, peso, barba o corte se empiezan a notar en las medidas.`)
+        + emTexto("Con el seguimiento mensual subes tus fotos otra vez, comparamos el escaneo nuevo con el primero y ves qué cambió, número por número. También recibes tu plan de nutrición y ejercicio, y se ajusta cada mes con tu avance.")
+        + (gratis ? emTexto("Con tu Plan Completo, el primer mes del seguimiento va incluido.") : "")
+        + emBoton(gratis ? "Activar mi mes gratis" : "Activar mi seguimiento", `${SITE}/panel?utm_source=email&utm_medium=seguimiento&utm_campaign=segundo-escaneo`),
+        baja, "hiciste tu análisis");
+      const idc = await registrarCorreo(admin, { email, tipo: "secuencia", secuencia: "segundo_escaneo", paso: 1, asunto });
+      const ok = await enviar(key, email, asunto, rastrear(cuerpo, idc), nombre);
+      await cerrarCorreo(admin, idc, ok); cuenta++; ok ? resumen.enviados++ : resumen.fallidos++;
+      if (!ok) break;
+    }
+  }
   return json({ ok: true, ...resumen });
 });
