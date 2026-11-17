@@ -1,7 +1,7 @@
 // Monthly follow-up plan: one full rescan per billing period, progress and compare.
 // Actions: estado, activar (one click after a purchase, on the card just used), suscribir (checkout),
 // usar (spend this month's rescan on a draft order), cancelar, reactivar.
-// No free month: the first month is charged when they subscribe.
+// The Plan Completo includes the first month free, once per person (see mesGratis); otherwise the first month is charged when they subscribe.
 // Secrets: STRIPE_SECRET_KEY, STRIPE_PRICE_SUB, SITE_URL
 import Stripe from "npm:stripe@16.12.0";
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
