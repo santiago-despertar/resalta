@@ -1952,7 +1952,7 @@
         $("#simWait").hidden = true; $("#simBox").hidden = true;
         const m = $("#simMsg"); if (m.querySelector(".rep-lock")) return;
         const U = C.UPSELL || {};
-        m.className = "msg"; m.innerHTML = `<div class="card rep-lock"><div><p class="label">Plan Completo</p><h3 class="rep-lock-h">Simula los cambios en tu cara</h3><p class="hint">Mueve los controles y ve tu cara de frente y de perfil con cada cambio: corte, barba, piel, menos grasa y tratamientos de ejemplo, y cómo cambian tus medidas. Incluye la parte de procedimientos y tu primer mes de seguimiento gratis.</p></div><div class="rep-lock-r"><p class="mono rep-lock-p">${U.was ? `<s>${esc(U.was)}</s> ` : ""}${esc(U.now || "")}${SUFIJO ? " " + SUFIJO : ""}</p><button class="btn btn-primary" id="simUp">Agregar el Plan Completo</button><div class="msg" id="simUpMsg"></div></div></div>`;
+        m.className = "msg"; m.innerHTML = `<div class="card rep-lock"><div><p class="label">Plan Completo</p><h3 class="rep-lock-h">Simula los cambios en tu cara</h3><p class="hint">Mueve los controles y ve tu cara de frente y de perfil con cada cambio: corte, barba, piel, menos grasa y tratamientos de ejemplo, y cómo cambian tus medidas. Incluye el chat con tu reporte, la parte de procedimientos y tu primer mes de seguimiento gratis.</p></div><div class="rep-lock-r"><p class="mono rep-lock-p">${U.was ? `<s>${esc(U.was)}</s> ` : ""}${esc(U.now || "")}${SUFIJO ? " " + SUFIJO : ""}</p><button class="btn btn-primary" id="simUp">Agregar el Plan Completo</button><div class="msg" id="simUpMsg"></div></div></div>`;
         $("#simUp").onclick = async () => {
           const b = $("#simUp"), mm = $("#simUpMsg"); clearMsg(mm); b.disabled = true; b.textContent = "Procesando…";
           try { const x = await fnCall("upgrade-order", { order_id: actual.id }); if (x.url) { location.href = x.url; return; } location.reload(); }
@@ -2131,7 +2131,7 @@
         traerProyeccion(o, "hard", av.querySelector(".rp-hard .rp-pend"));
       } else if (o.tier === "soft") {
         const U = C.UPSELL || {};
-        av.innerHTML = `<div class="card rep-lock"><div><p class="label">Plan Completo</p><h3 class="rep-lock-h">Simulador y procedimientos</h3><p class="hint">El simulador para ver tu cara con cada cambio, qué procedimientos se suelen considerar para un rostro con tus proporciones y qué pensar antes de una consulta. Incluye tu primer mes de seguimiento gratis.</p></div><div class="rep-lock-r"><p class="mono rep-lock-p">${U.was ? `<s>${esc(U.was)}</s> ` : ""}${esc(U.now || "")}${SUFIJO ? " " + SUFIJO : ""}</p><button class="btn btn-primary" id="repUp">Agregar a mi reporte</button><div class="msg" id="repUpMsg"></div></div></div>`;
+        av.innerHTML = `<div class="card rep-lock"><div><p class="label">Plan Completo</p><h3 class="rep-lock-h">Simulador y procedimientos</h3><p class="hint">El simulador para ver tu cara con cada cambio, qué procedimientos se suelen considerar para un rostro con tus proporciones y qué pensar antes de una consulta. Incluye el chat con tu reporte y tu primer mes de seguimiento gratis.</p></div><div class="rep-lock-r"><p class="mono rep-lock-p">${U.was ? `<s>${esc(U.was)}</s> ` : ""}${esc(U.now || "")}${SUFIJO ? " " + SUFIJO : ""}</p><button class="btn btn-primary" id="repUp">Agregar a mi reporte</button><div class="msg" id="repUpMsg"></div></div></div>`;
         $("#repUp").onclick = async () => {
           const b = $("#repUp"), m = $("#repUpMsg"); clearMsg(m); b.disabled = true; b.textContent = "Procesando…";
           try {
