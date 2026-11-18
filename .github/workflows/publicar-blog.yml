@@ -1,9 +1,11 @@
 # Publishes blog posts that were written ahead, on their date.
-# Every morning it rebuilds the site; posts whose date arrived get their page, a card on /blog and a sitemap entry.
+# Every morning it rebuilds the site (tries hourly from midnight Mexico City); posts whose date arrived get their page, a card on /blog and a sitemap entry.
 name: Publicar blog
 on:
   schedule:
-    - cron: "7 12 * * *"   # 6:07 am Ciudad de México
+    # GitHub suele atrasar los cron horas. Se intenta cada hora de 00:07 a 12:07 de Ciudad de México;
+    # el primero que corre publica el artículo del día (build.py usa la fecha de México) y los demás no hacen nada.
+    - cron: "7 6-18 * * *"
   workflow_dispatch:
 permissions:
   contents: write
