@@ -2386,3 +2386,4 @@ body[data-page=index] .notes{padding-bottom:32px}
 .cu-super[open]>summary::after{content:"–"}
 .cu-super>summary .label{margin:0}
 .doc .pl-n{width:auto;margin-right:8px}
+.cu-foto:not(.done){background:var(--mist);border-color:#B8C0C8}
