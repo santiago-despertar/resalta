@@ -21,7 +21,8 @@ La `fecha` del artículo es la del calendario, no la de hoy. Cada mañana un pro
 - Cada artículo lleva una foto propia, simple, que represente el tema: estilo estudio, fondo gris azulado liso, camiseta negra, luz suave, sin texto, sin líneas ni anotaciones encima. 1600x1063 px, JPG de menos de 320 KB, en `assets/img/blog/<slug>.jpg`. Va justo después del `</header>`:
   `<figure class="post-fig"><img src="/assets/img/blog/<slug>.jpg" width="1600" height="1063" alt="..."></figure>`
 - No dibujes figuras SVG con líneas o puntos sobre fotos.
-- Si existe `assets/img/og/blog-<slug>.jpg` (1200x630), se usa como imagen al compartir; si no, se usa la foto del artículo.
+- La foto se genera con Nano Banana Pro (Higgsfield, modelo nano_banana_pro, 3:2), con modelos que se vean latinos, y se recorta a 1600x1063. Un artículo nunca se sube sin su foto.
+- Cada artículo lleva también su imagen para compartir (Open Graph) y sus pines de Pinterest. Con la foto ya en su lugar, corre `python3 og.py <slug>` (crea `assets/img/og/blog-<slug>.jpg`, 1200x630) y `python3 pins.py <slug>` (crea `assets/img/pins/<slug>-a.jpg` y `-b.jpg`, 1000x1500). Sube los tres archivos junto con el artículo. Sin slugs, `og.py` hace los que falten.
 - `build.py` lo convierte en página, lo agrega a /blog y a sitemap.xml solo. No toques build.py.
 
 ## Cómo escribir
