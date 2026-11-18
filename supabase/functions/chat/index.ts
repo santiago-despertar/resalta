@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
     if (!order || !["pagado", "listo"].includes(order.status)) return json({ error: "Pedido no válido" }, 400);
 
     if (body.accion === "historial") {
-      const { data } = await admin.from("chat").select("rol,texto,creado").eq("order_id", orderId).eq("user_id", user.id).order("creado", { ascending: true }).limit(60);
+      const { data } = await admin.from("chat").select("rol,texto,creado").eq("order_id", orderId).eq("user_id", user.id).order("id", { ascending: true }).limit(60);
       return json({ mensajes: data ?? [] });
     }
 
@@ -63,8 +63,17 @@ Deno.serve(async (req) => {
     const { data: rep } = await supabase.from("reports").select("data").eq("order_id", orderId).maybeSingle();
     if (!rep?.data?.resumen) return json({ error: "Tu reporte todavía no está listo" }, 400);
 
-    const { data: previos } = await admin.from("chat").select("rol,texto").eq("order_id", orderId).eq("user_id", user.id).order("creado", { ascending: false }).limit(16);
-    const historia = (previos ?? []).reverse().map((m) => ({ role: m.rol === "user" ? "user" : "assistant", content: m.texto }));
+    // Both rows of a turn are saved in one insert with the same timestamp, so order by id (insertion order), not by time.
+    const { data: previos } = await admin.from("chat").select("rol,texto").eq("order_id", orderId).eq("user_id", user.id).order("id", { ascending: false }).limit(16);
+    // Keep only complete question/answer pairs, starting with a question, so the model answers just the new one.
+    const historia: { role: string; content: string }[] = [];
+    for (const m of (previos ?? []).reverse()) {
+      const role = m.rol === "user" ? "user" : "assistant";
+      if (!historia.length && role !== "user") continue;
+      if (historia.length && historia[historia.length - 1].role === role) historia[historia.length - 1] = { role, content: m.texto };
+      else historia.push({ role, content: m.texto });
+    }
+    if (historia.length && historia[historia.length - 1].role === "user") historia.pop();
 
     const a = order.answers || {};
     const avanzado = order.tier === "hard";
