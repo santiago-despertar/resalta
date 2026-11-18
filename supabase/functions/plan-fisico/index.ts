@@ -58,7 +58,7 @@ const T_COMIDA = {
       resumen: { type: "string", description: "2 o 3 frases: qué vamos a hacer este mes y por qué." },
       en_tu_cara: { type: "string", description: "2 o 3 frases: cómo se va a notar en su cara (mandíbula, pómulos, hinchazón, piel), ligado a lo que dice su análisis facial. Sin prometer resultados exactos." },
       meta_cara: { type: "string", description: "Una frase: qué zona de su cara debería empezar a verse mejor este mes según su análisis." },
-      recetas: lista("Entre 12 y 16 platillos para todo el mes. Cada uno con su id (R1, R2...).", {
+      recetas: lista("Exactamente 4 recetas por cada momento de comida del día, cada una con su id (R1, R2...).", {
         type: "object", required: ["id", "nombre", "momento", "ingredientes", "pasos", "kcal", "prot"],
         properties: {
           id: { type: "string" }, nombre: { type: "string" },
@@ -68,18 +68,11 @@ const T_COMIDA = {
           kcal: { type: "number" }, prot: { type: "number", description: "Gramos de proteína" },
         },
       }),
-      semanas: lista("Exactamente 4 semanas.", {
-        type: "object", required: ["enfoque", "dias", "lista"],
+      semanas: lista("Exactamente 4 semanas. El menú de cada día lo arma el sistema rotando tus recetas; aquí solo va el enfoque y la lista del súper.", {
+        type: "object", required: ["enfoque", "lista"],
         properties: {
           enfoque: { type: "string", description: "Una frase: en qué se enfoca esta semana." },
-          dias: lista("Exactamente 7 días, de lunes a domingo.", {
-            type: "object", required: ["comidas"],
-            properties: { comidas: lista("Una por cada momento de comida del día, con el id de la receta.", {
-              type: "object", required: ["momento", "receta"],
-              properties: { momento: { type: "string" }, receta: { type: "string", description: "id de la receta, por ejemplo R3" } },
-            }) },
-          }, { minItems: 7, maxItems: 7 }),
-          lista: lista("Lista del súper de esa semana con cantidades aproximadas, agrupada por tipo de alimento."),
+          lista: lista("Lista del súper para 7 días con cantidades aproximadas, entre 12 y 20 renglones."),
         },
       }, { minItems: 4, maxItems: 4 }),
       cambios: lista("Entre 6 y 10 cambios fáciles: si no tienes X, usa Y (en la misma porción)."),
@@ -134,20 +127,33 @@ function limpiar(v: unknown): Obj | null {
 const arr = (v: unknown) => (Array.isArray(v) ? v : []) as Obj[];
 function validoComida(p: Obj | null) {
   if (!p || typeof p.resumen !== "string") return false;
-  const ids = new Set(arr(p.recetas).map((r) => String(r.id)));
-  if (ids.size < 6) return false;
-  const sem = arr(p.semanas);
-  if (sem.length !== 4) return false;
-  for (const s of sem) {
-    const dias = arr(s.dias);
-    if (dias.length !== 7) return false;
-    for (const d of dias) {
-      // a meal pointing at a recipe that doesn't exist is dropped, a day left empty fails the plan
-      d.comidas = arr(d.comidas).filter((c) => ids.has(String(c.receta)));
-      if (!(d.comidas as unknown[]).length) return false;
-    }
-  }
-  return true;
+  return arr(p.recetas).filter((r) => r.id && arr(r.ingredientes).length).length >= 6 && arr(p.semanas).length >= 1;
+}
+// Meals of the day for each number of meals, and the share of the day's calories each one carries.
+const MOMENTOS: Record<number, [string, number][]> = {
+  3: [["Desayuno", 0.3], ["Comida", 0.4], ["Cena", 0.3]],
+  4: [["Desayuno", 0.25], ["Comida", 0.35], ["Cena", 0.25], ["Colación", 0.15]],
+  5: [["Desayuno", 0.2], ["Colación", 0.1], ["Comida", 0.35], ["Colación", 0.1], ["Cena", 0.25]],
+};
+const momentosDe = (c: unknown) => MOMENTOS[Math.min(5, Math.max(3, Number(c) || 3))];
+const norm = (t: unknown) => String(t ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+// The 28 days are built here instead of by the model (a full month written out takes longer than a function may run):
+// each meal rotates through the recipes for that moment, shifted per week so no two weeks look the same.
+function armarSemanas(recetas: Obj[], semanas: Obj[], comidas: unknown) {
+  const ms = momentosDe(comidas);
+  const por = (m: string) => { const x = recetas.filter((r) => norm(r.momento) === norm(m)); return x.length ? x : recetas; };
+  return [0, 1, 2, 3].map((w) => {
+    const S = semanas[w] ?? semanas[semanas.length - 1] ?? {};
+    const vistos: Record<string, number> = {};
+    const dias = DIAS_SEM.map((dia, j) => ({
+      dia,
+      comidas: ms.map(([m]) => {
+        const k = norm(m), occ = (vistos[`${j}-${k}`] = (vistos[`${j}-${k}`] ?? -1) + 1), lista = por(m);
+        return { momento: m, receta: String(lista[(j + w * 2 + occ * 3) % lista.length].id) };
+      }),
+    }));
+    return { semana: w + 1, enfoque: S.enfoque ?? "", lista: arr(S.lista).length ? S.lista : arr(semanas[0]?.lista), dias };
+  });
 }
 const validoEntreno = (p: Obj | null) => !!p && arr(p.dias).length >= 1 && arr(p.dias).every((d) => arr(d.ejercicios).length >= 2) && !!p.cara;
 
@@ -178,7 +184,7 @@ async function llamar(sistema: string, contenido: unknown[], herramienta: Obj, m
       headers: { "content-type": "application/json", "x-api-key": Deno.env.get("ANTHROPIC_API_KEY")!, "anthropic-version": "2023-06-01" },
       body: JSON.stringify({
         // this model only accepts tool_choice "auto", so the system prompt asks for the tool explicitly
-        model: MODELO, max_tokens: maxTokens, system: `${sistema}\n\nResponde únicamente llamando a la herramienta ${herramienta.name}, sin texto aparte.`, tools: [herramienta], tool_choice: { type: "auto" },
+        model: MODELO, max_tokens: maxTokens, system: `${sistema}\n\nResponde únicamente llamando a la herramienta ${herramienta.name}, sin texto aparte.`, tools: [herramienta], tool_choice: { type: "auto" }, ...(intento === 0 ? { output_config: { effort: "low" } } : {}),
         messages: [{ role: "user", content: contenido }],
       }),
     });
@@ -211,7 +217,7 @@ Come ${d.comidas} veces al día. Tipo de alimentación: ${d.dieta}. No come o no
 Objetivos del día (no los cambies): ${n.kcal} kcal, ${n.prot} g de proteína, ${n.carbs} g de carbohidratos, ${n.grasa} g de grasa, ${n.agua} litros de agua. Ritmo esperado: ${n.ritmo}. Meta de peso al terminar el mes: ${metaPeso}.${previo}${cara}`;
   const conFotos = (t: string) => [...fotos, { type: "text", text: `${datos}\n${fotos.length ? "Las fotos son de su físico; úsalas solo para orientar (postura, zonas a priorizar), sin comentar su cuerpo de forma negativa.\n" : ""}\n${t}` }];
   const [comida, entreno] = await Promise.all([
-    llamar(sistema, [{ type: "text", text: `${datos}\n\nArma su menú de 4 semanas, de lunes a domingo, con ${d.comidas} momentos de comida al día. Primero define entre 12 y 16 recetas y luego asígnalas a cada día; repite recetas para que sea fácil de cocinar, pero que cada semana cambie un poco. Entrégalo con la herramienta plan_comida.` }], T_COMIDA, 14000, validoComida),
+    llamar(sistema, [{ type: "text", text: `${datos}\n\nEscribe sus recetas del mes: 4 recetas distintas por cada momento de comida (${[...new Set(momentosDe(d.comidas).map((x) => x[0]))].join(", ")}). El sistema las rota en un menú de 4 semanas, así que cada receta debe quedar cerca de estas calorías: ${[...new Set(momentosDe(d.comidas).map((x) => x[0]))].map((m) => `${m} ${Math.round(n.kcal * momentosDe(d.comidas).filter((x) => x[0] === m)[0][1] / 10) * 10} kcal`).join(", ")}. Con eso cada día suma cerca de ${n.kcal} kcal y ${n.prot} g de proteína. Para cada semana da un enfoque y su lista del súper. Entrégalo con la herramienta plan_comida.` }], T_COMIDA, 12000, validoComida),
     llamar(sistema, conFotos(`Arma su entrenamiento de ${d.dias} días por semana para 4 semanas, con progresión semana a semana, y la parte de hábitos para su cara. Entrégalo con la herramienta plan_entreno.`), T_ENTRENO, 9000, validoEntreno),
   ]);
   if (!comida || !entreno) return null;
@@ -220,7 +226,7 @@ Objetivos del día (no los cambies): ${n.kcal} kcal, ${n.prot} g de proteína, $
     v: 2,
     resumen: comida.resumen, en_tu_cara: comida.en_tu_cara,
     metas: { peso: metaPeso, cara: comida.meta_cara, ritmo: n.ritmo },
-    recetas: comida.recetas, semanas: arr(comida.semanas).map((s, i) => ({ ...s, dias: arr(s.dias).map((x, j) => ({ ...x, dia: DIAS_SEM[j] })), semana: i + 1 })),
+    recetas: comida.recetas, semanas: armarSemanas(arr(comida.recetas), arr(comida.semanas), d.comidas),
     cambios: comida.cambios,
     entreno: { calentamiento: entreno.calentamiento, dias: entreno.dias, estiramiento: entreno.estiramiento, cardio: entreno.cardio, progresion: entreno.progresion },
     cara: cr, habitos: cr?.habitos ?? [],
