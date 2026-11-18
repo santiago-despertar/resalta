@@ -407,6 +407,15 @@
     const u = await getUser();
     document.documentElement.classList.toggle("authed", !!u);
   })();
+  // "Cerrar sesión" in the phone menu; in the account page it goes through the same button there (it warns people without a password)
+  const navSalir = $("#navSalir");
+  if (navSalir) navSalir.addEventListener("click", async ev => {
+    ev.preventDefault();
+    const lo = $("#logout");
+    if (lo) { document.documentElement.classList.remove("menu-abierto"); const nl = $("#navLinks"); if (nl) nl.classList.remove("open"); const mb = $("#menuBtn"); if (mb) mb.setAttribute("aria-expanded", "false"); return lo.click(); }
+    if (sb) await sb.auth.signOut().catch(() => {});
+    location.href = "/";
+  });
 
   // ---------- save access ----------
   // People start without a password. After paying (and in their account until they do it) they are asked to
@@ -2209,7 +2218,7 @@
       if (u && (u.user_metadata || {}).sin_clave && !avisoSalir && ac && !ac.hidden) {
         avisoSalir = true; ac.scrollIntoView({ behavior: "smooth", block: "center" });
         const m = ac.querySelector(".msg"); if (m) msg(m, "Antes de salir, crea tu contraseña. Si no, no vas a poder volver a entrar a tu reporte.");
-        $("#logout").textContent = "Salir de todos modos";
+        $("#logout").textContent = "Cerrar sesión de todos modos";
         return;
       }
       if (sb) await sb.auth.signOut(); location.href = "/";
