@@ -50,6 +50,7 @@ function correo(nombre: string, score: number, partes: Parte[], fuerte: string, 
   .cd{padding:22px 18px!important}
   .ti{font-size:28px!important;line-height:34px!important}
   .sc{font-size:84px!important}
+  .fi{width:100%!important;max-width:100%!important;height:auto!important}
 }
 </style></head>
 <body style="margin:0;padding:0;background:#FFFFFF;-webkit-text-size-adjust:100%">
@@ -62,7 +63,7 @@ function correo(nombre: string, score: number, partes: Parte[], fuerte: string, 
     <tr><td align="center" style="padding:0 0 34px"><a href="${site}" style="text-decoration:none"><img src="${site}/assets/img/email/logo-blanco.png" width="136" height="38" alt="resalta" style="display:block;border:0;width:136px;height:38px"></a></td></tr>
     <tr><td align="center" style="padding:0 0 16px"><span style="display:inline-block;font-family:${mono};font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#FFFFFF;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:8px 16px">Tu calificación facial</span></td></tr>
     <tr><td align="center" class="ti" style="padding:0 0 30px;font-family:${sans};font-size:34px;line-height:40px;font-weight:300;letter-spacing:-.02em;color:#FFFFFF">${esc(nombre)}, este es tu resultado</td></tr>
-    ${foto ? card(`<img src="${esc(foto)}" width="510" alt="Tu foto con tus medidas" style="display:block;width:100%;max-width:510px;height:auto;margin:0 auto;border:0;border-radius:14px">`, "9px") : ""}
+    ${foto ? card(`<img src="${esc(foto)}" width="100%" class="fi" alt="Tu foto con tus medidas" style="display:block;width:100%;max-width:510px;height:auto;margin:0 auto;border:0;border-radius:14px">`, "9px") : ""}
     ${card(`<div style="text-align:center">${label("Armonía facial", true)}
       <div class="sc" style="margin-top:10px;font-family:${sans};font-size:96px;line-height:1;font-weight:300;letter-spacing:-.045em;color:#FFFFFF">${s}<span style="font-size:24px;letter-spacing:0;color:${W}">&nbsp;/ 100</span></div>
       <div style="margin:16px auto 0;max-width:400px;font-family:${sans};font-size:17px;line-height:26px;color:${W}">${esc(nivel)}</div></div>`, "32px 24px 30px")}
