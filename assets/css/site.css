@@ -2387,3 +2387,4 @@ body[data-page=index] .notes{padding-bottom:32px}
 .cu-super>summary .label{margin:0}
 .doc .pl-n{width:auto;margin-right:8px}
 .cu-foto:not(.done){background:var(--mist);border-color:#B8C0C8}
+.site-header .nav-links .menu-salir{border-top:0!important;padding-top:4px!important}
