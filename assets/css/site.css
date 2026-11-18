@@ -1121,7 +1121,7 @@ html.authed [data-auth="out"]{display:none!important}
 @media (max-width:900px){
   .dash-nav{overflow-x:auto;scrollbar-width:none}
   .dash-nav::-webkit-scrollbar{display:none}
-  .dash-nav button{flex:1 0 auto;min-width:62px}
+  .dash-nav button{flex:0 0 auto;min-width:0;padding:0 14px}
   .prog-pils{grid-template-columns:repeat(2,auto)}
   .prog-now{font-size:38px}
 }
@@ -2319,3 +2319,6 @@ body[data-page=index] .notes{padding-bottom:32px}
 .cr-res b{font-size:28px;font-weight:400}
 @media (max-width:640px){.cr-cap{font-size:15px}.cr-card b{font-size:28px}.cr-phone,.cr-card{min-width:0;width:100%;max-width:280px;padding:14px 16px}.cr-sc{gap:14px;padding:16px 16px 34px}.cr-res{grid-template-columns:1fr}.cr-ex{aspect-ratio:4/5}.cr-top .inner{padding:120px 20px 36px;align-self:auto}}
 @media (prefers-reduced-motion:reduce){.cr-sc{animation:none;opacity:0}.cr-s1{opacity:1}.cr-bio{animation:none;max-width:260px}.cr-bars{display:none}}
+
+/* iOS hace zoom al tocar un campo con letra menor a 16px: en celular todos los campos van a 16px */
+@media (max-width:900px),(pointer:coarse){input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select{font-size:16px!important}}
