@@ -1673,6 +1673,7 @@
     // ---- body: nutrition and training plan, body photos and weight, month by month (subscribers)
     const PAISES = ["México", "España", "Colombia", "Chile", "Perú", "Argentina", "Ecuador", "Guatemala", "Venezuela", "Estados Unidos", "Otro"];
     const PAIS_MONEDA = { MXN: "México", EUR: "España", COP: "Colombia", CLP: "Chile", PEN: "Perú" };
+    const guiaCu = (k, sexo) => `/assets/img/poses/cuerpo_${k}${sexo === "mujer" ? "_mujer" : ""}.png`;
     const FOTOS_CU = [["frente", "De frente", "Cuerpo completo, brazos relajados"], ["perfil", "De lado", "Cuerpo completo, de perfil"], ["espalda", "De espaldas", "Opcional"]];
     const DIAS_CU = 21; // a new check-in, and a new plan, every three weeks at most
     let subEstado = null, cuRows = null, cuSondeo = null;
@@ -1761,14 +1762,16 @@
         </div>
         <div class="field"><label for="cu-no_come">Lo que no comes o no te gusta <span class="hint">(opcional)</span></label><input id="cu-no_come" name="no_come" maxlength="200" placeholder="Por ejemplo: brócoli, mariscos, lácteos" value="${String(p.no_come || "").replace(/"/g, "&quot;")}"></div>
         <p class="label" style="margin:10px 0 4px">Fotos de tu físico</p>
-        <p class="hint" style="margin-bottom:12px">Con ropa ajustada o deportiva, buena luz y el celular a la altura del pecho. Sirven para comparar tu avance cada mes.</p>
-        <div class="cu-fotos">${FOTOS_CU.map(([k, t, s]) => `<label class="cu-foto" data-k="${k}"><input type="file" accept="image/*" aria-label="${t}"><b>${t}</b><small>${s}</small></label>`).join("")}</div>
+        <p class="hint" style="margin-bottom:12px">En ropa interior, short o ropa deportiva, con buena luz y el celular a la altura del pecho. Párate como en el dibujo. Sirven para comparar tu avance cada mes.</p>
+        <div class="cu-fotos">${FOTOS_CU.map(([k, t, s]) => `<label class="cu-foto" data-k="${k}"><span class="slot-guia" style="background-image:url(${guiaCu(k, sexo)})"></span><input type="file" accept="image/*" aria-label="${t}"><b>${t}</b><small>${s}</small></label>`).join("")}</div>
         <label class="cu-ok"><input type="checkbox" id="cu-salud"> <span>No tengo ninguna condición médica que limite mi alimentación o el ejercicio, o ya lo platiqué con mi médico.</span></label>
         <div class="msg" id="cuMsg"></div>
         <button class="btn btn-primary btn-block" type="submit">${previo ? "Actualizar mi plan" : "Armar mi plan"}</button>
         ${previo ? '<button type="button" class="upsell-no" id="cuCancel">Cancelar</button>' : ""}
       </form>`;
       const fotos = {};
+      const sx = $("#cu-sexo");
+      if (sx) sx.addEventListener("change", () => box.querySelectorAll(".cu-foto").forEach(el => { const g = el.querySelector(".slot-guia"); if (g) g.style.backgroundImage = `url(${guiaCu(el.dataset.k, sx.value)})`; }));
       box.querySelectorAll(".cu-foto").forEach(el => {
         el.querySelector("input").onchange = async ev => {
           const f = ev.target.files[0]; if (!f || !/^image\//.test(f.type)) return;
@@ -1816,8 +1819,60 @@
       return new Promise(r => c.toBlob(r, "image/jpeg", 0.88));
     }
     async function urlFoto(ruta) { const { data } = await sb.storage.from("fotos").createSignedUrl(ruta, 3600); return data ? data.signedUrl : ""; }
+    // Plans written since nov-2026 (v 2): a 4-week menu with recipes and a 4-week training block, one week at a time.
+    function planV2(P, fila, toca, prox) {
+      const N = P.numeros || {}, M = P.metas || {}, E = P.entreno || {}, K = P.cara || {}, lst = a => (Array.isArray(a) ? a : []);
+      const rec = {}; lst(P.recetas).forEach(r => { rec[r.id] = r; });
+      const semana = i => {
+        const S = lst(P.semanas)[i] || {};
+        const dias = lst(S.dias).map((d, j) => `<details class="card cu-dia"${j === 0 ? " open" : ""}><summary><b>${esc(d.dia)}</b><span class="hint">${lst(d.comidas).reduce((t, c) => t + (Number((rec[c.receta] || {}).kcal) || 0), 0)} kcal</span></summary>
+          ${lst(d.comidas).map(c => { const r = rec[c.receta] || {}; return `<details class="cu-rec"><summary><span class="label">${esc(c.momento)}</span><b>${esc(r.nombre)}</b><i class="mono">${esc(r.kcal)} kcal · ${esc(r.prot)} g prot</i></summary>
+            <div class="cu-rec-b"><ul class="cu-ops">${lst(r.ingredientes).map(x => `<li>${esc(x)}</li>`).join("")}</ul><ol class="cu-pasos">${lst(r.pasos).map(x => `<li>${esc(x)}</li>`).join("")}</ol></div></details>`; }).join("")}</details>`).join("");
+        const ej = lst(E.dias).map(d => `<div class="card"><p class="label">${esc(d.dia)}</p><h4 class="cu-dh">${esc(d.enfoque)}</h4><ul class="cu-ej">${lst(d.ejercicios).map(e => `<li><span><b>${esc(e.nombre)}</b><small>${esc(e.tecnica)}</small>${e.casa ? `<small>En casa: ${esc(e.casa)}</small>` : ""}</span><i class="mono">${esc(lst(e.semanas)[i] || lst(e.semanas)[0] || "")}<br><small>${esc(e.descanso)}</small></i></li>`).join("")}</ul></div>`).join("");
+        return `<p class="rep-lead cu-enf">${esc(S.enfoque)}</p>
+          <h3 class="rep-h">Tu menú de la semana ${i + 1}</h3><p class="hint rep-sub">Toca cada día y cada comida para ver los ingredientes y cómo prepararla.</p>
+          <div class="cu-semdias">${dias}</div>
+          <details class="card cu-super"><summary><span class="label">Lista del súper de la semana ${i + 1}</span></summary><ul class="cu-ops">${lst(S.lista).map(h => `<li>${esc(h)}</li>`).join("")}</ul></details>
+          <h3 class="rep-h">Tu entrenamiento de la semana ${i + 1}</h3>
+          <div class="rep-two"><div class="card"><p class="label">Calentamiento</p><ul class="cu-ops">${lst(E.calentamiento).map(h => `<li>${esc(h)}</li>`).join("")}</ul></div><div class="card"><p class="label">Pasos y cardio</p><p class="hint" style="margin-top:6px">${esc(lst(E.cardio)[i] || "")}</p></div></div>
+          <div class="cu-dias">${ej}</div>
+          <div class="rep-two"><div class="card"><p class="label">Estiramiento</p><ul class="cu-ops">${lst(E.estiramiento).map(h => `<li>${esc(h)}</li>`).join("")}</ul></div><div class="card"><p class="label">Cómo ir subiendo</p><p class="hint" style="margin-top:6px">${esc(E.progresion)}</p></div></div>`;
+      };
+      const html = `
+        <div class="card cu-card cu-top"><div><p class="label">Tu plan de este mes</p><p class="hint">Hecho el ${fecha(fila.plan_at || fila.created_at)} con tu peso de ${esc(fila.peso_kg)} kg.</p></div>
+          <div class="cu-acc"><a class="btn btn-ghost" href="/plan?f=${encodeURIComponent(fila.id)}">Descargar PDF</a>${toca ? '<button type="button" class="btn btn-primary" id="cuNuevo">Actualizar mi plan del mes</button>' : ""}</div>
+          ${toca ? "" : `<p class="hint cu-prox">Tu siguiente actualización: ${prox}</p>`}</div>
+        <div class="strip af-strip cu-nums">
+          <div class="stat"><b>${esc(N.kcal)}</b><span>calorías al día</span></div>
+          <div class="stat"><b>${esc(N.prot)} g</b><span>proteína</span></div>
+          <div class="stat"><b>${esc(N.carbs)} g</b><span>carbohidratos</span></div>
+          <div class="stat"><b>${esc(N.grasa)} g</b><span>grasa</span></div>
+          <div class="stat"><b>${esc(N.agua)} L</b><span>agua</span></div>
+        </div>
+        <p class="rep-lead">${esc(P.resumen)}</p>
+        <div class="rep-two"><div class="card"><p class="label">Tu meta del mes</p><p class="cu-meta">${esc(M.peso)}</p><p class="hint">${esc(M.cara)}</p><p class="hint" style="margin-top:6px">Ritmo esperado: ${esc(M.ritmo || N.ritmo)}.</p></div>
+          <div class="card"><p class="label">Cómo se va a notar en tu cara</p><p class="hint" style="margin-top:6px">${esc(P.en_tu_cara)}</p></div></div>
+        <div class="tabs cu-sem" id="cuSem">${[0, 1, 2, 3].map(i => `<button type="button" data-s="${i}"${i === 0 ? ' class="active"' : ""}>Semana ${i + 1}</button>`).join("")}</div>
+        <div id="cuSemBody">${semana(0)}</div>
+        <div class="card"><p class="label">Si te falta algo</p><ul class="cu-ops">${lst(P.cambios).map(h => `<li>${esc(h)}</li>`).join("")}</ul></div>
+        <h3 class="rep-h">Lo que más se nota en tu cara</h3>
+        <div class="rep-two"><div class="card"><p class="label">Para que tu cara no se hinche</p><ul class="cu-ops">${lst(K.hinchazon).map(h => `<li>${esc(h)}</li>`).join("")}</ul></div>
+          <div class="card"><p class="label">Bajar grasa y tu cara</p><p class="hint" style="margin-top:6px">${esc(K.grasa)}</p></div></div>
+        <div class="card"><p class="label">Tus hábitos diarios</p><ul class="checks" style="margin:10px 0 0">${lst(P.habitos).map(h => `<li>${esc(h)}</li>`).join("")}</ul></div>`;
+      return { html, semana };
+    }
     async function verPlan(box, fila) {
       const P = fila.plan, N = P.numeros || {}, lst = a => (Array.isArray(a) ? a : []);
+      if (P.v === 2) {
+        const dias2 = Math.floor((Date.now() - new Date(fila.created_at)) / 864e5), toca2 = dias2 >= DIAS_CU;
+        const prox2 = new Date(+new Date(fila.created_at) + DIAS_CU * 864e5).toLocaleDateString("es-MX", { day: "numeric", month: "long" });
+        const v2 = planV2(P, fila, toca2, prox2);
+        box.innerHTML = v2.html + `<h3 class="rep-h">Tu avance de físico</h3><div class="card" id="cuAvance"><p class="hint">Cargando tus fotos…</p></div>
+          <p class="hint cu-nota">Es una guía general de alimentación y ejercicio, no un tratamiento médico. Si tienes alguna condición de salud, platícalo con tu médico antes de empezar.</p>`;
+        $$("#cuSem button").forEach(b => { b.onclick = () => { $$("#cuSem button").forEach(x => x.classList.toggle("active", x === b)); $("#cuSemBody").innerHTML = v2.semana(+b.dataset.s); }; });
+        if (toca2) $("#cuNuevo").onclick = () => formCuerpo(box, fila);
+        return avanceCuerpo(fila);
+      }
       const dias = Math.floor((Date.now() - new Date(fila.created_at)) / 864e5), toca = dias >= DIAS_CU;
       const prox = new Date(+new Date(fila.created_at) + DIAS_CU * 864e5).toLocaleDateString("es-MX", { day: "numeric", month: "long" });
       box.innerHTML = `
@@ -1843,6 +1898,9 @@
         <div class="card" id="cuAvance"><p class="hint">Cargando tus fotos…</p></div>
         <p class="hint cu-nota">Es una guía general de alimentación y ejercicio, no un tratamiento médico. Si tienes alguna condición de salud, platícalo con tu médico antes de empezar.</p>`;
       if (toca) $("#cuNuevo").onclick = () => formCuerpo(box, fila);
+      return avanceCuerpo(fila);
+    }
+    async function avanceCuerpo(fila) {
       // weight over time and first vs latest photos
       const filas = (cuRows || []).filter(x => x.peso_kg).slice().reverse();
       const prim = filas[0], ulti = filas[filas.length - 1];
