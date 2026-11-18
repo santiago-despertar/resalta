@@ -177,7 +177,8 @@ async function llamar(sistema: string, contenido: unknown[], herramienta: Obj, m
       method: "POST",
       headers: { "content-type": "application/json", "x-api-key": Deno.env.get("ANTHROPIC_API_KEY")!, "anthropic-version": "2023-06-01" },
       body: JSON.stringify({
-        model: MODELO, max_tokens: maxTokens, system: sistema, tools: [herramienta], tool_choice: { type: "tool", name: herramienta.name },
+        // this model only accepts tool_choice "auto", so the system prompt asks for the tool explicitly
+        model: MODELO, max_tokens: maxTokens, system: `${sistema}\n\nResponde únicamente llamando a la herramienta ${herramienta.name}, sin texto aparte.`, tools: [herramienta], tool_choice: { type: "auto" },
         messages: [{ role: "user", content: contenido }],
       }),
     });
