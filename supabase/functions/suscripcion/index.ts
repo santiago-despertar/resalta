@@ -69,7 +69,7 @@ ${o.preview ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0">
 </td></tr></table></center></div></body></html>`;
 }
 
-// Welcome email when the monthly follow-up starts (one-click or checkout). Sent once: skipped if one went out in the last 3 days.
+// Welcome email when the monthly follow-up starts (one-click or checkout). Says what is included, never mentions charges or renewal. Sent once: skipped if one went out in the last 3 days.
 async function bienvenidaSub(userId: string, sub: Stripe.Subscription) {
   const key = Deno.env.get("SENDER_API_KEY");
   if (!key || !["active", "trialing"].includes(sub.status)) return;
@@ -82,17 +82,13 @@ async function bienvenidaSub(userId: string, sub: Stripe.Subscription) {
     const site = Deno.env.get("SITE_URL") ?? "https://resalta.co";
     const nombre = String((data?.user?.user_metadata as Record<string, unknown> | undefined)?.full_name ?? "").split(" ")[0];
     const prueba = sub.status === "trialing" && !!sub.trial_end;
-    const cobro = new Date((sub.trial_end ?? sub.current_period_end) * 1000).toLocaleDateString("es-MX", { day: "numeric", month: "long", timeZone: "America/Mexico_City" });
-    const pr = sub.items.data[0]?.price;
-    const monto = pr?.unit_amount != null ? new Intl.NumberFormat("es-MX", { style: "currency", currency: (pr.currency || "mxn").toUpperCase(), maximumFractionDigits: (pr.currency || "") === "clp" ? 0 : 2 }).format(pr.unit_amount / ((pr.currency || "") === "clp" ? 1 : 100)) : "";
     const li = (t: string) => `<tr><td style="padding:7px 0;font-family:${EM_SANS};font-size:15px;line-height:23px;color:#FFFFFF">· ${t}</td></tr>`;
     const asunto = prueba ? "Tu mes gratis de seguimiento ya empezó" : "Tu seguimiento mensual está activo";
     const html = emShell({
       site, etiqueta: "Seguimiento mensual", titulo: nombre ? `${nombre}, ya estás dentro` : "Ya estás dentro",
-      preview: prueba ? `Tu primer cobro es el ${cobro}. Puedes cancelar cuando quieras.` : "Esto es lo que incluye tu seguimiento cada mes.",
+      preview: "Esto es lo que incluye tu seguimiento cada mes.",
       filas: emTexto(`<div style="text-align:center;color:${EM_SUAVE}">${prueba ? `Tu seguimiento ya está activo y este primer mes no te cuesta nada.` : `Tu seguimiento ya está activo.`} Esto es lo que tienes cada mes:</div>`)
         + emCaja(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${li("Un nuevo escaneo completo de tu cara para medir tu avance.")}${li("Tu plan de nutrición y ejercicio: menú de 4 semanas con recetas, lista del súper y entrenamiento día por día.")}${li("El chat para preguntar lo que quieras sobre tu reporte y tu plan.")}${li("Tus fotos de antes y después, mes contra mes.")}</table>`, "18px 22px")
-        + emTexto(`<div style="text-align:center;font-size:15px;line-height:24px;color:${EM_SUAVE}">${prueba ? `Tu primer cobro${monto ? ` de ${monto}` : ""} es el ${cobro}.` : `Tu siguiente cobro${monto ? ` de ${monto}` : ""} es el ${cobro}.`} Puedes cancelar cuando quieras desde tu cuenta, sin llamadas ni preguntas.</div>`)
         + emBoton("Ir a mi cuenta", `${site}/panel?utm_source=email&utm_medium=suscripcion&utm_campaign=bienvenida`),
       pie: "Resalta · resalta.co",
     });
