@@ -111,5 +111,9 @@
     // print only once the photos are in, or they come out blank
     await Promise.all([...doc.querySelectorAll("img")].map(i => i.complete ? 0 : new Promise(res => { i.onload = i.onerror = res; })));
     const b = $("#docPdf"); b.disabled = false; b.onclick = () => window.print();
+    // On phones the browser opens its print sheet; tell people how to save it as a file there.
+    const ua = navigator.userAgent, tip = $("#docTip");
+    if (tip && /iPhone|iPad|iPod/.test(ua)) tip.innerHTML = "Se abre la ventana de imprimir. Arriba toca el ícono de <b>compartir</b> y elige <b>Guardar en Archivos</b>. El PDF queda en alta calidad.";
+    else if (tip && /Android/.test(ua)) tip.innerHTML = "Se abre la ventana de imprimir. En <b>Impresora</b> elige <b>Guardar como PDF</b> y toca el botón de descarga.";
   })().catch(() => fallo("No pudimos cargar tu reporte. Vuelve a intentarlo en un momento."));
 })();
