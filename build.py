@@ -60,7 +60,8 @@ HEADER = """<header class="site-header">
     <div class="nav-cta">
       <a class="btn btn-ghost" href="/cuenta" data-auth="out">Entrar</a>
       <a class="btn btn-ghost" href="/panel" data-auth="in">Mi cuenta</a>
-      <a class="btn btn-primary" href="/analisis">Empieza tu plan</a>
+      <a class="btn btn-primary" href="/analisis" data-auth="out">Empieza tu plan</a>
+      <a class="btn btn-primary" href="/analisis" data-auth="in">Nuevo análisis</a>
       <button class="menu-btn" id="menuBtn" type="button" aria-label="Abrir menú" aria-controls="navLinks" aria-expanded="false"><span class="burger" aria-hidden="true"><i></i><i></i></span></button>
     </div>
   </div>
