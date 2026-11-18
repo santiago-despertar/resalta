@@ -122,6 +122,7 @@ PAGES = [
     ("terminos.html", "Términos y condiciones · Resalta", "Términos y condiciones de Resalta.", ""),
     ("calificacion.html", "Calificación facial gratis · Resalta", "Descubre tu puntaje de armonía facial del 0 al 100, gratis. Tu foto se analiza en tu dispositivo.", ""),
     ("reporte.html", "Tu reporte · Resalta", "Tu análisis facial para leer y descargar.", '<script src="/assets/js/reporte.js?v=__V__"></script>'),
+    ("plan.html", "Tu plan del mes · Resalta", "Tu plan de nutrición y ejercicio para leer y descargar.", '<script src="/assets/js/plan.js?v=__V__"></script>'),
     ("visor.html", "Tu cara, medida · Resalta", "Vista previa del visor de medidas de Resalta.", ""),
     ("404.html", "Página no encontrada · Resalta", "Esta página no existe.", ""),
     ("creadores.html", "Programa de creadores · Resalta", "Gana 50% de cada análisis de Resalta que recomiendes. Tu audiencia recibe 10% de descuento y tú cobras cada mes.", ""),
@@ -165,6 +166,7 @@ _GATE = '<script>(function(){{try{{var t=localStorage.getItem("' + _KEY + '"),ba
 GATES = {
     "analisis": _GATE.format(body='if(!t&&!back)location.replace("/cuenta?next=/analisis");'),
     "reporte": _GATE.format(body='if(!t&&!back)location.replace("/cuenta?modo=entrar&next="+encodeURIComponent(location.pathname+location.search));'),
+    "plan": _GATE.format(body='if(!t&&!back)location.replace("/cuenta?modo=entrar&next="+encodeURIComponent(location.pathname+location.search));'),
     "panel": _GATE.format(body='if(!t&&!back)location.replace("/cuenta?modo=entrar&next=/panel");'),
     "cuenta": _GATE.format(body='if(t&&!back&&!/[?&]modo=nueva/.test(location.search)){var n=new URLSearchParams(location.search).get("next")||"/panel";if(!/^\\/(?!\\/)/.test(n))n="/panel";location.replace(n);}'),
 }
