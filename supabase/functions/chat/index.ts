@@ -1,4 +1,4 @@
-// Chat about the customer's own results. The report, measurements and answers go in the system prompt.
+// Chat about the customer's own results. The report, measurements, answers and their body plan (if any) go in the system prompt.
 // Secrets: ANTHROPIC_API_KEY, ANTHROPIC_CHAT_MODEL (optional, default claude-haiku-5-5), SITE_URL
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
@@ -27,6 +27,24 @@ function reporteTexto(r: Obj) {
   // evaluated items without the long arrays of numbers
   if (Array.isArray(copia.evaluaciones)) delete copia.evaluaciones;
   return JSON.stringify(copia);
+}
+
+// The body plan (panel > Cuerpo), condensed, so the chat can answer food and training questions from it.
+function planCuerpoTexto(p: Obj | null) {
+  if (!p) return "";
+  const L = (v: unknown) => (Array.isArray(v) ? v : []) as Obj[];
+  const N = p.numeros || {}, M = p.metas || {}, E = p.entreno || {};
+  const recetas = L(p.recetas).map((r) => `${r.id} (${r.momento}) ${r.nombre}: ${r.kcal} kcal, ${r.prot} g proteína. Ingredientes: ${L(r.ingredientes).join("; ")}`).join("\n");
+  const ent = L(E.dias).map((d) => `${d.dia} · ${d.enfoque}: ${L(d.ejercicios).map((e) => `${e.nombre} (${L(e.semanas).join(" / ") || [e.series, e.reps].filter(Boolean).join("x")})`).join(", ")}`).join("\n");
+  const comidasV1 = L(p.comidas).map((c) => `${c.momento}: ${L(c.opciones).join(" | ")}`).join("\n");
+  return `\n\nSU PLAN DE NUTRICIÓN Y EJERCICIO DE ESTE MES (pestaña Cuerpo de su cuenta):
+Objetivos diarios: ${N.kcal} kcal, ${N.prot} g proteína, ${N.carbs} g carbohidratos, ${N.grasa} g grasa, ${N.agua} L de agua. Ritmo: ${N.ritmo || M.ritmo || ""}. Meta del mes: ${M.peso || ""}. ${M.cara || ""}
+Resumen: ${p.resumen || ""}
+${recetas ? `Recetas (el menú de las 4 semanas rota estas):\n${recetas}` : comidasV1}
+${L(p.cambios).length ? `Cambios permitidos: ${L(p.cambios).join("; ")}` : ""}
+Entrenamiento (series x repeticiones por semana 1/2/3/4):\n${ent}
+Cardio: ${L(E.cardio).join(" / ") || E.cardio || ""}. Progresión: ${E.progresion || ""}
+Hábitos: ${L(p.habitos).join("; ")}`;
 }
 
 Deno.serve(async (req) => {
@@ -75,6 +93,8 @@ Deno.serve(async (req) => {
     }
     if (historia.length && historia[historia.length - 1].role === "user") historia.pop();
 
+    const { data: fis } = await admin.from("fisico").select("plan").eq("user_id", user.id).eq("estado", "listo").order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const plan = planCuerpoTexto(fis?.plan ?? null);
     const a = order.answers || {};
     const avanzado = order.tier === "hard";
     const sistema = `Eres el asesor de Resalta, un servicio de análisis estético facial. Hablas con un cliente sobre SU reporte, que ya pagó y ya leyó.
@@ -95,14 +115,15 @@ Cómo respondes:
   frente: menton_largo (mentón más largo), menton_ancho (mentón más ancho), mandibula (mandíbula más ancha), pomulos (pómulos más anchos), nariz_ancho (nariz más ancha), nariz_punta (punta más abajo; negativo la sube), labios (labios más gruesos), boca_ancho (boca más ancha), boca_altura (labio superior más largo; negativo es lip lift), cejas_altura (cejas más altas), cejas_cola (cola de ceja más alta), ojos (ojos más rasgados).
   perfil: menton_proy (mentón más adelante), menton_vert (mentón más largo), cuello (línea bajo el mentón más definida), nariz_proy (punta más proyectada), nariz_rot (punta más arriba), nariz_dorso (más giba; negativo la quita), labios_proy (labios más adelante), ceja (arco de ceja más marcado).
   "magro": true si es bajar de peso o grasa en la cara. "extras": "piel" para piel más limpia, "ojeras" para ojeras corregidas. Usa valores realistas para su cara. Si la pregunta no es sobre verse con un cambio, no agregues la línea.
-- Si pide algo que no tiene que ver con su cara, su imagen o su reporte, regrésalo amablemente al tema.
+${plan ? `- Tiene un plan de nutrición y ejercicio (abajo). Contesta con gusto cualquier pregunta de comida, recetas, sustituciones, porciones, calorías, súper, ejercicios, técnica o progresión usando ese plan: qué cenar si le falta algo (propón otra receta de su plan o un cambio con calorías y proteína parecidas), cuántas calorías tiene algo, cómo hacer un ejercicio. Cita sus recetas por nombre y respeta sus calorías y lo que no come. Aquí sí puedes dar cifras de calorías y porciones porque vienen de su plan.
+` : ""}- Si pide algo que no tiene que ver con su cara, su imagen, su reporte${plan ? " o su plan de nutrición y ejercicio" : ""}, regrésalo amablemente al tema.
 
 Datos del cliente: sexo ${a.sexo || "no indicado"}, edad ${a.edad || "no indicada"}, país ${a.pais || "no indicado"}, objetivo "${a.objetivo || ""}", presupuesto ${a.presupuesto || "no indicado"}, rutina actual "${a.rutina || ""}", procedimientos previos "${a.procedimientos || ""}", notas "${a.notas || ""}".
 
 ${medidasTexto(order.medidas)}
 
 Reporte completo (JSON):
-${reporteTexto(rep.data)}`;
+${reporteTexto(rep.data)}${plan}`;
 
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
