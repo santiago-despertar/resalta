@@ -65,7 +65,7 @@ function emTexto(html: string) {
 }
 function emShell(o: { site: string; etiqueta?: string; titulo?: string; filas: string; pie: string; preview?: string }) {
   return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light"><title>Resalta</title>
-<style>@media only screen and (max-width:520px){.pn{border-radius:0!important}.pi{padding:34px 18px 26px!important}.cd{padding:22px 18px!important}.ti{font-size:28px!important;line-height:34px!important}.sc{font-size:84px!important}}</style></head>
+<style>@media only screen and (max-width:520px){.pn{border-radius:0!important}.pi{padding:34px 18px 26px!important}.cd{padding:22px 18px!important}.ti{font-size:28px!important;line-height:34px!important}.sc{font-size:84px!important}.fi{width:100%!important;max-width:100%!important;height:auto!important}}</style></head>
 <body style="margin:0;padding:0;background:#FFFFFF;-webkit-text-size-adjust:100%">
 ${o.preview ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0">${o.preview}</div>` : ""}
 <div style="width:100%;background-color:#FFFFFF;margin:0;padding:0"><center style="width:100%;table-layout:fixed;background-color:#FFFFFF">
@@ -92,7 +92,7 @@ export function render(cuerpo: string, vars: Obj, flags: Obj, enlace: string) {
     if (b) return emBoton(esc(b[1]), enlace);
     // {imagen:/assets/img/x.jpg} or a full URL: a picture in a translucent card
     const im = p.match(/^\{imagen:([^}]+)\}$/);
-    if (im) { const src = /^https?:/.test(im[1]) ? im[1] : SITE + im[1]; return emCaja(`<img src="${esc(src)}" width="510" alt="" style="display:block;width:100%;max-width:510px;height:auto;margin:0 auto;border:0;border-radius:14px">`, "9px"); }
+    if (im) { const src = /^https?:/.test(im[1]) ? im[1] : SITE + im[1]; return emCaja(`<img src="${esc(src)}" width="100%" class="fi" alt="" style="display:block;width:100%;max-width:510px;height:auto;margin:0 auto;border:0;border-radius:14px">`, "9px"); }
     // {dato:0.1 s|What the number means}: a big number in a card, like the site's stat cards
     const da = p.match(/^\{dato:([^|}]+)\|([^}]+)\}$/);
     if (da) return emCaja(`<div style="text-align:center"><div class="sc" style="font-family:${EM_SANS};font-size:72px;line-height:1;font-weight:300;letter-spacing:-.04em;color:#FFFFFF">${esc(da[1])}</div><div style="margin:12px auto 0;max-width:380px;font-family:${EM_MONO};font-size:12px;line-height:19px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.75)">${esc(da[2])}</div></div>`, "30px 24px");
