@@ -2,7 +2,7 @@
   <div class="wrap" style="max-width:1080px">
     <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:32px">
       <div><span class="label">Mi cuenta</span><h1 style="font-size:44px;margin-top:8px">Hola, <span id="who">…</span></h1></div>
-      <div style="display:flex;gap:10px"><a class="btn btn-primary" href="/analisis">Nuevo análisis</a><button class="btn btn-ghost" id="logout">Salir</button></div>
+      <div style="display:flex;gap:10px"><a class="btn btn-primary" href="/analisis">Nuevo análisis</a><button class="btn btn-ghost" id="logout">Cerrar sesión</button></div>
     </div>
 
     <div class="acceso card" id="acceso" hidden></div>
@@ -203,9 +203,10 @@
     </section>
 
     <div class="card" style="margin-top:20px">
-      <p class="label" style="margin-bottom:10px">Privacidad</p>
-      <p class="hint" style="margin-bottom:16px">Puedes borrar tus fotos en cualquier momento y tu reporte se queda en tu cuenta. O puedes borrar tu cuenta completa con todo lo que tiene.</p>
+      <p class="label" style="margin-bottom:10px">Tu cuenta y privacidad</p>
+      <p class="hint" style="margin-bottom:16px">Puedes cerrar sesión cuando quieras, tus reportes se quedan guardados. También puedes borrar tus fotos o tu cuenta completa con todo lo que tiene.</p>
       <div class="priv-acc">
+        <button class="btn btn-ghost" type="button" onclick="document.getElementById('logout').click()">Cerrar sesión</button>
         <button class="btn btn-ghost" id="deletePhotos">Borrar mis fotos</button>
         <button class="btn-borrar" id="deleteAccount">Borrar mi cuenta</button>
       </div>
