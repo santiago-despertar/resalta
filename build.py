@@ -55,7 +55,9 @@ HEADER = """<header class="site-header">
       <a href="/calificacion">Calificación gratis</a>
       <a href="/#preguntas">Preguntas</a>
       <a href="/blog">Blog</a>
-      <a href="/cuenta" class="menu-only">Entrar / Mi cuenta</a>
+      <a href="/cuenta" class="menu-only" data-auth="out">Entrar</a>
+      <a href="/panel" class="menu-only" data-auth="in">Mi cuenta</a>
+      <a href="/" class="menu-only menu-salir" data-auth="in" id="navSalir">Cerrar sesión</a>
     </nav>
     <div class="nav-cta">
       <a class="btn btn-ghost" href="/cuenta" data-auth="out">Entrar</a>
