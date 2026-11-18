@@ -2,7 +2,7 @@
 // Actions: estado, activar (one click after a purchase, on the card just used), suscribir (checkout),
 // usar (spend this month's rescan on a draft order), cancelar, reactivar.
 // The Plan Completo includes the first month free, once per person (see mesGratis); otherwise the first month is charged when they subscribe.
-// Secrets: STRIPE_SECRET_KEY, STRIPE_PRICE_SUB, SITE_URL
+// Secrets: STRIPE_SECRET_KEY, STRIPE_PRICE_SUB, SITE_URL, SENDER_API_KEY
 import Stripe from "npm:stripe@16.12.0";
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
@@ -40,6 +40,68 @@ async function guardarFila(userId: string, sub: Stripe.Subscription) {
     periodo_fin: new Date(sub.current_period_end * 1000).toISOString(),
     cancela: sub.cancel_at_period_end, actualizado: new Date().toISOString(),
   }, { onConflict: "user_id" });
+}
+
+// Email design shared with the other functions (copied here because each function deploys as one file).
+const EM_SANS = "'Inter','Helvetica Neue',Helvetica,Arial,sans-serif";
+const EM_MONO = "'SFMono-Regular',Menlo,Consolas,'Courier New',monospace";
+const EM_SUAVE = "rgba(255,255,255,.82)";
+const emCaja = (inner: string, pad = "26px 24px") => `<tr><td class="cd" bgcolor="#A0AEB9" style="background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.26);border-radius:22px;padding:${pad}">${inner}</td></tr><tr><td style="height:14px;line-height:14px;font-size:0">&nbsp;</td></tr>`;
+const emBoton = (texto: string, href: string) => `<tr><td align="center" style="padding:8px 0 22px"><a href="${href}" style="display:inline-block;background:#FFFFFF;color:#16191D;text-decoration:none;padding:17px 34px;border-radius:999px;font-family:${EM_SANS};font-size:16px;font-weight:600">${texto}</a></td></tr>`;
+const emTexto = (html: string) => `<tr><td style="padding:0 4px 18px;font-family:${EM_SANS};font-size:17px;line-height:27px;color:#FFFFFF">${html}</td></tr>`;
+function emShell(o: { site: string; etiqueta?: string; titulo?: string; filas: string; pie: string; preview?: string }) {
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light"><title>Resalta</title>
+<style>@media only screen and (max-width:520px){.pn{border-radius:0!important}.pi{padding:34px 18px 26px!important}.cd{padding:22px 18px!important}.ti{font-size:28px!important;line-height:34px!important}}</style></head>
+<body style="margin:0;padding:0;background:#FFFFFF;-webkit-text-size-adjust:100%">
+${o.preview ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0">${o.preview}</div>` : ""}
+<div style="width:100%;background-color:#FFFFFF;margin:0;padding:0"><center style="width:100%;table-layout:fixed;background-color:#FFFFFF">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#FFFFFF" style="width:100%;min-width:100%;background:#FFFFFF"><tr><td align="center" valign="top" style="padding:32px 0;text-align:center">
+<table role="presentation" class="pn" align="center" width="600" cellspacing="0" cellpadding="0" border="0" bgcolor="#97A6B2" style="margin:0 auto;width:100%;max-width:600px;background-color:#97A6B2;background-image:linear-gradient(180deg,#8B9BA8 0%,#A9B6C0 100%);border-radius:28px">
+<tr><td class="pi" style="padding:44px 36px 26px;text-align:left">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr><td align="center" style="padding:0 0 30px"><a href="${o.site}" style="text-decoration:none"><img src="${o.site}/assets/img/email/logo-blanco.png" width="136" height="38" alt="resalta" style="display:block;border:0;width:136px;height:38px"></a></td></tr>
+    ${o.etiqueta ? `<tr><td align="center" style="padding:0 0 16px"><span style="display:inline-block;font-family:${EM_MONO};font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#FFFFFF;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:8px 16px">${o.etiqueta}</span></td></tr>` : ""}
+    ${o.titulo ? `<tr><td align="center" class="ti" style="padding:0 0 28px;font-family:${EM_SANS};font-size:34px;line-height:40px;font-weight:300;letter-spacing:-.02em;color:#FFFFFF">${o.titulo}</td></tr>` : ""}
+    ${o.filas}
+  </table>
+</td></tr></table>
+<table role="presentation" align="center" width="600" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto;width:100%;max-width:600px"><tr><td align="center" style="padding:20px 24px 8px;font-family:${EM_SANS};font-size:13px;line-height:20px;color:#5B6470">${o.pie}</td></tr></table>
+</td></tr></table></center></div></body></html>`;
+}
+
+// Welcome email when the monthly follow-up starts (one-click or checkout). Sent once: skipped if one went out in the last 3 days.
+async function bienvenidaSub(userId: string, sub: Stripe.Subscription) {
+  const key = Deno.env.get("SENDER_API_KEY");
+  if (!key || !["active", "trialing"].includes(sub.status)) return;
+  try {
+    const { data } = await admin.auth.admin.getUserById(userId);
+    const email = data?.user?.email?.toLowerCase(); if (!email) return;
+    const hace = new Date(Date.now() - 3 * 864e5).toISOString();
+    const { data: ya } = await admin.from("correos_log").select("id").eq("email", email).eq("tipo", "bienvenida_sub").gt("enviado_at", hace).limit(1);
+    if (ya?.length) return;
+    const site = Deno.env.get("SITE_URL") ?? "https://resalta.co";
+    const nombre = String((data?.user?.user_metadata as Record<string, unknown> | undefined)?.full_name ?? "").split(" ")[0];
+    const prueba = sub.status === "trialing" && !!sub.trial_end;
+    const cobro = new Date((sub.trial_end ?? sub.current_period_end) * 1000).toLocaleDateString("es-MX", { day: "numeric", month: "long", timeZone: "America/Mexico_City" });
+    const pr = sub.items.data[0]?.price;
+    const monto = pr?.unit_amount != null ? new Intl.NumberFormat("es-MX", { style: "currency", currency: (pr.currency || "mxn").toUpperCase(), maximumFractionDigits: (pr.currency || "") === "clp" ? 0 : 2 }).format(pr.unit_amount / ((pr.currency || "") === "clp" ? 1 : 100)) : "";
+    const li = (t: string) => `<tr><td style="padding:7px 0;font-family:${EM_SANS};font-size:15px;line-height:23px;color:#FFFFFF">· ${t}</td></tr>`;
+    const asunto = prueba ? "Tu mes gratis de seguimiento ya empezó" : "Tu seguimiento mensual está activo";
+    const html = emShell({
+      site, etiqueta: "Seguimiento mensual", titulo: nombre ? `${nombre}, ya estás dentro` : "Ya estás dentro",
+      preview: prueba ? `Tu primer cobro es el ${cobro}. Puedes cancelar cuando quieras.` : "Esto es lo que incluye tu seguimiento cada mes.",
+      filas: emTexto(`<div style="text-align:center;color:${EM_SUAVE}">${prueba ? `Tu seguimiento ya está activo y este primer mes no te cuesta nada.` : `Tu seguimiento ya está activo.`} Esto es lo que tienes cada mes:</div>`)
+        + emCaja(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${li("Un nuevo escaneo completo de tu cara para medir tu avance.")}${li("Tu plan de nutrición y ejercicio: menú de 4 semanas con recetas, lista del súper y entrenamiento día por día.")}${li("El chat para preguntar lo que quieras sobre tu reporte y tu plan.")}${li("Tus fotos de antes y después, mes contra mes.")}</table>`, "18px 22px")
+        + emTexto(`<div style="text-align:center;font-size:15px;line-height:24px;color:${EM_SUAVE}">${prueba ? `Tu primer cobro${monto ? ` de ${monto}` : ""} es el ${cobro}.` : `Tu siguiente cobro${monto ? ` de ${monto}` : ""} es el ${cobro}.`} Puedes cancelar cuando quieras desde tu cuenta, sin llamadas ni preguntas.</div>`)
+        + emBoton("Ir a mi cuenta", `${site}/panel?utm_source=email&utm_medium=suscripcion&utm_campaign=bienvenida`),
+      pie: "Resalta · resalta.co",
+    });
+    const r = await fetch("https://api.sender.net/v2/message/send", {
+      method: "POST", headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ from: { name: "Resalta", email: Deno.env.get("SENDER_FROM") ?? "contacto@resalta.co" }, to: { email }, subject: asunto, html }),
+    });
+    await admin.from("correos_log").insert({ email, tipo: "bienvenida_sub", asunto, ok: r.ok }).then(() => {}, () => {});
+  } catch (e) { console.error("bienvenida suscripcion", e); }
 }
 
 // Reads the subscription from Stripe so the answer never depends on a missed webhook.
@@ -138,6 +200,7 @@ Deno.serve(async (req) => {
           }, { idempotencyKey: `sub-${user.id}-${order!.id}${gratis ? "-g" : ""}${tester ? "-t" : ""}` });
           if (ACTIVAS.includes(nueva.status)) {
             await guardarFila(user.id, nueva);
+            await bienvenidaSub(user.id, nueva);
             return json({ ok: true, prueba: gratis, siguiente_cobro: new Date(((nueva.trial_end ?? nueva.current_period_end)) * 1000).toISOString() });
           }
           await stripe.subscriptions.cancel(nueva.id).catch(() => {});
