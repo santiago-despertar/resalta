@@ -298,7 +298,7 @@ function puntaje() {
   _puntaje = { score: Math.round(35 + raw * 0.6), parts };
   return _puntaje;
 }
-function dibujarPuntaje(canvas) { D.dibujarBelleza(canvas, img, P); }
+function dibujarPuntaje(canvas) { D.dibujarBelleza(canvas, img, P, { disp: 260 }); }
 function nota(t) {
   let n = $("#resCanvasNota");
   if (!n) { $("#resCanvas").insertAdjacentHTML("afterend", '<p class="hint" id="resCanvasNota" style="margin:-8px 0 16px;font-size:13px"></p>'); n = $("#resCanvasNota"); }

@@ -17,13 +17,13 @@ export function marco(img, P, opt = {}) {
   return { x0: Math.max(0, bx0 - pw), x1: Math.min(img.width, bx1 + pw), y0: Math.max(0, by0 - ph), y1: Math.min(img.height, by1 + ph * 0.7) };
 }
 
-function lienzo(canvas, img, P, box) {
+function lienzo(canvas, img, P, box, disp = 420) {
   const W = box.W || Math.min(900, Math.round(box.x1 - box.x0)), k = W / (box.x1 - box.x0), H = box.H || Math.round((box.y1 - box.y0) * k);
   canvas.width = W; canvas.height = H;
   const g = canvas.getContext("2d");
   g.drawImage(img, box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0, 0, 0, W, H);
   g.fillStyle = "rgba(22,25,29,.16)"; g.fillRect(0, 0, W, H);
-  const S = Math.max(W, H * 0.8) / 420;
+  const S = Math.max(W, H * 0.8) / disp;
   const q = (pt) => ({ x: (pt.x - box.x0) * k, y: (pt.y - box.y0) * k });
   const p = (i) => q(P[i]);
   const m = lineaMedia(P), A = q(m.a), B = q(m.b);
@@ -58,7 +58,7 @@ function lienzo(canvas, img, P, box) {
 }
 
 export function dibujarBelleza(canvas, img, P, opt = {}) {
-  const c = lienzo(canvas, img, P, marco(img, P, { pad: 0.45, ...opt }));
+  const c = lienzo(canvas, img, P, marco(img, P, { pad: 0.45, ...opt }), opt.disp);
   const half = dist(c.p(234), c.p(454)) / 2;
   const nivel = (i) => c.add(c.p(i), c.r, 0);
   const lado = (i) => {
