@@ -53,6 +53,7 @@ HEADER = """<header class="site-header">
       <a href="/#como-funciona">Cómo funciona</a>
       <a href="/#por-que">Por qué Resalta</a>
       <a href="/calificacion">Calificación gratis</a>
+      <a href="/herramientas/">Herramientas</a>
       <a href="/#preguntas">Preguntas</a>
       <a href="/blog">Blog</a>
       <a href="/cuenta" class="menu-only" data-auth="out">Entrar</a>
@@ -82,6 +83,7 @@ FOOTER = """<footer class="site-footer">
         <a href="/#como-funciona">Cómo funciona</a>
         <a href="/#precio">Planes</a>
         <a href="/#preguntas">Preguntas frecuentes</a>
+        <a href="/herramientas/">Herramientas gratis</a>
         <a href="/blog">Blog</a>
         <a href="/cuenta">Entrar</a>
         <a href="https://afiliados.resalta.co">Programa de afiliados</a>
@@ -128,6 +130,13 @@ PAGES = [
     ("visor.html", "Tu cara, medida · Resalta", "Vista previa del visor de medidas de Resalta.", ""),
     ("404.html", "Página no encontrada · Resalta", "Esta página no existe.", ""),
     ("creadores.html", "Programa de creadores · Resalta", "Gana 50% de cada análisis de Resalta que recomiendes. Tu audiencia recibe 10% de descuento y tú cobras cada mes.", ""),
+    ("herramientas/index.html", "Herramientas gratis para tu cara · Resalta", "Forma de cara, simetría, colorimetría, edad visual y test de belleza con una foto. Herramientas gratis, sin registro y sin que tu foto salga de tu dispositivo.", ""),
+    ("herramientas/test-de-belleza.html", "Test de belleza facial gratis: tu puntaje del 0 al 100 · Resalta", "Haz el test de belleza facial gratis con una foto. Medimos tu simetría, tus tercios y tus proporciones y te damos tu puntaje de armonía del 0 al 100.", ""),
+    ("herramientas/forma-de-cara.html", "Qué forma de cara tengo: descúbrelo con tu foto gratis · Resalta", "Descubre qué forma de cara tienes con una foto: ovalada, redonda, cuadrada, alargada, corazón o diamante. Gratis, con medidas reales y qué corte, lentes y cejas te favorecen.", ""),
+    ("herramientas/simetria-facial.html", "Test de simetría facial gratis: mide qué tan simétrica es tu cara · Resalta", "Mide tu simetría facial con una foto. Comparamos cejas, ojos, nariz, boca, pómulos y mandíbula de cada lado y te enseñamos tu cara con dos lados iguales.", ""),
+    ("herramientas/test-de-colorimetria.html", "Test de colorimetría gratis con foto: descubre tu estación · Resalta", "Haz el test de colorimetría gratis con una foto. Medimos el tono de tu piel, tus ojos y tu cabello y te decimos tu estación, tu subtono y tu paleta de colores.", ""),
+    ("herramientas/que-edad-aparento.html", "¿Qué edad aparento? Calcula tu edad visual con una foto · Resalta", "Descubre qué edad aparentas con una foto. Un modelo entrenado con miles de caras estima tu edad visual y la compara con tu edad real. Gratis.", ""),
+    ("herramientas/tipo-de-cuerpo.html", "Qué tipo de cuerpo tengo: calculadora con tus medidas · Resalta", "Calcula tu tipo de cuerpo con tus medidas de busto o pecho, cintura y cadera. Reloj de arena, triángulo, rectángulo y más, con qué ropa te favorece. Para mujer y hombre.", ""),
     ("blog.html", "Blog · Resalta", "Simetría, proporciones, mandíbula y procedimientos: lo que hay que saber de tu cara, explicado claro y con medidas.", ""),
 ]
 
@@ -158,7 +167,7 @@ CARDS = "\n".join(
       <span class="blog-meta">{int(p.get('minutos') or 5)} min de lectura</span>
     </a>""" for p in POSTS)
 _hoy = _HOY_MX
-_urls = [("", "1.0", _hoy), ("blog", "0.7", POSTS[0]["fecha"] if POSTS else _hoy)] + [(f"blog/{p['slug']}", "0.7", p["fecha"]) for p in POSTS] + [("calificacion", "0.9", _hoy), ("creadores", "0.6", _hoy), ("privacidad", "0.2", _hoy), ("terminos", "0.2", _hoy)]
+_urls = [("", "1.0", _hoy), ("blog", "0.7", POSTS[0]["fecha"] if POSTS else _hoy)] + [(f"blog/{p['slug']}", "0.7", p["fecha"]) for p in POSTS] + [("calificacion", "0.9", _hoy), ("herramientas/", "0.8", _hoy)] + [(f"herramientas/{_t}", "0.8", _hoy) for _t in ("test-de-belleza", "forma-de-cara", "simetria-facial", "test-de-colorimetria", "que-edad-aparento", "tipo-de-cuerpo")] + [ ("creadores", "0.6", _hoy), ("privacidad", "0.2", _hoy), ("terminos", "0.2", _hoy)]
 (ROOT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(f"  <url><loc>https://resalta.co/{u}</loc><lastmod>{d}</lastmod><priority>{pr}</priority></url>\n" for u, pr, d in _urls) + "</urlset>\n", encoding="utf-8")
 
 # Runs before the page paints, so signed-out visitors go straight to sign-in (and signed-in ones skip it)
@@ -184,7 +193,7 @@ for fname, title, desc, extra in PAGES:
     if not (ROOT / og.lstrip("/")).exists():
         _post = next((p for p in POSTS if f"blog/{p['slug']}.html" == fname), None)
         og = (_post.get("imagen") if _post else None) or "/assets/img/og.png"
-    html = HEAD.format(title=title, desc=desc, path="" if fname == "index.html" else fname[:-5], page=page, extra_head=GATES.get(page, ""), og=og, og_type="article" if fname.startswith("blog/") else "website")
+    html = HEAD.format(title=title, desc=desc, path="" if fname == "index.html" else (fname[:-10] if fname.endswith("/index.html") else fname[:-5]), page=page, extra_head=GATES.get(page, ""), og=og, og_type="article" if fname.startswith("blog/") else "website")
     html += HEADER + body + FOOTER + SCRIPTS.format(extra_scripts=extra)
     html = html.replace("__V__", str(int(time.time())))
     (ROOT / fname).write_text(html, encoding="utf-8")
