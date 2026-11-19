@@ -5,6 +5,7 @@ Resalta (resalta.co) hace análisis facial estético para hispanohablantes de to
 ## De dónde sale el tema
 `contenido/calendario.json`: una lista ordenada de lo más fácil a lo más difícil de posicionar, con una `fecha` por artículo (uno al día).
 Los artículos se escriben por adelantado. Toma los siguientes con `"estado": "pendiente"` en orden, escríbelos y cambia su `estado` a `"escrito"`.
+Algunas entradas traen además `tipo` ("long tail" o "programática"), `mercado_busquedas` (de dónde salen las búsquedas, MX = solo México) y `nota`. Si una entrada trae `nota`, síguela al escribir. Los artículos de famosos (pilar "Famosos") describen cambios visibles con fotos públicas y las medidas de Resalta, nunca afirman cirugías que la persona no haya confirmado en público, y no se burlan de nadie.
 La `fecha` del artículo es la del calendario, no la de hoy. Cada mañana un proceso automático de GitHub (`.github/workflows/publicar-blog.yml`) vuelve a construir el sitio y publica los artículos cuya fecha ya llegó. Un artículo con fecha futura no aparece en el sitio hasta su día.
 
 ## Archivo
