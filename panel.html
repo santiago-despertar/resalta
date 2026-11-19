@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/site.css?v=1795053390">
+<link rel="stylesheet" href="/assets/css/site.css?v=1795054331">
 <script>try{var _q=new URLSearchParams(location.search),_u={};["utm_source","utm_medium","utm_campaign","utm_content"].forEach(function(k){if(_q.get(k))_u[k]=_q.get(k).slice(0,80)});if(!_u.utm_source&&_q.get("fbclid")){_u.utm_source="facebook";_u.utm_medium=_u.utm_medium||"paid"}if(!_u.utm_source&&_q.get("gclid")){_u.utm_source="google";_u.utm_medium=_u.utm_medium||"cpc"}if(!_u.utm_source&&_q.get("ttclid")){_u.utm_source="tiktok";_u.utm_medium=_u.utm_medium||"paid"}if(_u.utm_source||_u.utm_campaign)sessionStorage.setItem("rs_utm",JSON.stringify(_u))}catch(e){}</script>
 <script>try{var _p=location.pathname;if(/\.html$/.test(_p))history.replaceState(null,"",((/\/index\.html$/.test(_p)?_p.slice(0,-10):_p.slice(0,-5))||"/")+location.search+location.hash)}catch(e){}</script>
 <script>try{var _d=document.documentElement;if(document.fonts&&document.fonts.load){_d.classList.add("fload");var _ok=function(){_d.classList.remove("fload")};Promise.all([document.fonts.load("300 40px Inter"),document.fonts.load("400 16px Inter"),document.fonts.load("600 16px Inter")]).then(_ok,_ok);setTimeout(_ok,900)}}catch(e){}</script>
@@ -181,6 +181,7 @@
                 <div class="visor-stage" id="simStage"><canvas id="simCanvas" class="sim-canvas" role="img" aria-label="Tu foto con los cambios simulados"></canvas>
                   <button type="button" class="sim-orig" id="simOrig">Mantén presionado para ver el original</button></div>
                 <div class="visor-now" id="simNow" aria-live="polite"></div>
+                <p class="hint sim-aviso">Esta foto muestra un cambio aproximado, al instante. Para ver cómo te verías de verdad, pícale a <b>Ver resultado realista</b>.</p>
               </div>
               <div class="visor-side">
                 <div class="card visor-score">
@@ -195,6 +196,7 @@
                 <label class="sim-magro"><input type="checkbox" data-extra="piel"> <span><b>Piel más limpia</b><small>Menos manchas, marcas y rojez, como con una buena rutina.</small></span></label>
                 <label class="sim-magro"><input type="checkbox" data-extra="ojeras"> <span><b>Ojeras corregidas</b><small>Menos color y hundimiento bajo los ojos.</small></span></label>
                 <p class="hint sim-ext-n" id="simExtN" hidden>Estos tres cambios no se ven en la vista rápida. Toca <b>Ver resultado realista</b> para verlos aplicados a tu foto.</p>
+                <p class="hint sim-acc-nota">El resultado realista lo genera la IA sobre tu foto con los cambios que elegiste. Tarda unos segundos.</p>
                 <div class="sim-acc"><button type="button" class="btn btn-primary" id="simIABtn">Ver resultado realista</button><button type="button" class="btn btn-ghost" id="simReset">Reiniciar</button></div>
                 <p class="hint sim-acc-n">Aplica estos mismos cambios a tu foto con IA para verlo como se vería de verdad.</p>
                 <div class="msg" id="simIAMsg"></div>
@@ -309,8 +311,8 @@
   </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="/assets/js/config.js?v=1795053390"></script>
-<script src="/assets/js/app.js?v=1795053390"></script>
+<script src="/assets/js/config.js?v=1795054331"></script>
+<script src="/assets/js/app.js?v=1795054331"></script>
 
 </body>
 </html>
