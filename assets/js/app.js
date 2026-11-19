@@ -1097,18 +1097,17 @@
         await new Promise(r => setTimeout(r, 800));
       }
       if (!o || o.status === "borrador" || o.origen === "suscripcion" || !box) return;
-      const st = (await estadoP) || {};
-      const conUp = o.tier === "soft" && q.get("mejora") !== "1", conSub = !st.activa;
-      if (!conUp && !conSub) return;
+      // Show the offer as soon as the order is paid; the follow-up status fills in when it arrives (most buyers don't have one yet).
+      let st = {};
+      const conUp = o.tier === "soft" && q.get("mejora") !== "1";
+      let conSub = true;
 
       // Both offers come ticked; the person unticks what they don't want.
       // With the Plan Completo (bought now or before) the follow-up's first month is free.
       const up = $("#ofUp"), sub = $("#ofSub"), cUp = up.querySelector("input"), cSub = sub.querySelector("input");
       up.hidden = !conUp; cUp.checked = conUp;
       sub.hidden = !conSub; cSub.checked = conSub;
-      const yaGratis = o.tier === "hard" || !!st.mes_gratis;
-      const nuevoSub = st.nuevo !== false;
-      const gratisAhora = () => nuevoSub && (yaGratis || (conUp && cUp.checked));
+      const gratisAhora = () => st.nuevo !== false && (o.tier === "hard" || !!st.mes_gratis || (conUp && cUp.checked));
       $("#ofIntro").textContent = conUp && conSub ? "Ya vienen marcados. Si no quieres alguno, quítale la palomita." : conUp ? "El Plan Completo ya viene marcado. Si no lo quieres, quítale la palomita." : "Tu Plan Completo incluye tu primer mes de seguimiento. Actívalo aquí.";
       const yes = $("#ofYes");
       const pintar = () => {
@@ -1127,6 +1126,11 @@
       };
       cUp.addEventListener("change", pintar); cSub.addEventListener("change", pintar); pintar();
       box.hidden = false;
+      estadoP.then(x => {
+        st = x || {};
+        if (st.activa) { conSub = false; sub.hidden = true; cSub.checked = false; if (!conUp) { box.hidden = true; return; } $("#ofIntro").textContent = "El Plan Completo ya viene marcado. Si no lo quieres, quítale la palomita."; }
+        pintar();
+      });
       $("#ofNo").onclick = () => { box.hidden = true; };
 
       yes.onclick = async () => {
