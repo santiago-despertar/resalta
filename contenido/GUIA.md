@@ -38,6 +38,16 @@ La `fecha` del artículo es la del calendario, no la de hoy. Cada mañana un pro
 - 2 o 3 enlaces internos a otros artículos del mismo pilar que ya estén escritos o publicados y cuya fecha sea ANTERIOR a la de este artículo (así el enlace ya existe cuando este se publique).
 - Temas médicos o de procedimientos: informativo, sin prometer resultados, y termina con el `post-nota` que dice que no sustituye la valoración de un médico.
 
+## Herramientas gratis
+Resalta tiene herramientas gratis en /herramientas/. Cuando el tema del artículo toque una, enlázala una vez dentro del texto, con un ancla natural:
+- Forma o tipo de rostro, cortes, lentes, cejas o barba según la cara: `/herramientas/forma-de-cara`
+- Simetría: `/herramientas/simetria-facial`
+- Colorimetría, subtono, colores de ropa o de cabello: `/herramientas/test-de-colorimetria`
+- Edad, envejecimiento, piel, ojeras: `/herramientas/que-edad-aparento`
+- Atractivo, belleza, armonía o proporciones: `/herramientas/test-de-belleza`
+- Silueta o ropa según el cuerpo: `/herramientas/tipo-de-cuerpo`
+No escribas artículos que compitan con esas páginas por la misma búsqueda (por ejemplo "test de colorimetría" o "qué edad aparento"): esas búsquedas ya las cubre la herramienta.
+
 ## Lenguaje compatible con los anuncios de Meta
 Resalta corre anuncios en Meta, y Meta revisa las páginas a las que llevan los anuncios y clasifica el dominio completo según lo que encuentra en el sitio. Todo artículo sigue estas reglas:
 - Nada que haga sentir mal al lector por su apariencia. No uses "feo", "defecto", "horrible", "gordo", "cachetón" como juicio, ni "arreglar tu cara". Describe variaciones con palabras neutras (ancho, alto, separados, llenas) y habla de lo que se puede resaltar.

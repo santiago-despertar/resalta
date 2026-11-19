@@ -927,20 +927,6 @@
   "estado": "pendiente"
  },
  {
-  "n": 81,
-  "fecha": "2027-02-02",
-  "keyword": "test de colorimetría",
-  "titulo": "Test de colorimetría: descubre tu paleta con una foto",
-  "pilar": "Colorimetría",
-  "busquedas": 1000,
-  "dificultad": 13,
-  "slug": "test-de-colorimetria",
-  "estado": "pendiente",
-  "tipo": "long tail",
-  "mercado_busquedas": "MX",
-  "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
- },
- {
   "n": 82,
   "fecha": "2027-02-03",
   "keyword": "peinados para cara redonda",
@@ -1025,20 +1011,6 @@
   "tipo": "programática",
   "mercado_busquedas": "MX",
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
- },
- {
-  "n": 89,
-  "fecha": "2027-02-10",
-  "keyword": "cómo saber mi colorimetría",
-  "titulo": "Cómo saber tu colorimetría en casa, paso a paso",
-  "pilar": "Colorimetría",
-  "busquedas": 880,
-  "dificultad": 13,
-  "slug": "como-saber-mi-colorimetria",
-  "estado": "pendiente",
-  "tipo": "long tail",
-  "mercado_busquedas": "MX",
-  "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
   "n": 90,
@@ -2253,17 +2225,6 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 192,
-  "fecha": "2027-05-24",
-  "keyword": "test de belleza facial",
-  "titulo": "Test de belleza facial con foto: cómo funcionan y cuál es confiable",
-  "pilar": "Armonía y medidas",
-  "busquedas": 1000,
-  "dificultad": 15,
-  "slug": "test-de-belleza-facial",
-  "estado": "pendiente"
- },
- {
   "n": 193,
   "fecha": "2027-05-25",
   "keyword": "arrugas debajo de los ojos",
@@ -3167,17 +3128,6 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 270,
-  "fecha": "2027-08-10",
-  "keyword": "como saber que tipo de rostro tengo",
-  "titulo": "¿Qué tipo de rostro tengo? Cómo saberlo en 2 minutos",
-  "pilar": "Armonía y medidas",
-  "busquedas": 1600,
-  "dificultad": 25,
-  "slug": "como-saber-que-tipo-de-rostro-tengo",
-  "estado": "pendiente"
- },
- {
   "n": 271,
   "fecha": "2027-08-11",
   "keyword": "ejercicio de mandíbula",
@@ -3256,17 +3206,6 @@
   "tipo": "programática",
   "mercado_busquedas": "MX",
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
- },
- {
-  "n": 278,
-  "fecha": "2027-08-18",
-  "keyword": "simetría facial test",
-  "titulo": "Test de simetría facial: cómo medir la tuya con una foto",
-  "pilar": "Armonía y medidas",
-  "busquedas": 590,
-  "dificultad": 17,
-  "slug": "simetria-facial-test",
-  "estado": "pendiente"
  },
  {
   "n": 279,
@@ -3882,19 +3821,6 @@
   "dificultad": 44,
   "slug": "exfoliacion-de-labios",
   "estado": "pendiente"
- },
- {
-  "n": 330,
-  "fecha": "2027-10-09",
-  "keyword": "análisis facial online gratis",
-  "titulo": "Análisis facial online gratis con una foto",
-  "pilar": "Armonía y medidas",
-  "busquedas": 50,
-  "dificultad": 12,
-  "slug": "analisis-facial-online-gratis",
-  "estado": "pendiente",
-  "tipo": "long tail",
-  "mercado_busquedas": "MX"
  },
  {
   "n": 331,
@@ -4727,20 +4653,6 @@
   "nota": "Concepto propio de los planes de Resalta. Informativo, con el aviso médico."
  },
  {
-  "n": 399,
-  "fecha": "2027-12-17",
-  "keyword": "qué edad aparento",
-  "titulo": "¿Qué edad aparento? Cómo se calcula la edad visual de tu cara",
-  "pilar": "Piel y envejecimiento",
-  "busquedas": null,
-  "dificultad": 25,
-  "slug": "que-edad-aparento",
-  "estado": "pendiente",
-  "tipo": "long tail",
-  "mercado_busquedas": "MX",
-  "nota": "Ángulo de longevidad: edad visual vs edad real. CTA a la calificación gratis."
- },
- {
   "n": 400,
   "fecha": "2027-12-18",
   "keyword": "canthal tilt",
@@ -4905,17 +4817,6 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 414,
-  "fecha": "2028-01-01",
-  "keyword": "como saber mi tipo de rostro hombre",
-  "titulo": "Cómo saber tu tipo de rostro si eres hombre",
-  "pilar": "Armonía y medidas",
-  "busquedas": 260,
-  "dificultad": 29,
-  "slug": "como-saber-mi-tipo-de-rostro-hombre",
-  "estado": "pendiente"
- },
- {
   "n": 415,
   "fecha": "2028-01-02",
   "keyword": "cómo saber si soy guapo",
@@ -4979,17 +4880,6 @@
   "busquedas": 170,
   "dificultad": 28,
   "slug": "corte-de-cabello-para-frente-amplia",
-  "estado": "pendiente"
- },
- {
-  "n": 421,
-  "fecha": "2028-01-08",
-  "keyword": "tipo de rostro online",
-  "titulo": "Detector de tipo de rostro online: qué tan precisos son",
-  "pilar": "Armonía y medidas",
-  "busquedas": 140,
-  "dificultad": 26,
-  "slug": "tipo-de-rostro-online",
   "estado": "pendiente"
  },
  {
