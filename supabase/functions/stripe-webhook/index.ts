@@ -157,6 +157,10 @@ async function comision(orderId: string, concepto: string, ventaMxn: number) {
   });
 }
 
+// Newer Stripe API versions keep the billing period on the subscription item, older ones on the subscription.
+const periodo = (sub: Stripe.Subscription, k: "current_period_start" | "current_period_end"): number =>
+  Number((sub as unknown as Record<string, unknown>)[k] ?? (sub.items?.data?.[0] as unknown as Record<string, unknown> | undefined)?.[k] ?? Date.now() / 1000);
+
 Deno.serve(async (req) => {
   const sig = req.headers.get("stripe-signature");
   const body = await req.text();
@@ -180,8 +184,8 @@ Deno.serve(async (req) => {
           stripe_customer: String(s.customer ?? ""),
           stripe_subscription: sub.id,
           estado: sub.status,
-          periodo_inicio: new Date(sub.current_period_start * 1000).toISOString(),
-          periodo_fin: new Date(sub.current_period_end * 1000).toISOString(),
+          periodo_inicio: new Date(periodo(sub, "current_period_start") * 1000).toISOString(),
+          periodo_fin: new Date(periodo(sub, "current_period_end") * 1000).toISOString(),
           cancela: sub.cancel_at_period_end,
           actualizado: new Date().toISOString(),
         });
@@ -218,8 +222,8 @@ Deno.serve(async (req) => {
     const sub = event.data.object as Stripe.Subscription;
     await admin.from("suscripciones").update({
       estado: sub.status,
-      periodo_inicio: new Date(sub.current_period_start * 1000).toISOString(),
-      periodo_fin: new Date(sub.current_period_end * 1000).toISOString(),
+      periodo_inicio: new Date(periodo(sub, "current_period_start") * 1000).toISOString(),
+      periodo_fin: new Date(periodo(sub, "current_period_end") * 1000).toISOString(),
       cancela: sub.cancel_at_period_end,
       actualizado: new Date().toISOString(),
     }).eq("stripe_subscription", sub.id);
