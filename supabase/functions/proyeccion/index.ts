@@ -131,7 +131,8 @@ Deno.serve(async (req) => {
       const prompt = `Edit this ${vista === "perfil" ? "side profile" : "front"} photo of a real person to show exactly these facial changes, as a top aesthetic surgeon would achieve them (or, for fat loss, as weight loss would), with a natural, healed result (no swelling, no marks):
 ${lista}
 
-The millimetres are real-world sizes on this face (an adult's pupils are about 63 mm apart): make each change exactly that big, visible side by side, no more and no less. Change nothing else: same identity, same skin, hair, beard, eyes, expression, head angle, lighting, clothing and background. Keep every other feature exactly where it is. Photorealistic, like the same photo taken after the procedure. No text, no watermark, no borders.`;
+${body.mejor === true ? `This is this person's "best version": the goal is a more harmonious, attractive and refined face, the way a top surgeon would subtly improve it. The face must NOT look wider, rounder or heavier than in the original: keep the overall face width the same or slightly slimmer, with a cleaner, more defined jawline.
+` : ""}The millimetres are real-world sizes on this face (an adult's pupils are about 63 mm apart): make each change exactly that big, visible side by side, no more and no less. Never make the face wider than the changes above ask for. Change nothing else: same identity, same skin, hair, beard, eyes, expression, head angle, lighting, clothing and background. Keep every other feature exactly where it is. Photorealistic, like the same photo taken after the procedure. No text, no watermark, no borders.`;
       const out = await editar(new Uint8Array(await foto.arrayBuffer()), prompt, null); // keeps the photo's own proportions
       if (!out) return json({ error: "No pudimos generar la imagen ahorita" }, 502);
       // keep it, so the customer can come back to their simulations
