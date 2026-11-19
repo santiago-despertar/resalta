@@ -26,7 +26,6 @@ const CTL_FRENTE = [
 ];
 // each preset says which controls it may touch and in which direction; the values are searched per face
 const PRE_FRENTE = [
-  ["Mejor versión", { mandibula: [-2, 0.5], menton_largo: [-2, 2], menton_ancho: [-1.5, 0.5], pomulos: [-1, 1], nariz_ancho: [-3, 1], nariz_punta: [-2, 1], labios: [-1, 2.5], boca_ancho: [-2, 2], boca_altura: [-2, 1.5], cejas_altura: [-1.5, 2.5], cejas_cola: [-1.5, 2.5] }],
   ["Mandíbula marcada", { mandibula: [0, 4], menton_largo: [-1.5, 2], menton_ancho: [-1, 2] }],
   ["Relleno de mandíbula", { mandibula: [0, 4] }],
   ["Botox de maseteros", { mandibula: [-4, 0] }],
@@ -121,7 +120,6 @@ const CTL_PERFIL = [
   ["ceja", "Arco de la ceja", "Labios y frente", 4, "Menos marcado", "Más marcado"],
 ];
 const PRE_PERFIL = [
-  ["Mejor versión", { menton_proy: [-3, 6], menton_vert: [-2, 3], cuello: [0, 7], nariz_dorso: [-3, 0], nariz_proy: [-3, 2], nariz_rot: [-1, 3], labios_proy: [-3, 3], ceja: [-2, 3] }],
   ["Implante de mentón", { menton_proy: [0, 6] }],
   ["Genioplastia de avance", { menton_proy: [0, 6], menton_vert: [0, 3] }],
   ["Reducción de mentón", { menton_proy: [-4, 0], menton_vert: [-2, 0] }],
