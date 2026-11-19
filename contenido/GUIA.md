@@ -38,6 +38,17 @@ La `fecha` del artículo es la del calendario, no la de hoy. Cada mañana un pro
 - 2 o 3 enlaces internos a otros artículos del mismo pilar que ya estén escritos o publicados y cuya fecha sea ANTERIOR a la de este artículo (así el enlace ya existe cuando este se publique).
 - Temas médicos o de procedimientos: informativo, sin prometer resultados, y termina con el `post-nota` que dice que no sustituye la valoración de un médico.
 
+## Lenguaje compatible con los anuncios de Meta
+Resalta corre anuncios en Meta, y Meta revisa las páginas a las que llevan los anuncios y clasifica el dominio completo según lo que encuentra en el sitio. Todo artículo sigue estas reglas:
+- Nada que haga sentir mal al lector por su apariencia. No uses "feo", "defecto", "horrible", "gordo", "cachetón" como juicio, ni "arreglar tu cara". Describe variaciones con palabras neutras (ancho, alto, separados, llenas) y habla de lo que se puede resaltar.
+- No digas que existe una cara o un cuerpo perfecto al que haya que aspirar. Habla de proporciones que suelen verse armónicas y de rangos de referencia.
+- No le afirmes al lector que tiene un rasgo o una condición ("tienes ojeras", "tu nariz es grande"). Escribe en condicional: "si tu nariz...", "cuando las ojeras...".
+- No prometas resultados ni tiempos (nada de "en 7 días"), y no hables de bajar de peso como objetivo estético.
+- Nunca pongas fotos de antes y después de bajar de peso ni de tratamientos para arrugas. Las fotos del artículo son las de estudio, sin comparaciones.
+- Si un rasgo puede tener una causa médica, dilo en una frase y recomienda ver a un médico. No conviertas el artículo en uno sobre enfermedades o diagnósticos.
+- No uses jerga de foros como "chad", "mogging", "PSL" o "subhumano".
+- Famosos: describe cambios visibles, no especules sobre cirugías que no hayan confirmado en público.
+
 ## Antes de publicar
 - `python3 build.py` corre sin errores. Para revisar cómo se ve un artículo con fecha futura, cambia su fecha temporalmente a hoy, construye, revisa y regrésala.
 - Revisa que no haya rayas largas: `grep -c "—" src/blog/<slug>.html` debe dar 0.

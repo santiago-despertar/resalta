@@ -703,7 +703,7 @@
   "n": 61,
   "fecha": "2027-01-13",
   "keyword": "cejas perfectas",
-  "titulo": "Cejas perfectas: la forma según tus proporciones",
+  "titulo": "Cejas ideales: la forma según tus proporciones",
   "pilar": "Ojos y cejas",
   "busquedas": 27100,
   "dificultad": 27,
@@ -1289,6 +1289,20 @@
  {
   "n": 111,
   "fecha": "2027-03-04",
+  "keyword": "filtrum",
+  "titulo": "Filtrum: qué es, cómo se mide y qué proporción se ve más armónica",
+  "pilar": "Medidas",
+  "busquedas": 1000,
+  "dificultad": 16,
+  "slug": "filtrum",
+  "estado": "pendiente",
+  "tipo": "programática",
+  "mercado_busquedas": "MX",
+  "nota": "Glosario de medidas. Explica qué es la medida, cómo se mide en una foto, rangos de referencia por sexo y ejemplos con famosos. Conéctalo con lo que mide Resalta. Lenguaje neutro: describe variaciones, no defectos."
+ },
+ {
+  "n": 112,
+  "fecha": "2027-03-05",
   "keyword": "biopolimeros en labios",
   "titulo": "Biopolímeros en labios: por qué evitarlos",
   "pilar": "Procedimientos",
@@ -1298,8 +1312,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 112,
-  "fecha": "2027-03-05",
+  "n": 113,
+  "fecha": "2027-03-06",
   "keyword": "labios carnosos",
   "titulo": "Labios carnosos: cómo conseguirlos de forma natural",
   "pilar": "Labios y sonrisa",
@@ -1309,8 +1323,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 113,
-  "fecha": "2027-03-06",
+  "n": 114,
+  "fecha": "2027-03-07",
   "keyword": "colorimetría ropa",
   "titulo": "Colorimetría en la ropa: cómo elegir colores que te favorecen",
   "pilar": "Colorimetría",
@@ -1323,8 +1337,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 114,
-  "fecha": "2027-03-07",
+  "n": 115,
+  "fecha": "2027-03-08",
   "keyword": "cuanto tarda en crecer las cejas",
   "titulo": "¿Cuánto tardan en crecer las cejas?",
   "pilar": "Ojos y cejas",
@@ -1334,8 +1348,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 115,
-  "fecha": "2027-03-08",
+  "n": 116,
+  "fecha": "2027-03-09",
   "keyword": "manchas en la cara rojas",
   "titulo": "Manchas rojas en la cara: causas comunes",
   "pilar": "Piel y envejecimiento",
@@ -1345,10 +1359,10 @@
   "estado": "pendiente"
  },
  {
-  "n": 116,
-  "fecha": "2027-03-09",
+  "n": 117,
+  "fecha": "2027-03-10",
   "keyword": "corte bob para cara redonda y cachetona",
-  "titulo": "Corte bob para cara redonda y cachetona: cómo pedirlo",
+  "titulo": "Corte bob para cara redonda y mejillas llenas: cómo pedirlo",
   "pilar": "Barba, pelo y lentes",
   "busquedas": 4400,
   "dificultad": 30,
@@ -1359,8 +1373,22 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 117,
-  "fecha": "2027-03-10",
+  "n": 118,
+  "fecha": "2027-03-11",
+  "keyword": "pómulos altos",
+  "titulo": "Pómulos altos: cómo se mide su altura y por qué destacan",
+  "pilar": "Medidas",
+  "busquedas": 590,
+  "dificultad": 13,
+  "slug": "pomulos-altos",
+  "estado": "pendiente",
+  "tipo": "programática",
+  "mercado_busquedas": "MX",
+  "nota": "Glosario de medidas. Explica qué es la medida, cómo se mide en una foto, rangos de referencia por sexo y ejemplos con famosos. Conéctalo con lo que mide Resalta. Lenguaje neutro: describe variaciones, no defectos."
+ },
+ {
+  "n": 119,
+  "fecha": "2027-03-12",
   "keyword": "acido hialuronico en labios",
   "titulo": "Ácido hialurónico en labios: lo que debes saber",
   "pilar": "Procedimientos",
@@ -1370,8 +1398,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 118,
-  "fecha": "2027-03-11",
+  "n": 120,
+  "fecha": "2027-03-13",
   "keyword": "porque mis labios tienen dos colores",
   "titulo": "Labios de dos tonos: por qué pasa y qué hacer",
   "pilar": "Labios y sonrisa",
@@ -1381,8 +1409,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 119,
-  "fecha": "2027-03-12",
+  "n": 121,
+  "fecha": "2027-03-14",
   "keyword": "perfil facial",
   "titulo": "Perfil facial: qué es y cómo se evalúa",
   "pilar": "Mandíbula y perfil",
@@ -1392,8 +1420,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 120,
-  "fecha": "2027-03-13",
+  "n": 122,
+  "fecha": "2027-03-15",
   "keyword": "hipoplasia maxilar",
   "titulo": "Hipoplasia maxilar: cómo afecta la cara y opciones",
   "pilar": "Mandíbula y perfil",
@@ -1405,8 +1433,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 121,
-  "fecha": "2027-03-14",
+  "n": 123,
+  "fecha": "2027-03-16",
   "keyword": "carillas dentales precio",
   "titulo": "Carillas dentales: cuánto cuestan",
   "pilar": "Labios y sonrisa",
@@ -1416,8 +1444,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 122,
-  "fecha": "2027-03-15",
+  "n": 124,
+  "fecha": "2027-03-17",
   "keyword": "subtono de piel",
   "titulo": "Subtono de piel: cómo saber si eres frío, cálido o neutro",
   "pilar": "Colorimetría",
@@ -1430,8 +1458,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 123,
-  "fecha": "2027-03-16",
+  "n": 125,
+  "fecha": "2027-03-18",
   "keyword": "mandíbula definida",
   "titulo": "Cómo tener una mandíbula más definida sin cirugía",
   "pilar": "Mandíbula y perfil",
@@ -1441,8 +1469,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 124,
-  "fecha": "2027-03-17",
+  "n": 126,
+  "fecha": "2027-03-19",
   "keyword": "visagismo de cejas",
   "titulo": "Visagismo de cejas: qué es y cómo funciona",
   "pilar": "Ojos y cejas",
@@ -1452,8 +1480,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 125,
-  "fecha": "2027-03-18",
+  "n": 127,
+  "fecha": "2027-03-20",
   "keyword": "manchas en la cara blancas",
   "titulo": "Manchas blancas en la cara: causas frecuentes",
   "pilar": "Piel y envejecimiento",
@@ -1463,8 +1491,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 126,
-  "fecha": "2027-03-19",
+  "n": 128,
+  "fecha": "2027-03-21",
   "keyword": "corte de pelo hombre cara ovalada",
   "titulo": "Corte de pelo para hombre con cara ovalada",
   "pilar": "Barba, pelo y lentes",
@@ -1477,8 +1505,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 127,
-  "fecha": "2027-03-20",
+  "n": 129,
+  "fecha": "2027-03-22",
   "keyword": "mandíbula cuadrada",
   "titulo": "Mandíbula cuadrada: qué la define y cómo resaltarla",
   "pilar": "Mandíbula y perfil",
@@ -1488,8 +1516,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 128,
-  "fecha": "2027-03-21",
+  "n": 130,
+  "fecha": "2027-03-23",
   "keyword": "bichectomía mal hecha",
   "titulo": "Bichectomía mal hecha: señales y soluciones",
   "pilar": "Procedimientos",
@@ -1499,8 +1527,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 129,
-  "fecha": "2027-03-22",
+  "n": 131,
+  "fecha": "2027-03-24",
   "keyword": "ejercicios faciales",
   "titulo": "Ejercicios faciales: qué dice la evidencia",
   "pilar": "Piel y envejecimiento",
@@ -1510,10 +1538,10 @@
   "estado": "pendiente"
  },
  {
-  "n": 130,
-  "fecha": "2027-03-23",
+  "n": 132,
+  "fecha": "2027-03-25",
   "keyword": "cortes para cara redonda y cachetona",
-  "titulo": "Cortes para cara redonda y cachetona que afinan el rostro",
+  "titulo": "Cortes para cara redonda y mejillas llenas",
   "pilar": "Barba, pelo y lentes",
   "busquedas": 3600,
   "dificultad": 30,
@@ -1524,8 +1552,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 131,
-  "fecha": "2027-03-24",
+  "n": 133,
+  "fecha": "2027-03-26",
   "keyword": "belinda antes y después",
   "titulo": "Belinda antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -1538,8 +1566,22 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 132,
-  "fecha": "2027-03-25",
+  "n": 134,
+  "fecha": "2027-03-27",
+  "keyword": "distancia interpupilar",
+  "titulo": "Distancia interpupilar: cómo medirla y qué dice de tu rostro",
+  "pilar": "Medidas",
+  "busquedas": 480,
+  "dificultad": 13,
+  "slug": "distancia-interpupilar",
+  "estado": "pendiente",
+  "tipo": "programática",
+  "mercado_busquedas": "MX",
+  "nota": "Glosario de medidas. Explica qué es la medida, cómo se mide en una foto, rangos de referencia por sexo y ejemplos con famosos. Conéctalo con lo que mide Resalta. Lenguaje neutro: describe variaciones, no defectos."
+ },
+ {
+  "n": 135,
+  "fecha": "2027-03-28",
   "keyword": "cuanto dura la rinomodelación",
   "titulo": "¿Cuánto dura una rinomodelación?",
   "pilar": "Nariz",
@@ -1549,8 +1591,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 133,
-  "fecha": "2027-03-26",
+  "n": 136,
+  "fecha": "2027-03-29",
   "keyword": "que es el mentón",
   "titulo": "Qué es el mentón y por qué define tu perfil",
   "pilar": "Mandíbula y perfil",
@@ -1560,8 +1602,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 134,
-  "fecha": "2027-03-27",
+  "n": 137,
+  "fecha": "2027-03-30",
   "keyword": "como quitar la papada",
   "titulo": "Cómo quitar la papada: lo que funciona y lo que no",
   "pilar": "Mandíbula y perfil",
@@ -1571,8 +1613,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 135,
-  "fecha": "2027-03-28",
+  "n": 138,
+  "fecha": "2027-03-31",
   "keyword": "cara hinchada",
   "titulo": "Cara hinchada: causas comunes y cómo desinflamarla",
   "pilar": "Piel y envejecimiento",
@@ -1582,8 +1624,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 136,
-  "fecha": "2027-03-29",
+  "n": 139,
+  "fecha": "2027-04-01",
   "keyword": "protector solar facial",
   "titulo": "Protector solar facial: cómo elegirlo según tu piel",
   "pilar": "Piel y envejecimiento",
@@ -1593,8 +1635,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 137,
-  "fecha": "2027-03-30",
+  "n": 140,
+  "fecha": "2027-04-02",
   "keyword": "lentes para cara cuadrada",
   "titulo": "Lentes para cara cuadrada",
   "pilar": "Barba, pelo y lentes",
@@ -1604,8 +1646,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 138,
-  "fecha": "2027-03-31",
+  "n": 141,
+  "fecha": "2027-04-03",
   "keyword": "frente grande",
   "titulo": "Frente grande: por qué se ve así y cómo equilibrarla",
   "pilar": "Armonía y medidas",
@@ -1617,8 +1659,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 139,
-  "fecha": "2027-04-01",
+  "n": 142,
+  "fecha": "2027-04-04",
   "keyword": "colorimetría otoño",
   "titulo": "Colorimetría otoño: colores, rasgos y cómo saber si eres otoño",
   "pilar": "Colorimetría",
@@ -1631,8 +1673,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 140,
-  "fecha": "2027-04-02",
+  "n": 143,
+  "fecha": "2027-04-05",
   "keyword": "mandíbula prominente",
   "titulo": "Mandíbula prominente: qué es y qué opciones hay",
   "pilar": "Mandíbula y perfil",
@@ -1642,8 +1684,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 141,
-  "fecha": "2027-04-03",
+  "n": 144,
+  "fecha": "2027-04-06",
   "keyword": "mandíbula chueca",
   "titulo": "Mandíbula chueca: por qué pasa y qué se puede hacer",
   "pilar": "Mandíbula y perfil",
@@ -1653,8 +1695,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 142,
-  "fecha": "2027-04-04",
+  "n": 145,
+  "fecha": "2027-04-07",
   "keyword": "mandíbula grande",
   "titulo": "Mandíbula grande: cuándo favorece y cuándo no",
   "pilar": "Mandíbula y perfil",
@@ -1664,8 +1706,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 143,
-  "fecha": "2027-04-05",
+  "n": 146,
+  "fecha": "2027-04-08",
   "keyword": "armonización facial con ácido hialurónico",
   "titulo": "Armonización facial con ácido hialurónico: cómo funciona",
   "pilar": "Procedimientos",
@@ -1675,8 +1717,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 144,
-  "fecha": "2027-04-06",
+  "n": 147,
+  "fecha": "2027-04-09",
   "keyword": "expansion maxilar",
   "titulo": "Expansión maxilar: qué es y cómo cambia la cara",
   "pilar": "Mandíbula y perfil",
@@ -1688,8 +1730,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 145,
-  "fecha": "2027-04-07",
+  "n": 148,
+  "fecha": "2027-04-10",
   "keyword": "minoxidil barba",
   "titulo": "Minoxidil para la barba: qué esperar mes a mes",
   "pilar": "Barba, pelo y lentes",
@@ -1699,8 +1741,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 146,
-  "fecha": "2027-04-08",
+  "n": 149,
+  "fecha": "2027-04-11",
   "keyword": "rinomodelación con ácido hialurónico",
   "titulo": "Rinomodelación con ácido hialurónico: cómo funciona y qué esperar",
   "pilar": "Nariz",
@@ -1710,8 +1752,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 147,
-  "fecha": "2027-04-09",
+  "n": 150,
+  "fecha": "2027-04-12",
   "keyword": "tipo de rostro hombre",
   "titulo": "Tipos de rostro en hombres y cómo reconocer el tuyo",
   "pilar": "Armonía y medidas",
@@ -1721,8 +1763,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 148,
-  "fecha": "2027-04-10",
+  "n": 151,
+  "fecha": "2027-04-13",
   "keyword": "diseño de cejas para mujer",
   "titulo": "Diseño de cejas para mujer según tu rostro",
   "pilar": "Ojos y cejas",
@@ -1732,8 +1774,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 149,
-  "fecha": "2027-04-11",
+  "n": 152,
+  "fecha": "2027-04-14",
   "keyword": "lifting de cejas",
   "titulo": "Lifting de cejas: con y sin cirugía",
   "pilar": "Procedimientos",
@@ -1743,8 +1785,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 150,
-  "fecha": "2027-04-12",
+  "n": 153,
+  "fecha": "2027-04-15",
   "keyword": "kylie jenner antes y después",
   "titulo": "Kylie Jenner antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -1757,8 +1799,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 151,
-  "fecha": "2027-04-13",
+  "n": 154,
+  "fecha": "2027-04-16",
   "keyword": "galilea montijo antes y después",
   "titulo": "Galilea Montijo antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -1771,8 +1813,22 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 152,
-  "fecha": "2027-04-14",
+  "n": 155,
+  "fecha": "2027-04-17",
+  "keyword": "ojos sanpaku",
+  "titulo": "Ojos sanpaku: qué son y cómo se mide la esclera visible",
+  "pilar": "Medidas",
+  "busquedas": 2400,
+  "dificultad": 29,
+  "slug": "ojos-sanpaku",
+  "estado": "pendiente",
+  "tipo": "programática",
+  "mercado_busquedas": "MX",
+  "nota": "Glosario de medidas. Explica qué es la medida, cómo se mide en una foto, rangos de referencia por sexo y ejemplos con famosos. Conéctalo con lo que mide Resalta. Lenguaje neutro: describe variaciones, no defectos."
+ },
+ {
+  "n": 156,
+  "fecha": "2027-04-18",
   "keyword": "cómo bajar la papada",
   "titulo": "Cómo bajar la papada: postura, grasa y estructura",
   "pilar": "Mandíbula y perfil",
@@ -1782,8 +1838,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 153,
-  "fecha": "2027-04-15",
+  "n": 157,
+  "fecha": "2027-04-19",
   "keyword": "colorimetría para el cabello",
   "titulo": "Qué color de cabello te favorece según tu colorimetría",
   "pilar": "Colorimetría",
@@ -1796,8 +1852,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 154,
-  "fecha": "2027-04-16",
+  "n": 158,
+  "fecha": "2027-04-20",
   "keyword": "rinoplastia secundaria",
   "titulo": "Rinoplastia secundaria: cuándo se necesita",
   "pilar": "Nariz",
@@ -1807,8 +1863,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 155,
-  "fecha": "2027-04-17",
+  "n": 159,
+  "fecha": "2027-04-21",
   "keyword": "rinoplastia o septoplastia",
   "titulo": "Rinoplastia o septoplastia: la diferencia",
   "pilar": "Nariz",
@@ -1818,8 +1874,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 156,
-  "fecha": "2027-04-18",
+  "n": 160,
+  "fecha": "2027-04-22",
   "keyword": "ácido hialurónico mentón",
   "titulo": "Ácido hialurónico en el mentón: resultados y duración",
   "pilar": "Procedimientos",
@@ -1829,8 +1885,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 157,
-  "fecha": "2027-04-19",
+  "n": 161,
+  "fecha": "2027-04-23",
   "keyword": "pexia de cejas",
   "titulo": "Pexia de cejas: qué es y para quién",
   "pilar": "Procedimientos",
@@ -1840,8 +1896,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 158,
-  "fecha": "2027-04-20",
+  "n": 162,
+  "fecha": "2027-04-24",
   "keyword": "aumento de mentón",
   "titulo": "Aumento de mentón: implante, relleno o genioplastia",
   "pilar": "Procedimientos",
@@ -1851,8 +1907,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 159,
-  "fecha": "2027-04-21",
+  "n": 163,
+  "fecha": "2027-04-25",
   "keyword": "6 mes rinoplastia mes a mes",
   "titulo": "Recuperación de rinoplastia mes a mes",
   "pilar": "Nariz",
@@ -1862,8 +1918,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 160,
-  "fecha": "2027-04-22",
+  "n": 164,
+  "fecha": "2027-04-26",
   "keyword": "cara hinchada por estrés",
   "titulo": "Cara hinchada por estrés: qué pasa y qué hacer",
   "pilar": "Piel y envejecimiento",
@@ -1873,8 +1929,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 161,
-  "fecha": "2027-04-23",
+  "n": 165,
+  "fecha": "2027-04-27",
   "keyword": "cuánto cuesta una rinoplastia en méxico",
   "titulo": "¿Cuánto cuesta una rinoplastia en México?",
   "pilar": "Nariz",
@@ -1884,8 +1940,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 162,
-  "fecha": "2027-04-24",
+  "n": 166,
+  "fecha": "2027-04-28",
   "keyword": "colorimetría verano",
   "titulo": "Colorimetría verano: paleta suave y fría",
   "pilar": "Colorimetría",
@@ -1898,8 +1954,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 163,
-  "fecha": "2027-04-25",
+  "n": 167,
+  "fecha": "2027-04-29",
   "keyword": "ojos de cazador",
   "titulo": "Ojos de cazador (hunter eyes): qué son y cómo se miden",
   "pilar": "Looksmaxxing",
@@ -1911,8 +1967,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 164,
-  "fecha": "2027-04-26",
+  "n": 168,
+  "fecha": "2027-04-30",
   "keyword": "mandíbula partes",
   "titulo": "Partes de la mandíbula y cuáles se ven en tu cara",
   "pilar": "Mandíbula y perfil",
@@ -1922,8 +1978,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 165,
-  "fecha": "2027-04-27",
+  "n": 169,
+  "fecha": "2027-05-01",
   "keyword": "blefaroplastia mal hechas",
   "titulo": "Blefaroplastia mal hecha: señales y cómo evitarla",
   "pilar": "Procedimientos",
@@ -1935,8 +1991,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 166,
-  "fecha": "2027-04-28",
+  "n": 170,
+  "fecha": "2027-05-02",
   "keyword": "estilos de barba y bigote",
   "titulo": "Barba y bigote: estilos y cómo elegir",
   "pilar": "Barba, pelo y lentes",
@@ -1946,8 +2002,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 167,
-  "fecha": "2027-04-29",
+  "n": 171,
+  "fecha": "2027-05-03",
   "keyword": "arrugas",
   "titulo": "Arrugas: por qué salen y cómo prevenirlas",
   "pilar": "Piel y envejecimiento",
@@ -1957,8 +2013,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 168,
-  "fecha": "2027-04-30",
+  "n": 172,
+  "fecha": "2027-05-04",
   "keyword": "perfil convexo",
   "titulo": "Perfil convexo: qué es y cómo se corrige",
   "pilar": "Mandíbula y perfil",
@@ -1970,8 +2026,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 169,
-  "fecha": "2027-05-01",
+  "n": 173,
+  "fecha": "2027-05-05",
   "keyword": "tercios faciales",
   "titulo": "Tercios faciales: cómo medirlos en tu cara",
   "pilar": "Armonía y medidas",
@@ -1983,8 +2039,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 170,
-  "fecha": "2027-05-02",
+  "n": 174,
+  "fecha": "2027-05-06",
   "keyword": "manchas en la cara por sol",
   "titulo": "Manchas por sol en la cara: cómo prevenirlas y aclararlas",
   "pilar": "Piel y envejecimiento",
@@ -1994,8 +2050,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 171,
-  "fecha": "2027-05-03",
+  "n": 175,
+  "fecha": "2027-05-07",
   "keyword": "anitta antes y después",
   "titulo": "Anitta antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -2008,8 +2064,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 172,
-  "fecha": "2027-05-04",
+  "n": 176,
+  "fecha": "2027-05-08",
   "keyword": "estilos de barba moderna",
   "titulo": "Estilos de barba modernos",
   "pilar": "Barba, pelo y lentes",
@@ -2019,8 +2075,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 173,
-  "fecha": "2027-05-05",
+  "n": 177,
+  "fecha": "2027-05-09",
   "keyword": "faja para papada",
   "titulo": "Fajas para la papada: ¿sirven de algo?",
   "pilar": "Mandíbula y perfil",
@@ -2030,8 +2086,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 174,
-  "fecha": "2027-05-06",
+  "n": 178,
+  "fecha": "2027-05-10",
   "keyword": "cuanto cuesta una blefaroplastia en mexico",
   "titulo": "Cuánto cuesta una blefaroplastia en México",
   "pilar": "Procedimientos",
@@ -2043,8 +2099,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 175,
-  "fecha": "2027-05-07",
+  "n": 179,
+  "fecha": "2027-05-11",
   "keyword": "arrugas en la frente",
   "titulo": "Arrugas en la frente: causas y opciones",
   "pilar": "Piel y envejecimiento",
@@ -2054,8 +2110,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 176,
-  "fecha": "2027-05-08",
+  "n": 180,
+  "fecha": "2027-05-12",
   "keyword": "lifting facial",
   "titulo": "Lifting facial: qué cambia y cuándo vale la pena",
   "pilar": "Procedimientos",
@@ -2065,8 +2121,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 177,
-  "fecha": "2027-05-09",
+  "n": 181,
+  "fecha": "2027-05-13",
   "keyword": "rinomodelación con hilos tensores",
   "titulo": "Rinomodelación con hilos: ¿qué tanto cambia?",
   "pilar": "Nariz",
@@ -2076,8 +2132,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 178,
-  "fecha": "2027-05-10",
+  "n": 182,
+  "fecha": "2027-05-14",
   "keyword": "mandíbula marcada mujer",
   "titulo": "Mandíbula marcada en mujeres: qué la define y cómo resaltarla",
   "pilar": "Mandíbula y perfil",
@@ -2087,8 +2143,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 179,
-  "fecha": "2027-05-11",
+  "n": 183,
+  "fecha": "2027-05-15",
   "keyword": "maxilar inferior",
   "titulo": "Maxilar inferior: forma, ángulo y estética de la mandíbula",
   "pilar": "Mandíbula y perfil",
@@ -2100,8 +2156,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 180,
-  "fecha": "2027-05-12",
+  "n": 184,
+  "fecha": "2027-05-16",
   "keyword": "el mewing funciona",
   "titulo": "¿El mewing funciona en adultos?",
   "pilar": "Looksmaxxing",
@@ -2111,8 +2167,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 181,
-  "fecha": "2027-05-13",
+  "n": 185,
+  "fecha": "2027-05-17",
   "keyword": "labios grandes",
   "titulo": "Labios grandes: proporción ideal según tu cara",
   "pilar": "Labios y sonrisa",
@@ -2122,8 +2178,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 182,
-  "fecha": "2027-05-14",
+  "n": 186,
+  "fecha": "2027-05-18",
   "keyword": "rostro cuadrado",
   "titulo": "Rostro cuadrado: cómo saber si lo tienes y qué te favorece",
   "pilar": "Armonía y medidas",
@@ -2136,8 +2192,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 183,
-  "fecha": "2027-05-15",
+  "n": 187,
+  "fecha": "2027-05-19",
   "keyword": "cejas rectas",
   "titulo": "Cejas rectas: a quién le quedan",
   "pilar": "Ojos y cejas",
@@ -2147,8 +2203,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 184,
-  "fecha": "2027-05-16",
+  "n": 188,
+  "fecha": "2027-05-20",
   "keyword": "cejas delgadas",
   "titulo": "Cejas delgadas: cómo hacer que se vean más llenas",
   "pilar": "Ojos y cejas",
@@ -2158,8 +2214,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 185,
-  "fecha": "2027-05-17",
+  "n": 189,
+  "fecha": "2027-05-21",
   "keyword": "cejas como hacer crecer",
   "titulo": "Cómo hacer crecer las cejas",
   "pilar": "Ojos y cejas",
@@ -2169,8 +2225,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 186,
-  "fecha": "2027-05-18",
+  "n": 190,
+  "fecha": "2027-05-22",
   "keyword": "la mujer más bonita del mundo",
   "titulo": "La mujer más bonita del mundo según las medidas faciales",
   "pilar": "Famosos",
@@ -2183,8 +2239,8 @@
   "nota": "Ranking con medidas de Resalta. Actualizar cada año."
  },
  {
-  "n": 187,
-  "fecha": "2027-05-19",
+  "n": 191,
+  "fecha": "2027-05-23",
   "keyword": "cabello corto mujer cara redonda",
   "titulo": "Cabello corto en mujer con cara redonda: ideas que funcionan",
   "pilar": "Barba, pelo y lentes",
@@ -2197,8 +2253,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 188,
-  "fecha": "2027-05-20",
+  "n": 192,
+  "fecha": "2027-05-24",
   "keyword": "test de belleza facial",
   "titulo": "Test de belleza facial con foto: cómo funcionan y cuál es confiable",
   "pilar": "Armonía y medidas",
@@ -2208,8 +2264,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 189,
-  "fecha": "2027-05-21",
+  "n": 193,
+  "fecha": "2027-05-25",
   "keyword": "arrugas debajo de los ojos",
   "titulo": "Arrugas debajo de los ojos: causas y tratamientos",
   "pilar": "Piel y envejecimiento",
@@ -2219,8 +2275,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 190,
-  "fecha": "2027-05-22",
+  "n": 194,
+  "fecha": "2027-05-26",
   "keyword": "serum para manchas en la cara",
   "titulo": "Sérum para manchas: qué ingredientes buscar",
   "pilar": "Piel y envejecimiento",
@@ -2230,8 +2286,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 191,
-  "fecha": "2027-05-23",
+  "n": 195,
+  "fecha": "2027-05-27",
   "keyword": "mandíbula marcada hombre",
   "titulo": "Mandíbula marcada en hombres: lo que más cambia",
   "pilar": "Mandíbula y perfil",
@@ -2241,8 +2297,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 192,
-  "fecha": "2027-05-24",
+  "n": 196,
+  "fecha": "2027-05-28",
   "keyword": "corte shaggy cara redonda",
   "titulo": "Corte shaggy en cara redonda: cuándo favorece",
   "pilar": "Barba, pelo y lentes",
@@ -2255,8 +2311,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 193,
-  "fecha": "2027-05-25",
+  "n": 197,
+  "fecha": "2027-05-29",
   "keyword": "porque tengo ojeras si duermo bien",
   "titulo": "¿Por qué tengo ojeras si duermo bien?",
   "pilar": "Ojos y cejas",
@@ -2266,8 +2322,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 194,
-  "fecha": "2027-05-26",
+  "n": 198,
+  "fecha": "2027-05-30",
   "keyword": "tipos de arrugas",
   "titulo": "Tipos de arrugas y cómo tratar cada una",
   "pilar": "Piel y envejecimiento",
@@ -2277,8 +2333,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 195,
-  "fecha": "2027-05-27",
+  "n": 199,
+  "fecha": "2027-05-31",
   "keyword": "rinoplastia precio méxico",
   "titulo": "Precio de la rinoplastia: qué incluye y qué no",
   "pilar": "Nariz",
@@ -2288,8 +2344,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 196,
-  "fecha": "2027-05-28",
+  "n": 200,
+  "fecha": "2027-06-01",
   "keyword": "bad bunny antes y después",
   "titulo": "Bad Bunny antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -2302,8 +2358,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 197,
-  "fecha": "2027-05-29",
+  "n": 201,
+  "fecha": "2027-06-02",
   "keyword": "cómo verse más joven",
   "titulo": "Cómo verse más joven: lo que de verdad cambia tu edad visual",
   "pilar": "Piel y envejecimiento",
@@ -2315,8 +2371,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 198,
-  "fecha": "2027-05-30",
+  "n": 202,
+  "fecha": "2027-06-03",
   "keyword": "porque sale la papada",
   "titulo": "¿Por qué sale la papada aunque no tengas sobrepeso?",
   "pilar": "Mandíbula y perfil",
@@ -2326,8 +2382,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 199,
-  "fecha": "2027-05-31",
+  "n": 203,
+  "fecha": "2027-06-04",
   "keyword": "tipos de manchas en la cara",
   "titulo": "Tipos de manchas en la cara y cómo distinguirlas",
   "pilar": "Piel y envejecimiento",
@@ -2337,8 +2393,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 200,
-  "fecha": "2027-06-01",
+  "n": 204,
+  "fecha": "2027-06-05",
   "keyword": "tipos de mandíbula hombre",
   "titulo": "Tipos de mandíbula en hombres",
   "pilar": "Mandíbula y perfil",
@@ -2348,10 +2404,10 @@
   "estado": "pendiente"
  },
  {
-  "n": 201,
-  "fecha": "2027-06-02",
+  "n": 205,
+  "fecha": "2027-06-06",
   "keyword": "punta de nariz gorda despues de rinoplastia",
-  "titulo": "Punta de nariz gorda después de la rinoplastia",
+  "titulo": "Punta de nariz ancha después de la rinoplastia: qué es normal",
   "pilar": "Nariz",
   "busquedas": 390,
   "dificultad": 10,
@@ -2359,8 +2415,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 202,
-  "fecha": "2027-06-03",
+  "n": 206,
+  "fecha": "2027-06-07",
   "keyword": "precio de bichectomía",
   "titulo": "Bichectomía: precio, riesgos y cuándo no conviene",
   "pilar": "Procedimientos",
@@ -2370,8 +2426,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 203,
-  "fecha": "2027-06-04",
+  "n": 207,
+  "fecha": "2027-06-08",
   "keyword": "colorimetría fría",
   "titulo": "Colorimetría fría: cómo saber si tu piel es fría",
   "pilar": "Colorimetría",
@@ -2384,8 +2440,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 204,
-  "fecha": "2027-06-05",
+  "n": 208,
+  "fecha": "2027-06-09",
   "keyword": "cejas para cara redonda",
   "titulo": "Cejas para cara redonda: la forma que más favorece",
   "pilar": "Ojos y cejas",
@@ -2398,8 +2454,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 205,
-  "fecha": "2027-06-06",
+  "n": 209,
+  "fecha": "2027-06-10",
   "keyword": "kim kardashian antes y después",
   "titulo": "Kim Kardashian antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -2412,8 +2468,22 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 206,
-  "fecha": "2027-06-07",
+  "n": 210,
+  "fecha": "2027-06-11",
+  "keyword": "ángulo nasolabial",
+  "titulo": "Ángulo nasolabial: qué es y cómo se mide de perfil",
+  "pilar": "Medidas",
+  "busquedas": 590,
+  "dificultad": 20,
+  "slug": "angulo-nasolabial",
+  "estado": "pendiente",
+  "tipo": "programática",
+  "mercado_busquedas": "MX",
+  "nota": "Glosario de medidas. Explica qué es la medida, cómo se mide en una foto, rangos de referencia por sexo y ejemplos con famosos. Conéctalo con lo que mide Resalta. Lenguaje neutro: describe variaciones, no defectos."
+ },
+ {
+  "n": 211,
+  "fecha": "2027-06-12",
   "keyword": "signos de envejecimiento facial",
   "titulo": "Signos de envejecimiento facial por edad",
   "pilar": "Piel y envejecimiento",
@@ -2425,8 +2495,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 207,
-  "fecha": "2027-06-08",
+  "n": 212,
+  "fecha": "2027-06-13",
   "keyword": "mandíbula pequeña",
   "titulo": "Mandíbula pequeña: cómo equilibrar tu perfil",
   "pilar": "Mandíbula y perfil",
@@ -2436,8 +2506,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 208,
-  "fecha": "2027-06-09",
+  "n": 213,
+  "fecha": "2027-06-14",
   "keyword": "arrugas cuello",
   "titulo": "Arrugas del cuello: cómo prevenirlas y tratarlas",
   "pilar": "Piel y envejecimiento",
@@ -2447,8 +2517,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 209,
-  "fecha": "2027-06-10",
+  "n": 214,
+  "fecha": "2027-06-15",
   "keyword": "colorimetría en el maquillaje",
   "titulo": "Colorimetría en el maquillaje: base, rubor y labial según tu subtono",
   "pilar": "Colorimetría",
@@ -2461,8 +2531,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 210,
-  "fecha": "2027-06-11",
+  "n": 215,
+  "fecha": "2027-06-16",
   "keyword": "remedio casero para ojeras",
   "titulo": "Remedios caseros para ojeras: cuáles sirven",
   "pilar": "Ojos y cejas",
@@ -2472,8 +2542,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 211,
-  "fecha": "2027-06-12",
+  "n": 216,
+  "fecha": "2027-06-17",
   "keyword": "lentes para cara ovalada hombres",
   "titulo": "Lentes para cara ovalada en hombres",
   "pilar": "Barba, pelo y lentes",
@@ -2483,8 +2553,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 212,
-  "fecha": "2027-06-13",
+  "n": 217,
+  "fecha": "2027-06-18",
   "keyword": "colorimetría primavera",
   "titulo": "Colorimetría primavera: colores que te iluminan la cara",
   "pilar": "Colorimetría",
@@ -2497,8 +2567,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 213,
-  "fecha": "2027-06-14",
+  "n": 218,
+  "fecha": "2027-06-19",
   "keyword": "ejercicios faciales de yoga",
   "titulo": "Yoga facial: ¿sirve para verte más joven?",
   "pilar": "Piel y envejecimiento",
@@ -2508,8 +2578,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 214,
-  "fecha": "2027-06-15",
+  "n": 219,
+  "fecha": "2027-06-20",
   "keyword": "soy joven y tengo arrugas en la frente",
   "titulo": "Soy joven y tengo arrugas en la frente: ¿es normal?",
   "pilar": "Piel y envejecimiento",
@@ -2519,8 +2589,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 215,
-  "fecha": "2027-06-16",
+  "n": 220,
+  "fecha": "2027-06-21",
   "keyword": "colorimetría invierno profundo",
   "titulo": "Invierno profundo: colores que te favorecen y cuáles evitar",
   "pilar": "Colorimetría",
@@ -2533,8 +2603,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 216,
-  "fecha": "2027-06-17",
+  "n": 221,
+  "fecha": "2027-06-22",
   "keyword": "karol g antes y después",
   "titulo": "Karol G antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -2547,8 +2617,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 217,
-  "fecha": "2027-06-18",
+  "n": 222,
+  "fecha": "2027-06-23",
   "keyword": "contorno segun tipo de rostro",
   "titulo": "Contorno según tu tipo de rostro: dónde poner luz y sombra",
   "pilar": "Armonía y medidas",
@@ -2558,8 +2628,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 218,
-  "fecha": "2027-06-19",
+  "n": 223,
+  "fecha": "2027-06-24",
   "keyword": "mandíbula larga",
   "titulo": "Mandíbula larga: qué significa para tu perfil",
   "pilar": "Mandíbula y perfil",
@@ -2569,8 +2639,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 219,
-  "fecha": "2027-06-20",
+  "n": 224,
+  "fecha": "2027-06-25",
   "keyword": "cirugía de ojeras",
   "titulo": "Cirugía de ojeras: blefaroplastia y otras opciones",
   "pilar": "Procedimientos",
@@ -2580,8 +2650,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 220,
-  "fecha": "2027-06-21",
+  "n": 225,
+  "fecha": "2027-06-26",
   "keyword": "bichectomía envejece",
   "titulo": "¿La bichectomía envejece? Lo que pasa con los años",
   "pilar": "Procedimientos",
@@ -2591,8 +2661,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 221,
-  "fecha": "2027-06-22",
+  "n": 226,
+  "fecha": "2027-06-27",
   "keyword": "mandíbula desviada ejercicios",
   "titulo": "¿Los ejercicios corrigen una mandíbula desviada?",
   "pilar": "Mandíbula y perfil",
@@ -2602,8 +2672,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 222,
-  "fecha": "2027-06-23",
+  "n": 227,
+  "fecha": "2027-06-28",
   "keyword": "reducción de mentón",
   "titulo": "Reducción de mentón: cuándo se hace y qué esperar",
   "pilar": "Procedimientos",
@@ -2613,8 +2683,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 223,
-  "fecha": "2027-06-24",
+  "n": 228,
+  "fecha": "2027-06-29",
   "keyword": "tipo de perfil facial",
   "titulo": "Tipos de perfil facial: recto, convexo y cóncavo",
   "pilar": "Mandíbula y perfil",
@@ -2624,8 +2694,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 224,
-  "fecha": "2027-06-25",
+  "n": 229,
+  "fecha": "2027-06-30",
   "keyword": "labios gruesos",
   "titulo": "Labios gruesos o finos: qué te favorece",
   "pilar": "Labios y sonrisa",
@@ -2635,8 +2705,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 225,
-  "fecha": "2027-06-26",
+  "n": 230,
+  "fecha": "2027-07-01",
   "keyword": "cejas arqueadas",
   "titulo": "Cejas arqueadas: cómo elegir el arco correcto",
   "pilar": "Ojos y cejas",
@@ -2646,8 +2716,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 226,
-  "fecha": "2027-06-27",
+  "n": 231,
+  "fecha": "2027-07-02",
   "keyword": "arrugas nasogenianas",
   "titulo": "Surcos nasogenianos: por qué se marcan y cómo suavizarlos",
   "pilar": "Piel y envejecimiento",
@@ -2657,8 +2727,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 227,
-  "fecha": "2027-06-28",
+  "n": 232,
+  "fecha": "2027-07-03",
   "keyword": "lentes según tipo de rostro",
   "titulo": "Qué lentes te quedan según tu tipo de rostro",
   "pilar": "Barba, pelo y lentes",
@@ -2668,8 +2738,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 228,
-  "fecha": "2027-06-29",
+  "n": 233,
+  "fecha": "2027-07-04",
   "keyword": "ojeras pigmentadas",
   "titulo": "Ojeras pigmentadas: cómo reconocerlas y aclararlas",
   "pilar": "Ojos y cejas",
@@ -2679,8 +2749,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 229,
-  "fecha": "2027-06-30",
+  "n": 234,
+  "fecha": "2027-07-05",
   "keyword": "estilos de barba candado",
   "titulo": "Barba candado: a quién le queda",
   "pilar": "Barba, pelo y lentes",
@@ -2690,8 +2760,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 230,
-  "fecha": "2027-07-01",
+  "n": 235,
+  "fecha": "2027-07-06",
   "keyword": "lentes para cara cuadrada hombre",
   "titulo": "Lentes para cara cuadrada en hombres",
   "pilar": "Barba, pelo y lentes",
@@ -2701,8 +2771,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 231,
-  "fecha": "2027-07-02",
+  "n": 236,
+  "fecha": "2027-07-07",
   "keyword": "colorimetría otoño cálido",
   "titulo": "Otoño cálido: colores, maquillaje y cabello",
   "pilar": "Colorimetría",
@@ -2715,8 +2785,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 232,
-  "fecha": "2027-07-03",
+  "n": 237,
+  "fecha": "2027-07-08",
   "keyword": "ejercitador de mandíbula",
   "titulo": "Ejercitadores de mandíbula: ¿sirven para marcar la cara?",
   "pilar": "Mandíbula y perfil",
@@ -2726,8 +2796,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 233,
-  "fecha": "2027-07-04",
+  "n": 238,
+  "fecha": "2027-07-09",
   "keyword": "grasa facial",
   "titulo": "Grasa facial: cuánto influye en cómo te ves",
   "pilar": "Piel y envejecimiento",
@@ -2737,8 +2807,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 234,
-  "fecha": "2027-07-05",
+  "n": 239,
+  "fecha": "2027-07-10",
   "keyword": "carillas dentales horribles",
   "titulo": "Carillas que se ven falsas: cómo evitarlas",
   "pilar": "Labios y sonrisa",
@@ -2748,8 +2818,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 235,
-  "fecha": "2027-07-06",
+  "n": 240,
+  "fecha": "2027-07-11",
   "keyword": "estilos de barba para cara redonda",
   "titulo": "Barba para cara redonda: los estilos que más afinan",
   "pilar": "Barba, pelo y lentes",
@@ -2759,8 +2829,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 236,
-  "fecha": "2027-07-07",
+  "n": 241,
+  "fecha": "2027-07-12",
   "keyword": "cortes de flequillo según el rostro",
   "titulo": "Qué flequillo te queda según tu tipo de rostro",
   "pilar": "Barba, pelo y lentes",
@@ -2773,8 +2843,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 237,
-  "fecha": "2027-07-08",
+  "n": 242,
+  "fecha": "2027-07-13",
   "keyword": "cuanto dura el laminado de cejas",
   "titulo": "¿Cuánto dura el laminado de cejas?",
   "pilar": "Ojos y cejas",
@@ -2784,8 +2854,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 238,
-  "fecha": "2027-07-09",
+  "n": 243,
+  "fecha": "2027-07-14",
   "keyword": "aumento de mentón con ácido hialurónico",
   "titulo": "Aumento de mentón con ácido hialurónico: lo que debes saber",
   "pilar": "Procedimientos",
@@ -2795,8 +2865,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 239,
-  "fecha": "2027-07-10",
+  "n": 244,
+  "fecha": "2027-07-15",
   "keyword": "ejercicio para la papada",
   "titulo": "Ejercicios para la papada: ¿realmente funcionan?",
   "pilar": "Mandíbula y perfil",
@@ -2806,8 +2876,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 240,
-  "fecha": "2027-07-11",
+  "n": 245,
+  "fecha": "2027-07-16",
   "keyword": "ojos almendrados hombres",
   "titulo": "Ojos almendrados en hombres: rasgos y ejemplos",
   "pilar": "Ojos y cejas",
@@ -2819,8 +2889,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 241,
-  "fecha": "2027-07-12",
+  "n": 246,
+  "fecha": "2027-07-17",
   "keyword": "lentes para cara diamante",
   "titulo": "Lentes para cara diamante",
   "pilar": "Barba, pelo y lentes",
@@ -2830,8 +2900,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 242,
-  "fecha": "2027-07-13",
+  "n": 247,
+  "fecha": "2027-07-18",
   "keyword": "colorimetría invierno",
   "titulo": "Colorimetría invierno: paleta y cómo reconocerla",
   "pilar": "Colorimetría",
@@ -2844,8 +2914,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 243,
-  "fecha": "2027-07-14",
+  "n": 248,
+  "fecha": "2027-07-19",
   "keyword": "porque amanezco con la cara hinchada",
   "titulo": "¿Por qué amaneces con la cara hinchada?",
   "pilar": "Piel y envejecimiento",
@@ -2855,8 +2925,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 244,
-  "fecha": "2027-07-15",
+  "n": 249,
+  "fecha": "2027-07-20",
   "keyword": "mandíbula hacia adelante",
   "titulo": "Mandíbula hacia adelante: causas y opciones estéticas",
   "pilar": "Mandíbula y perfil",
@@ -2866,8 +2936,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 245,
-  "fecha": "2027-07-16",
+  "n": 250,
+  "fecha": "2027-07-21",
   "keyword": "como tener mandíbula marcada",
   "titulo": "Cómo tener la mandíbula marcada: guía sin cirugía",
   "pilar": "Mandíbula y perfil",
@@ -2877,8 +2947,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 246,
-  "fecha": "2027-07-17",
+  "n": 251,
+  "fecha": "2027-07-22",
   "keyword": "rinomodelación punta caída",
   "titulo": "Rinomodelación para punta caída",
   "pilar": "Nariz",
@@ -2888,8 +2958,22 @@
   "estado": "pendiente"
  },
  {
-  "n": 247,
-  "fecha": "2027-07-18",
+  "n": 252,
+  "fecha": "2027-07-23",
+  "keyword": "ojos separados",
+  "titulo": "Ojos separados: cómo se mide la distancia entre los ojos",
+  "pilar": "Medidas",
+  "busquedas": 1000,
+  "dificultad": 30,
+  "slug": "ojos-separados",
+  "estado": "pendiente",
+  "tipo": "programática",
+  "mercado_busquedas": "MX",
+  "nota": "Glosario de medidas. Explica qué es la medida, cómo se mide en una foto, rangos de referencia por sexo y ejemplos con famosos. Conéctalo con lo que mide Resalta. Lenguaje neutro: describe variaciones, no defectos."
+ },
+ {
+  "n": 253,
+  "fecha": "2027-07-24",
   "keyword": "estilos de barba italiana",
   "titulo": "Barba italiana: qué es y cómo hacerla",
   "pilar": "Barba, pelo y lentes",
@@ -2899,8 +2983,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 248,
-  "fecha": "2027-07-19",
+  "n": 254,
+  "fecha": "2027-07-25",
   "keyword": "corte de cejas para hombre",
   "titulo": "Corte de cejas en hombre: cuándo queda bien",
   "pilar": "Ojos y cejas",
@@ -2910,8 +2994,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 249,
-  "fecha": "2027-07-20",
+  "n": 255,
+  "fecha": "2027-07-26",
   "keyword": "estilos de barba larga",
   "titulo": "Barba larga: cómo llevarla bien",
   "pilar": "Barba, pelo y lentes",
@@ -2921,8 +3005,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 250,
-  "fecha": "2027-07-21",
+  "n": 256,
+  "fecha": "2027-07-27",
   "keyword": "calvicie",
   "titulo": "Calvicie: cómo cambia tu cara y qué opciones hay",
   "pilar": "Barba, pelo y lentes",
@@ -2932,10 +3016,10 @@
   "estado": "pendiente"
  },
  {
-  "n": 251,
-  "fecha": "2027-07-22",
+  "n": 257,
+  "fecha": "2027-07-28",
   "keyword": "lentes para cara redonda y cachetona",
-  "titulo": "Lentes para cara redonda y cachetona",
+  "titulo": "Lentes para cara redonda con mejillas llenas",
   "pilar": "Barba, pelo y lentes",
   "busquedas": 320,
   "dificultad": 12,
@@ -2943,8 +3027,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 252,
-  "fecha": "2027-07-23",
+  "n": 258,
+  "fecha": "2027-07-29",
   "keyword": "shakira antes y después",
   "titulo": "Shakira antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -2957,8 +3041,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 253,
-  "fecha": "2027-07-24",
+  "n": 259,
+  "fecha": "2027-07-30",
   "keyword": "mandíbula y quijada",
   "titulo": "Mandíbula y quijada: diferencias y cómo marcarla",
   "pilar": "Mandíbula y perfil",
@@ -2968,8 +3052,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 254,
-  "fecha": "2027-07-25",
+  "n": 260,
+  "fecha": "2027-07-31",
   "keyword": "cómo hacer mewing",
   "titulo": "Cómo hacer mewing bien: la postura de lengua paso a paso",
   "pilar": "Looksmaxxing",
@@ -2979,8 +3063,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 255,
-  "fecha": "2027-07-26",
+  "n": 261,
+  "fecha": "2027-08-01",
   "keyword": "rinomodelación antes y después",
   "titulo": "Rinomodelación antes y después: casos donde sí funciona",
   "pilar": "Nariz",
@@ -2990,8 +3074,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 256,
-  "fecha": "2027-07-27",
+  "n": 262,
+  "fecha": "2027-08-02",
   "keyword": "forma de labios",
   "titulo": "Forma de labios: cómo leer la tuya",
   "pilar": "Labios y sonrisa",
@@ -3001,8 +3085,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 257,
-  "fecha": "2027-07-28",
+  "n": 263,
+  "fecha": "2027-08-03",
   "keyword": "mentón hombre",
   "titulo": "El mentón ideal en hombres: proporciones y opciones",
   "pilar": "Mandíbula y perfil",
@@ -3012,8 +3096,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 258,
-  "fecha": "2027-07-29",
+  "n": 264,
+  "fecha": "2027-08-04",
   "keyword": "rinoplastia sin cirugía",
   "titulo": "Rinoplastia sin cirugía: qué se puede corregir",
   "pilar": "Nariz",
@@ -3023,8 +3107,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 259,
-  "fecha": "2027-07-30",
+  "n": 265,
+  "fecha": "2027-08-05",
   "keyword": "tipos de ojos hombres",
   "titulo": "Tipos de ojos en hombres y cuáles se ven más atractivos",
   "pilar": "Ojos y cejas",
@@ -3036,8 +3120,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 260,
-  "fecha": "2027-07-31",
+  "n": 266,
+  "fecha": "2027-08-06",
   "keyword": "ojeras por no dormir",
   "titulo": "Ojeras por no dormir: cuánto influye el sueño",
   "pilar": "Ojos y cejas",
@@ -3047,8 +3131,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 261,
-  "fecha": "2027-08-01",
+  "n": 267,
+  "fecha": "2027-08-07",
   "keyword": "simulador de rinoplastia",
   "titulo": "Simulador de rinoplastia: qué tan real es",
   "pilar": "Nariz",
@@ -3058,8 +3142,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 262,
-  "fecha": "2027-08-02",
+  "n": 268,
+  "fecha": "2027-08-08",
   "keyword": "lentes para cara cuadrada mujer",
   "titulo": "Lentes para cara cuadrada en mujeres",
   "pilar": "Barba, pelo y lentes",
@@ -3069,8 +3153,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 263,
-  "fecha": "2027-08-03",
+  "n": 269,
+  "fecha": "2027-08-09",
   "keyword": "bella hadid antes y después",
   "titulo": "Bella Hadid antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -3083,8 +3167,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 264,
-  "fecha": "2027-08-04",
+  "n": 270,
+  "fecha": "2027-08-10",
   "keyword": "como saber que tipo de rostro tengo",
   "titulo": "¿Qué tipo de rostro tengo? Cómo saberlo en 2 minutos",
   "pilar": "Armonía y medidas",
@@ -3094,8 +3178,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 265,
-  "fecha": "2027-08-05",
+  "n": 271,
+  "fecha": "2027-08-11",
   "keyword": "ejercicio de mandíbula",
   "titulo": "Ejercicios de mandíbula: qué sí hacen y qué no",
   "pilar": "Mandíbula y perfil",
@@ -3105,8 +3189,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 266,
-  "fecha": "2027-08-06",
+  "n": 272,
+  "fecha": "2027-08-12",
   "keyword": "mentón partido",
   "titulo": "Mentón partido: por qué aparece y si se puede cambiar",
   "pilar": "Mandíbula y perfil",
@@ -3116,8 +3200,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 267,
-  "fecha": "2027-08-07",
+  "n": 273,
+  "fecha": "2027-08-13",
   "keyword": "porque salen ojeras",
   "titulo": "Por qué salen ojeras: las causas principales",
   "pilar": "Ojos y cejas",
@@ -3127,8 +3211,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 268,
-  "fecha": "2027-08-08",
+  "n": 274,
+  "fecha": "2027-08-14",
   "keyword": "cara hinchada por retencion de liquidos",
   "titulo": "Cara hinchada por retención de líquidos: cómo bajarla",
   "pilar": "Piel y envejecimiento",
@@ -3138,8 +3222,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 269,
-  "fecha": "2027-08-09",
+  "n": 275,
+  "fecha": "2027-08-15",
   "keyword": "relleno de mentón",
   "titulo": "Relleno de mentón: cuánto cambia el perfil y cuánto cuesta",
   "pilar": "Procedimientos",
@@ -3149,8 +3233,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 270,
-  "fecha": "2027-08-10",
+  "n": 276,
+  "fecha": "2027-08-16",
   "keyword": "arrugas en los ojos a los 30",
   "titulo": "Arrugas en los ojos a los 30: qué es normal",
   "pilar": "Piel y envejecimiento",
@@ -3160,8 +3244,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 271,
-  "fecha": "2027-08-11",
+  "n": 277,
+  "fecha": "2027-08-17",
   "keyword": "rostro corazón mujer",
   "titulo": "Rostro corazón: cómo reconocerlo y qué te favorece",
   "pilar": "Armonía y medidas",
@@ -3174,8 +3258,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 272,
-  "fecha": "2027-08-12",
+  "n": 278,
+  "fecha": "2027-08-18",
   "keyword": "simetría facial test",
   "titulo": "Test de simetría facial: cómo medir la tuya con una foto",
   "pilar": "Armonía y medidas",
@@ -3185,8 +3269,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 273,
-  "fecha": "2027-08-13",
+  "n": 279,
+  "fecha": "2027-08-19",
   "keyword": "dua lipa antes y después",
   "titulo": "Dua Lipa antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -3199,8 +3283,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 274,
-  "fecha": "2027-08-14",
+  "n": 280,
+  "fecha": "2027-08-20",
   "keyword": "botox para arrugas",
   "titulo": "Bótox para arrugas: zonas, duración y precio",
   "pilar": "Procedimientos",
@@ -3210,8 +3294,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 275,
-  "fecha": "2027-08-15",
+  "n": 281,
+  "fecha": "2027-08-21",
   "keyword": "calvicie cortes de cabello para hombres con entradas",
   "titulo": "Cortes de cabello para hombres con entradas",
   "pilar": "Barba, pelo y lentes",
@@ -3221,8 +3305,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 276,
-  "fecha": "2027-08-16",
+  "n": 282,
+  "fecha": "2027-08-22",
   "keyword": "como tener simetría facial",
   "titulo": "Cómo mejorar la simetría facial de forma natural",
   "pilar": "Armonía y medidas",
@@ -3232,8 +3316,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 277,
-  "fecha": "2027-08-17",
+  "n": 283,
+  "fecha": "2027-08-23",
   "keyword": "rinoplastia riesgos muerte",
   "titulo": "Riesgos reales de la rinoplastia",
   "pilar": "Nariz",
@@ -3243,8 +3327,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 278,
-  "fecha": "2027-08-18",
+  "n": 284,
+  "fecha": "2027-08-24",
   "keyword": "minoxidil para las cejas",
   "titulo": "Minoxidil para las cejas: ¿funciona?",
   "pilar": "Ojos y cejas",
@@ -3254,8 +3338,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 279,
-  "fecha": "2027-08-19",
+  "n": 285,
+  "fecha": "2027-08-25",
   "keyword": "calvicie en la coronilla",
   "titulo": "Calvicie en la coronilla: cómo detectarla y qué hacer",
   "pilar": "Barba, pelo y lentes",
@@ -3265,8 +3349,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 280,
-  "fecha": "2027-08-20",
+  "n": 286,
+  "fecha": "2027-08-26",
   "keyword": "lipo enzimas papada",
   "titulo": "Lipoenzimas para la papada: cómo funcionan y riesgos",
   "pilar": "Procedimientos",
@@ -3276,8 +3360,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 281,
-  "fecha": "2027-08-21",
+  "n": 287,
+  "fecha": "2027-08-27",
   "keyword": "carboxiterapia ojeras",
   "titulo": "Carboxiterapia para ojeras: cómo funciona",
   "pilar": "Procedimientos",
@@ -3287,8 +3371,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 282,
-  "fecha": "2027-08-22",
+  "n": 288,
+  "fecha": "2027-08-28",
   "keyword": "acné adultos",
   "titulo": "Acné en adultos: por qué aparece y cómo controlarlo",
   "pilar": "Piel y envejecimiento",
@@ -3298,8 +3382,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 283,
-  "fecha": "2027-08-23",
+  "n": 289,
+  "fecha": "2027-08-29",
   "keyword": "colorimetría otoño profundo",
   "titulo": "Otoño profundo: paleta y cómo saber si eres",
   "pilar": "Colorimetría",
@@ -3312,8 +3396,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 284,
-  "fecha": "2027-08-24",
+  "n": 290,
+  "fecha": "2027-08-30",
   "keyword": "colorimetría estaciones",
   "titulo": "Las estaciones de la colorimetría explicadas fácil",
   "pilar": "Colorimetría",
@@ -3326,8 +3410,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 285,
-  "fecha": "2027-08-25",
+  "n": 291,
+  "fecha": "2027-08-31",
   "keyword": "corto corte de pelo cara alargada",
   "titulo": "Cortes cortos para cara alargada",
   "pilar": "Barba, pelo y lentes",
@@ -3340,8 +3424,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 286,
-  "fecha": "2027-08-26",
+  "n": 292,
+  "fecha": "2027-09-01",
   "keyword": "ojos caídos",
   "titulo": "Ojos caídos: por qué pasa y qué se puede hacer",
   "pilar": "Ojos y cejas",
@@ -3351,8 +3435,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 287,
-  "fecha": "2027-08-27",
+  "n": 293,
+  "fecha": "2027-09-02",
   "keyword": "cortes para rostro alargado hombre",
   "titulo": "Cortes para hombre con rostro alargado",
   "pilar": "Barba, pelo y lentes",
@@ -3365,8 +3449,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 288,
-  "fecha": "2027-08-28",
+  "n": 294,
+  "fecha": "2027-09-03",
   "keyword": "primavera cálida colorimetría",
   "titulo": "Primavera cálida: paleta y rasgos típicos",
   "pilar": "Colorimetría",
@@ -3379,8 +3463,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 289,
-  "fecha": "2027-08-29",
+  "n": 295,
+  "fecha": "2027-09-04",
   "keyword": "que tipos de ojos tengo",
   "titulo": "¿Qué tipo de ojos tengo? Cómo saberlo con una foto",
   "pilar": "Ojos y cejas",
@@ -3392,8 +3476,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 290,
-  "fecha": "2027-08-30",
+  "n": 296,
+  "fecha": "2027-09-05",
   "keyword": "arrugas entrecejo",
   "titulo": "Arrugas del entrecejo: cómo suavizarlas",
   "pilar": "Piel y envejecimiento",
@@ -3403,8 +3487,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 291,
-  "fecha": "2027-08-31",
+  "n": 297,
+  "fecha": "2027-09-06",
   "keyword": "tipos de calvicie",
   "titulo": "Tipos de calvicie: la escala Norwood explicada",
   "pilar": "Barba, pelo y lentes",
@@ -3414,8 +3498,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 292,
-  "fecha": "2027-09-01",
+  "n": 298,
+  "fecha": "2027-09-07",
   "keyword": "corte pixie largo cara redonda",
   "titulo": "Pixie largo para cara redonda: cómo lograr que estilice",
   "pilar": "Barba, pelo y lentes",
@@ -3428,8 +3512,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 293,
-  "fecha": "2027-09-02",
+  "n": 299,
+  "fecha": "2027-09-08",
   "keyword": "invierno frío colorimetría",
   "titulo": "Invierno frío: colores que te favorecen",
   "pilar": "Colorimetría",
@@ -3442,8 +3526,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 294,
-  "fecha": "2027-09-03",
+  "n": 300,
+  "fecha": "2027-09-09",
   "keyword": "doble mentón",
   "titulo": "Doble mentón: por qué aparece y cómo reducirlo",
   "pilar": "Mandíbula y perfil",
@@ -3453,8 +3537,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 295,
-  "fecha": "2027-09-04",
+  "n": 301,
+  "fecha": "2027-09-10",
   "keyword": "lentes para cara ovalada mujer",
   "titulo": "Lentes para cara ovalada en mujeres",
   "pilar": "Barba, pelo y lentes",
@@ -3464,8 +3548,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 296,
-  "fecha": "2027-09-05",
+  "n": 302,
+  "fecha": "2027-09-11",
   "keyword": "peinado para frente grande",
   "titulo": "Peinados para frente grande que la disimulan",
   "pilar": "Barba, pelo y lentes",
@@ -3477,8 +3561,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 297,
-  "fecha": "2027-09-06",
+  "n": 303,
+  "fecha": "2027-09-12",
   "keyword": "nariz grande mujer",
   "titulo": "Nariz grande en mujer: cuándo armoniza y cuándo no",
   "pilar": "Nariz",
@@ -3490,10 +3574,10 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 298,
-  "fecha": "2027-09-07",
+  "n": 304,
+  "fecha": "2027-09-13",
   "keyword": "corte de pelo hombre gordo",
-  "titulo": "Cortes de pelo para hombre con cara llena",
+  "titulo": "Cortes de pelo para hombre con rostro lleno",
   "pilar": "Barba, pelo y lentes",
   "busquedas": 590,
   "dificultad": 30,
@@ -3503,8 +3587,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 299,
-  "fecha": "2027-09-08",
+  "n": 305,
+  "fecha": "2027-09-14",
   "keyword": "corte de pelo hombre con barba",
   "titulo": "Corte de pelo con barba: combinaciones según tu cara",
   "pilar": "Barba, pelo y lentes",
@@ -3516,8 +3600,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 300,
-  "fecha": "2027-09-09",
+  "n": 306,
+  "fecha": "2027-09-15",
   "keyword": "bárbara de regil antes y después",
   "titulo": "Bárbara de Regil antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -3530,8 +3614,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 301,
-  "fecha": "2027-09-10",
+  "n": 307,
+  "fecha": "2027-09-16",
   "keyword": "cejas gruesas",
   "titulo": "Cejas gruesas o delgadas: qué te favorece",
   "pilar": "Ojos y cejas",
@@ -3541,8 +3625,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 302,
-  "fecha": "2027-09-11",
+  "n": 308,
+  "fecha": "2027-09-17",
   "keyword": "hombre ojeras",
   "titulo": "Ojeras en hombres: causas y soluciones simples",
   "pilar": "Ojos y cejas",
@@ -3552,8 +3636,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 303,
-  "fecha": "2027-09-12",
+  "n": 309,
+  "fecha": "2027-09-18",
   "keyword": "mentonera para papada",
   "titulo": "Mentonera para la papada: qué esperar de verdad",
   "pilar": "Mandíbula y perfil",
@@ -3563,8 +3647,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 304,
-  "fecha": "2027-09-13",
+  "n": 310,
+  "fecha": "2027-09-19",
   "keyword": "acné mecanico",
   "titulo": "Acné mecánico: el que causan la fricción y el cubrebocas",
   "pilar": "Piel y envejecimiento",
@@ -3574,8 +3658,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 305,
-  "fecha": "2027-09-14",
+  "n": 311,
+  "fecha": "2027-09-20",
   "keyword": "rostro corazón hombre",
   "titulo": "Rostro corazón en hombres: cortes y barba que equilibran",
   "pilar": "Armonía y medidas",
@@ -3588,8 +3672,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 306,
-  "fecha": "2027-09-15",
+  "n": 312,
+  "fecha": "2027-09-21",
   "keyword": "rostro alargado",
   "titulo": "Rostro alargado: rasgos y cómo equilibrarlo",
   "pilar": "Armonía y medidas",
@@ -3602,8 +3686,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 307,
-  "fecha": "2027-09-16",
+  "n": 313,
+  "fecha": "2027-09-22",
   "keyword": "reducción de mandíbula",
   "titulo": "Reducción de mandíbula: opciones con y sin cirugía",
   "pilar": "Procedimientos",
@@ -3613,8 +3697,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 308,
-  "fecha": "2027-09-17",
+  "n": 314,
+  "fecha": "2027-09-23",
   "keyword": "tipos de acné y causas",
   "titulo": "Tipos de acné y sus causas",
   "pilar": "Piel y envejecimiento",
@@ -3624,8 +3708,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 309,
-  "fecha": "2027-09-18",
+  "n": 315,
+  "fecha": "2027-09-24",
   "keyword": "ojos caídos hombres",
   "titulo": "Ojos caídos en hombres: hunter eyes vs prey eyes",
   "pilar": "Ojos y cejas",
@@ -3635,8 +3719,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 310,
-  "fecha": "2027-09-19",
+  "n": 316,
+  "fecha": "2027-09-25",
   "keyword": "cafeina para las ojeras",
   "titulo": "¿La cafeína sirve para las ojeras?",
   "pilar": "Ojos y cejas",
@@ -3646,8 +3730,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 311,
-  "fecha": "2027-09-20",
+  "n": 317,
+  "fecha": "2027-09-26",
   "keyword": "luis miguel antes y después",
   "titulo": "Luis Miguel antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -3660,8 +3744,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 312,
-  "fecha": "2027-09-21",
+  "n": 318,
+  "fecha": "2027-09-27",
   "keyword": "estilos de barba modernos",
   "titulo": "Estilos de barba modernos según tu forma de cara",
   "pilar": "Barba, pelo y lentes",
@@ -3671,8 +3755,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 313,
-  "fecha": "2027-09-22",
+  "n": 319,
+  "fecha": "2027-09-28",
   "keyword": "colorimetría para morenas",
   "titulo": "Colorimetría para piel morena: colores que más favorecen",
   "pilar": "Colorimetría",
@@ -3685,8 +3769,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 314,
-  "fecha": "2027-09-23",
+  "n": 320,
+  "fecha": "2027-09-29",
   "keyword": "lentes para cara alargada",
   "titulo": "Lentes para cara alargada",
   "pilar": "Barba, pelo y lentes",
@@ -3696,8 +3780,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 315,
-  "fecha": "2027-09-24",
+  "n": 321,
+  "fecha": "2027-09-30",
   "keyword": "tipos de nariz respingada",
   "titulo": "Nariz respingada: qué es y cómo se mide",
   "pilar": "Nariz",
@@ -3707,8 +3791,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 316,
-  "fecha": "2027-09-25",
+  "n": 322,
+  "fecha": "2027-10-01",
   "keyword": "tipos de ojos rasgados",
   "titulo": "Ojos rasgados: tipos y características",
   "pilar": "Ojos y cejas",
@@ -3720,8 +3804,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 317,
-  "fecha": "2027-09-26",
+  "n": 323,
+  "fecha": "2027-10-02",
   "keyword": "rinomodelación con ácido hialurónico es peligroso",
   "titulo": "¿La rinomodelación con ácido hialurónico es peligrosa?",
   "pilar": "Nariz",
@@ -3731,8 +3815,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 318,
-  "fecha": "2027-09-27",
+  "n": 324,
+  "fecha": "2027-10-03",
   "keyword": "tipos de cejas hombre",
   "titulo": "Tipos de cejas en hombres y cuál va con tu cara",
   "pilar": "Ojos y cejas",
@@ -3742,8 +3826,22 @@
   "estado": "pendiente"
  },
  {
-  "n": 319,
-  "fecha": "2027-09-28",
+  "n": 325,
+  "fecha": "2027-10-04",
+  "keyword": "ángulo gonial",
+  "titulo": "Ángulo gonial: qué es y cómo se mide el ángulo de la mandíbula",
+  "pilar": "Medidas",
+  "busquedas": 170,
+  "dificultad": 20,
+  "slug": "angulo-gonial",
+  "estado": "pendiente",
+  "tipo": "programática",
+  "mercado_busquedas": "MX",
+  "nota": "Glosario de medidas. Explica qué es la medida, cómo se mide en una foto, rangos de referencia por sexo y ejemplos con famosos. Conéctalo con lo que mide Resalta. Lenguaje neutro: describe variaciones, no defectos."
+ },
+ {
+  "n": 326,
+  "fecha": "2027-10-05",
   "keyword": "radiesse mandíbula",
   "titulo": "Radiesse en la mandíbula: cómo funciona y cuánto dura",
   "pilar": "Procedimientos",
@@ -3753,8 +3851,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 320,
-  "fecha": "2027-09-29",
+  "n": 327,
+  "fecha": "2027-10-06",
   "keyword": "labios finitos",
   "titulo": "Labios finos: opciones para darles volumen",
   "pilar": "Labios y sonrisa",
@@ -3764,8 +3862,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 321,
-  "fecha": "2027-09-30",
+  "n": 328,
+  "fecha": "2027-10-07",
   "keyword": "diferencia entre remolino y calvicie",
   "titulo": "¿Remolino o calvicie? Cómo diferenciarlos",
   "pilar": "Barba, pelo y lentes",
@@ -3775,8 +3873,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 322,
-  "fecha": "2027-10-01",
+  "n": 329,
+  "fecha": "2027-10-08",
   "keyword": "exfoliación de labios",
   "titulo": "Cómo exfoliar los labios para que se vean mejor",
   "pilar": "Labios y sonrisa",
@@ -3786,8 +3884,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 323,
-  "fecha": "2027-10-02",
+  "n": 330,
+  "fecha": "2027-10-09",
   "keyword": "análisis facial online gratis",
   "titulo": "Análisis facial online gratis con una foto",
   "pilar": "Armonía y medidas",
@@ -3799,8 +3897,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 324,
-  "fecha": "2027-10-03",
+  "n": 331,
+  "fecha": "2027-10-10",
   "keyword": "contorno para cara redonda",
   "titulo": "Contorno para cara redonda: dónde poner sombra y luz",
   "pilar": "Armonía y medidas",
@@ -3813,8 +3911,36 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 325,
-  "fecha": "2027-10-04",
+  "n": 332,
+  "fecha": "2027-10-11",
+  "keyword": "ojos juntos",
+  "titulo": "Ojos juntos: qué significa y cómo se mide",
+  "pilar": "Medidas",
+  "busquedas": 390,
+  "dificultad": 29,
+  "slug": "ojos-juntos",
+  "estado": "pendiente",
+  "tipo": "programática",
+  "mercado_busquedas": "MX",
+  "nota": "Glosario de medidas. Explica qué es la medida, cómo se mide en una foto, rangos de referencia por sexo y ejemplos con famosos. Conéctalo con lo que mide Resalta. Lenguaje neutro: describe variaciones, no defectos."
+ },
+ {
+  "n": 333,
+  "fecha": "2027-10-12",
+  "keyword": "como mejorar la asimetría facial",
+  "titulo": "Cómo mejorar la asimetría facial: qué se puede cambiar y qué no",
+  "pilar": "Medidas",
+  "busquedas": 170,
+  "dificultad": 21,
+  "slug": "como-mejorar-la-asimetria-facial",
+  "estado": "pendiente",
+  "tipo": "programática",
+  "mercado_busquedas": "MX",
+  "nota": "Glosario de medidas. Explica qué es la medida, cómo se mide en una foto, rangos de referencia por sexo y ejemplos con famosos. Conéctalo con lo que mide Resalta. Lenguaje neutro: describe variaciones, no defectos."
+ },
+ {
+  "n": 334,
+  "fecha": "2027-10-13",
   "keyword": "ojeras estructurales",
   "titulo": "Ojeras estructurales: cuando el problema es el hueso y la grasa",
   "pilar": "Ojos y cejas",
@@ -3824,8 +3950,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 326,
-  "fecha": "2027-10-05",
+  "n": 335,
+  "fecha": "2027-10-14",
   "keyword": "tipos de nariz de perfil",
   "titulo": "Tu nariz de perfil: ángulos que la definen",
   "pilar": "Nariz",
@@ -3835,8 +3961,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 327,
-  "fecha": "2027-10-06",
+  "n": 336,
+  "fecha": "2027-10-15",
   "keyword": "vitamina c para ojeras",
   "titulo": "Vitamina C para las ojeras: qué esperar",
   "pilar": "Ojos y cejas",
@@ -3846,8 +3972,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 328,
-  "fecha": "2027-10-07",
+  "n": 337,
+  "fecha": "2027-10-16",
   "keyword": "estilos de barba corta sin bigote",
   "titulo": "Barba corta sin bigote: cuándo funciona",
   "pilar": "Barba, pelo y lentes",
@@ -3857,8 +3983,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 329,
-  "fecha": "2027-10-08",
+  "n": 338,
+  "fecha": "2027-10-17",
   "keyword": "acné y puntos negros",
   "titulo": "Acné y puntos negros: cómo tratarlos sin irritar",
   "pilar": "Piel y envejecimiento",
@@ -3868,8 +3994,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 330,
-  "fecha": "2027-10-09",
+  "n": 339,
+  "fecha": "2027-10-18",
   "keyword": "cómo eliminar cicatrices de acné profundas",
   "titulo": "Cicatrices de acné profundas: tratamientos que sí funcionan",
   "pilar": "Piel y envejecimiento",
@@ -3879,8 +4005,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 331,
-  "fecha": "2027-10-10",
+  "n": 340,
+  "fecha": "2027-10-19",
   "keyword": "maquillaje para cara redonda",
   "titulo": "Maquillaje para cara redonda: contorno y rubor paso a paso",
   "pilar": "Armonía y medidas",
@@ -3893,8 +4019,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 332,
-  "fecha": "2027-10-11",
+  "n": 341,
+  "fecha": "2027-10-20",
   "keyword": "como tener ojos de cazador",
   "titulo": "Cómo tener ojos de cazador: qué sí se puede cambiar",
   "pilar": "Looksmaxxing",
@@ -3906,8 +4032,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 333,
-  "fecha": "2027-10-12",
+  "n": 342,
+  "fecha": "2027-10-21",
   "keyword": "rosalía antes y después",
   "titulo": "Rosalía antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -3920,10 +4046,10 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 334,
-  "fecha": "2027-10-13",
+  "n": 343,
+  "fecha": "2027-10-22",
   "keyword": "rostro perfecto hombre",
-  "titulo": "El rostro perfecto en hombres: proporciones y ejemplos",
+  "titulo": "Rostro armónico en hombres: proporciones y ejemplos",
   "pilar": "Armonía y medidas",
   "busquedas": 140,
   "dificultad": 20,
@@ -3933,10 +4059,10 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 335,
-  "fecha": "2027-10-14",
+  "n": 344,
+  "fecha": "2027-10-23",
   "keyword": "rostro perfecto",
-  "titulo": "El rostro perfecto: qué medidas lo definen",
+  "titulo": "Qué hace armónico a un rostro (y por qué no existe el rostro perfecto)",
   "pilar": "Armonía y medidas",
   "busquedas": 320,
   "dificultad": 28,
@@ -3946,8 +4072,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 336,
-  "fecha": "2027-10-15",
+  "n": 345,
+  "fecha": "2027-10-24",
   "keyword": "mentón pequeño",
   "titulo": "Mentón pequeño: qué opciones hay para equilibrar el perfil",
   "pilar": "Mandíbula y perfil",
@@ -3957,8 +4083,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 337,
-  "fecha": "2027-10-16",
+  "n": 346,
+  "fecha": "2027-10-25",
   "keyword": "arrugas dinámicas",
   "titulo": "Arrugas dinámicas y estáticas: la diferencia que cambia el tratamiento",
   "pilar": "Piel y envejecimiento",
@@ -3968,8 +4094,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 338,
-  "fecha": "2027-10-17",
+  "n": 347,
+  "fecha": "2027-10-26",
   "keyword": "análisis facial",
   "titulo": "Análisis facial: qué mide y cómo hacerlo online",
   "pilar": "Armonía y medidas",
@@ -3981,8 +4107,22 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 339,
-  "fecha": "2027-10-18",
+  "n": 348,
+  "fecha": "2027-10-27",
+  "keyword": "quintos faciales",
+  "titulo": "Quintos faciales: cómo se mide el ancho de la cara en cinco partes",
+  "pilar": "Medidas",
+  "busquedas": 260,
+  "dificultad": 26,
+  "slug": "quintos-faciales",
+  "estado": "pendiente",
+  "tipo": "programática",
+  "mercado_busquedas": "MX",
+  "nota": "Glosario de medidas. Explica qué es la medida, cómo se mide en una foto, rangos de referencia por sexo y ejemplos con famosos. Conéctalo con lo que mide Resalta. Lenguaje neutro: describe variaciones, no defectos."
+ },
+ {
+  "n": 349,
+  "fecha": "2027-10-28",
   "keyword": "aretes para cara redonda",
   "titulo": "Aretes para cara redonda: los que alargan el rostro",
   "pilar": "Armonía y medidas",
@@ -3995,8 +4135,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 340,
-  "fecha": "2027-10-19",
+  "n": 350,
+  "fecha": "2027-10-29",
   "keyword": "lentes para cara rectangular",
   "titulo": "Lentes para cara rectangular",
   "pilar": "Barba, pelo y lentes",
@@ -4006,8 +4146,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 341,
-  "fecha": "2027-10-20",
+  "n": 351,
+  "fecha": "2027-10-30",
   "keyword": "corte para rostro cuadrado hombre",
   "titulo": "Cortes para hombre con rostro cuadrado",
   "pilar": "Barba, pelo y lentes",
@@ -4020,8 +4160,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 342,
-  "fecha": "2027-10-21",
+  "n": 352,
+  "fecha": "2027-10-31",
   "keyword": "como desinflamar la cara hinchada",
   "titulo": "Cómo desinflamar la cara en la mañana",
   "pilar": "Piel y envejecimiento",
@@ -4031,8 +4171,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 343,
-  "fecha": "2027-10-22",
+  "n": 353,
+  "fecha": "2027-11-01",
   "keyword": "arrugas del sueño",
   "titulo": "Arrugas del sueño: cómo tu forma de dormir marca tu cara",
   "pilar": "Piel y envejecimiento",
@@ -4042,8 +4182,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 344,
-  "fecha": "2027-10-23",
+  "n": 354,
+  "fecha": "2027-11-02",
   "keyword": "frente amplia",
   "titulo": "Frente amplia: cómo saber si la tienes y cómo equilibrarla",
   "pilar": "Armonía y medidas",
@@ -4053,10 +4193,10 @@
   "estado": "pendiente"
  },
  {
-  "n": 345,
-  "fecha": "2027-10-24",
+  "n": 355,
+  "fecha": "2027-11-03",
   "keyword": "simetría facial pobre",
-  "titulo": "Simetría facial pobre: qué significa y qué se puede hacer",
+  "titulo": "Simetría facial baja: qué significa y qué se puede hacer",
   "pilar": "Armonía y medidas",
   "busquedas": 140,
   "dificultad": 13,
@@ -4064,8 +4204,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 346,
-  "fecha": "2027-10-25",
+  "n": 356,
+  "fecha": "2027-11-04",
   "keyword": "flequillo para cara ovalada",
   "titulo": "Flequillo para cara ovalada: todas las opciones",
   "pilar": "Barba, pelo y lentes",
@@ -4078,8 +4218,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 347,
-  "fecha": "2027-10-26",
+  "n": 357,
+  "fecha": "2027-11-05",
   "keyword": "metodo de la toalla mandíbula",
   "titulo": "Método de la toalla para la mandíbula: qué hay de cierto",
   "pilar": "Mandíbula y perfil",
@@ -4089,8 +4229,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 348,
-  "fecha": "2027-10-27",
+  "n": 358,
+  "fecha": "2027-11-06",
   "keyword": "tipos de nariz hombre",
   "titulo": "Tipos de nariz en hombres y qué transmite cada una",
   "pilar": "Nariz",
@@ -4100,8 +4240,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 349,
-  "fecha": "2027-10-28",
+  "n": 359,
+  "fecha": "2027-11-07",
   "keyword": "mentón cuadrado",
   "titulo": "Mentón cuadrado: qué transmite y a quién le queda",
   "pilar": "Mandíbula y perfil",
@@ -4111,8 +4251,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 350,
-  "fecha": "2027-10-29",
+  "n": 360,
+  "fecha": "2027-11-08",
   "keyword": "mentón redondo",
   "titulo": "Mentón redondo: cómo se ve y cómo darle definición",
   "pilar": "Mandíbula y perfil",
@@ -4122,8 +4262,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 351,
-  "fecha": "2027-10-30",
+  "n": 361,
+  "fecha": "2027-11-09",
   "keyword": "corte de pelo según forma de cara",
   "titulo": "Corte de pelo según tu forma de cara",
   "pilar": "Barba, pelo y lentes",
@@ -4133,8 +4273,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 352,
-  "fecha": "2027-10-31",
+  "n": 362,
+  "fecha": "2027-11-10",
   "keyword": "gloria trevi antes y después",
   "titulo": "Gloria Trevi antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -4147,8 +4287,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 353,
-  "fecha": "2027-11-01",
+  "n": 363,
+  "fecha": "2027-11-11",
   "keyword": "becky g antes y después",
   "titulo": "Becky G antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -4161,8 +4301,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 354,
-  "fecha": "2027-11-02",
+  "n": 364,
+  "fecha": "2027-11-12",
   "keyword": "como quitar cicatrices de acné rapido",
   "titulo": "Cómo mejorar las cicatrices de acné",
   "pilar": "Piel y envejecimiento",
@@ -4172,8 +4312,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 355,
-  "fecha": "2027-11-03",
+  "n": 365,
+  "fecha": "2027-11-13",
   "keyword": "chiquis rivera antes y después",
   "titulo": "Chiquis Rivera antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -4186,8 +4326,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 356,
-  "fecha": "2027-11-04",
+  "n": 366,
+  "fecha": "2027-11-14",
   "keyword": "cazzu antes y después",
   "titulo": "Cazzu antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -4200,8 +4340,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 357,
-  "fecha": "2027-11-05",
+  "n": 367,
+  "fecha": "2027-11-15",
   "keyword": "tipo de rostro diamante",
   "titulo": "Rostro diamante: cómo reconocerlo y cómo resaltarlo",
   "pilar": "Armonía y medidas",
@@ -4211,8 +4351,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 358,
-  "fecha": "2027-11-06",
+  "n": 368,
+  "fecha": "2027-11-16",
   "keyword": "calvicie por estrés",
   "titulo": "Calvicie por estrés: qué es real y qué no",
   "pilar": "Barba, pelo y lentes",
@@ -4222,8 +4362,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 359,
-  "fecha": "2027-11-07",
+  "n": 369,
+  "fecha": "2027-11-17",
   "keyword": "cortes para rostro cuadrado mujer",
   "titulo": "Cortes para mujer con rostro cuadrado que suavizan",
   "pilar": "Barba, pelo y lentes",
@@ -4236,8 +4376,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 360,
-  "fecha": "2027-11-08",
+  "n": 370,
+  "fecha": "2027-11-18",
   "keyword": "christian nodal antes y después",
   "titulo": "Christian Nodal antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -4250,8 +4390,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 361,
-  "fecha": "2027-11-09",
+  "n": 371,
+  "fecha": "2027-11-19",
   "keyword": "belleza facial",
   "titulo": "Qué hace que una cara se vea bonita: las claves de la belleza facial",
   "pilar": "Armonía y medidas",
@@ -4261,8 +4401,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 362,
-  "fecha": "2027-11-10",
+  "n": 372,
+  "fecha": "2027-11-20",
   "keyword": "masaje de mandíbula",
   "titulo": "Masaje de mandíbula: para qué sirve y cómo hacerlo",
   "pilar": "Mandíbula y perfil",
@@ -4272,8 +4412,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 363,
-  "fecha": "2027-11-11",
+  "n": 373,
+  "fecha": "2027-11-21",
   "keyword": "ojeras negras causas",
   "titulo": "Ojeras negras: causas y cómo aclararlas",
   "pilar": "Ojos y cejas",
@@ -4283,8 +4423,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 364,
-  "fecha": "2027-11-12",
+  "n": 374,
+  "fecha": "2027-11-22",
   "keyword": "signos de calvicie",
   "titulo": "Signos de calvicie: cómo detectarla a tiempo",
   "pilar": "Barba, pelo y lentes",
@@ -4294,8 +4434,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 365,
-  "fecha": "2027-11-13",
+  "n": 375,
+  "fecha": "2027-11-23",
   "keyword": "ojeras vasculares",
   "titulo": "Ojeras vasculares: las azules o moradas",
   "pilar": "Ojos y cejas",
@@ -4305,8 +4445,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 366,
-  "fecha": "2027-11-14",
+  "n": 376,
+  "fecha": "2027-11-24",
   "keyword": "arrugas gravitacionales",
   "titulo": "Arrugas gravitacionales: qué son y a qué edad aparecen",
   "pilar": "Piel y envejecimiento",
@@ -4316,8 +4456,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 367,
-  "fecha": "2027-11-15",
+  "n": 377,
+  "fecha": "2027-11-25",
   "keyword": "cómo ser más atractivo",
   "titulo": "Cómo ser más atractivo: los cambios con más impacto",
   "pilar": "Looksmaxxing",
@@ -4327,8 +4467,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 368,
-  "fecha": "2027-11-16",
+  "n": 378,
+  "fecha": "2027-11-26",
   "keyword": "arrugas patas de gallo",
   "titulo": "Patas de gallo: por qué salen y qué funciona",
   "pilar": "Piel y envejecimiento",
@@ -4338,8 +4478,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 369,
-  "fecha": "2027-11-17",
+  "n": 379,
+  "fecha": "2027-11-27",
   "keyword": "cortes de pelo que rejuvenecen a los 40 cara redonda",
   "titulo": "Cortes que rejuvenecen a los 40 si tienes cara redonda",
   "pilar": "Barba, pelo y lentes",
@@ -4352,8 +4492,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 370,
-  "fecha": "2027-11-18",
+  "n": 380,
+  "fecha": "2027-11-28",
   "keyword": "cara redonda famosas",
   "titulo": "Famosas con cara redonda y cómo la estilizan",
   "pilar": "Famosos",
@@ -4366,8 +4506,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 371,
-  "fecha": "2027-11-19",
+  "n": 381,
+  "fecha": "2027-11-29",
   "keyword": "bichectomía resultados",
   "titulo": "Resultados de la bichectomía: cuándo se notan",
   "pilar": "Procedimientos",
@@ -4377,8 +4517,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 372,
-  "fecha": "2027-11-20",
+  "n": 382,
+  "fecha": "2027-11-30",
   "keyword": "negative canthal tilt",
   "titulo": "Canthal tilt negativo: qué significa en tu cara",
   "pilar": "Ojos y cejas",
@@ -4388,8 +4528,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 373,
-  "fecha": "2027-11-21",
+  "n": 383,
+  "fecha": "2027-12-01",
   "keyword": "masaje facial arrugas",
   "titulo": "Masaje facial para arrugas: cómo hacerlo y qué esperar",
   "pilar": "Piel y envejecimiento",
@@ -4399,8 +4539,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 374,
-  "fecha": "2027-11-22",
+  "n": 384,
+  "fecha": "2027-12-02",
   "keyword": "thalía antes y después",
   "titulo": "Thalía antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -4413,8 +4553,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 375,
-  "fecha": "2027-11-23",
+  "n": 385,
+  "fecha": "2027-12-03",
   "keyword": "la calvicie es hereditaria",
   "titulo": "¿La calvicie es hereditaria? Lo que sí se sabe",
   "pilar": "Barba, pelo y lentes",
@@ -4424,8 +4564,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 376,
-  "fecha": "2027-11-24",
+  "n": 386,
+  "fecha": "2027-12-04",
   "keyword": "las ojeras son hereditarias",
   "titulo": "¿Las ojeras son hereditarias?",
   "pilar": "Ojos y cejas",
@@ -4435,8 +4575,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 377,
-  "fecha": "2027-11-25",
+  "n": 387,
+  "fecha": "2027-12-05",
   "keyword": "yuridia antes y después",
   "titulo": "Yuridia antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -4449,8 +4589,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 378,
-  "fecha": "2027-11-26",
+  "n": 388,
+  "fecha": "2027-12-06",
   "keyword": "famosos mentoplastia",
   "titulo": "Famosos con mentoplastia: el cambio en su perfil",
   "pilar": "Famosos",
@@ -4463,8 +4603,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 379,
-  "fecha": "2027-11-27",
+  "n": 389,
+  "fecha": "2027-12-07",
   "keyword": "arrugas de marioneta",
   "titulo": "Líneas de marioneta: qué son y cómo tratarlas",
   "pilar": "Piel y envejecimiento",
@@ -4474,8 +4614,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 380,
-  "fecha": "2027-11-28",
+  "n": 390,
+  "fecha": "2027-12-08",
   "keyword": "arrugas peribucales",
   "titulo": "Arrugas alrededor de la boca: causas y opciones",
   "pilar": "Piel y envejecimiento",
@@ -4485,8 +4625,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 381,
-  "fecha": "2027-11-29",
+  "n": 391,
+  "fecha": "2027-12-09",
   "keyword": "depilarse las cejas hombre",
   "titulo": "¿Los hombres deben depilarse las cejas?",
   "pilar": "Ojos y cejas",
@@ -4496,8 +4636,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 382,
-  "fecha": "2027-11-30",
+  "n": 392,
+  "fecha": "2027-12-10",
   "keyword": "el looksmaxxing funciona",
   "titulo": "¿El looksmaxxing funciona? Lo que dice la evidencia",
   "pilar": "Looksmaxxing",
@@ -4507,8 +4647,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 383,
-  "fecha": "2027-12-01",
+  "n": 393,
+  "fecha": "2027-12-11",
   "keyword": "flequillo para cara cuadrada",
   "titulo": "Flequillo para cara cuadrada: los que suavizan la mandíbula",
   "pilar": "Barba, pelo y lentes",
@@ -4521,8 +4661,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 384,
-  "fecha": "2027-12-02",
+  "n": 394,
+  "fecha": "2027-12-12",
   "keyword": "ojos de cazador y presa",
   "titulo": "Ojos de cazador vs ojos de presa: la diferencia",
   "pilar": "Looksmaxxing",
@@ -4534,8 +4674,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 385,
-  "fecha": "2027-12-03",
+  "n": 395,
+  "fecha": "2027-12-13",
   "keyword": "hielo para ojeras",
   "titulo": "Hielo para las ojeras: cuándo ayuda",
   "pilar": "Ojos y cejas",
@@ -4545,8 +4685,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 386,
-  "fecha": "2027-12-04",
+  "n": 396,
+  "fecha": "2027-12-14",
   "keyword": "sombreros para cara redonda",
   "titulo": "Sombreros y gorras para cara redonda",
   "pilar": "Barba, pelo y lentes",
@@ -4559,8 +4699,8 @@
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
  },
  {
-  "n": 387,
-  "fecha": "2027-12-05",
+  "n": 397,
+  "fecha": "2027-12-15",
   "keyword": "softmaxxing",
   "titulo": "Softmaxxing: cómo mejorar tu cara sin cirugía",
   "pilar": "Looksmaxxing",
@@ -4573,8 +4713,8 @@
   "nota": "Concepto propio de los planes de Resalta. Explica qué cambios no quirúrgicos sí mueven las medidas."
  },
  {
-  "n": 388,
-  "fecha": "2027-12-06",
+  "n": 398,
+  "fecha": "2027-12-16",
   "keyword": "hardmaxxing",
   "titulo": "Hardmaxxing: procedimientos que cambian la estructura de la cara",
   "pilar": "Looksmaxxing",
@@ -4587,8 +4727,8 @@
   "nota": "Concepto propio de los planes de Resalta. Informativo, con el aviso médico."
  },
  {
-  "n": 389,
-  "fecha": "2027-12-07",
+  "n": 399,
+  "fecha": "2027-12-17",
   "keyword": "qué edad aparento",
   "titulo": "¿Qué edad aparento? Cómo se calcula la edad visual de tu cara",
   "pilar": "Piel y envejecimiento",
@@ -4601,8 +4741,8 @@
   "nota": "Ángulo de longevidad: edad visual vs edad real. CTA a la calificación gratis."
  },
  {
-  "n": 390,
-  "fecha": "2027-12-08",
+  "n": 400,
+  "fecha": "2027-12-18",
   "keyword": "canthal tilt",
   "titulo": "Canthal tilt: qué es y si se puede cambiar",
   "pilar": "Ojos y cejas",
@@ -4612,8 +4752,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 391,
-  "fecha": "2027-12-09",
+  "n": 401,
+  "fecha": "2027-12-19",
   "keyword": "armonización facial mujer",
   "titulo": "Armonización facial en mujeres: zonas, resultados y errores comunes",
   "pilar": "Procedimientos",
@@ -4623,8 +4763,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 392,
-  "fecha": "2027-12-10",
+  "n": 402,
+  "fecha": "2027-12-20",
   "keyword": "peso pluma antes y después",
   "titulo": "Peso Pluma antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -4637,8 +4777,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 393,
-  "fecha": "2027-12-11",
+  "n": 403,
+  "fecha": "2027-12-21",
   "keyword": "ojos de cazador mujer",
   "titulo": "Ojos de cazador en mujeres: cómo se ven y ejemplos",
   "pilar": "Looksmaxxing",
@@ -4650,8 +4790,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 394,
-  "fecha": "2027-12-12",
+  "n": 404,
+  "fecha": "2027-12-22",
   "keyword": "maluma antes y después",
   "titulo": "Maluma antes y después: cómo ha cambiado su rostro",
   "pilar": "Famosos",
@@ -4664,8 +4804,8 @@
   "nota": "Programática de famosos. Compara fotos públicas de distintas épocas y describe los cambios visibles con las medidas de Resalta (tercios, mandíbula, nariz, labios, pómulos). No afirmes cirugías que la persona no haya confirmado en público; si las confirmó, cita la fuente. Sin burlas ni juicios. Cierra con 'Compárate con tu análisis gratis'."
  },
  {
-  "n": 395,
-  "fecha": "2027-12-13",
+  "n": 405,
+  "fecha": "2027-12-23",
   "keyword": "tretinoína para las arrugas",
   "titulo": "Tretinoína para las arrugas: qué hace y cómo usarla",
   "pilar": "Piel y envejecimiento",
@@ -4675,8 +4815,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 396,
-  "fecha": "2027-12-14",
+  "n": 406,
+  "fecha": "2027-12-24",
   "keyword": "aceite de ricino en cejas",
   "titulo": "Aceite de ricino en las cejas: mito o realidad",
   "pilar": "Ojos y cejas",
@@ -4686,8 +4826,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 397,
-  "fecha": "2027-12-15",
+  "n": 407,
+  "fecha": "2027-12-25",
   "keyword": "tipo de rostro ovalado",
   "titulo": "Rostro ovalado: por qué se considera el más equilibrado",
   "pilar": "Armonía y medidas",
@@ -4697,8 +4837,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 398,
-  "fecha": "2027-12-16",
+  "n": 408,
+  "fecha": "2027-12-26",
   "keyword": "rinoplastia estetica y funcional",
   "titulo": "Rinoplastia estética y funcional: en qué se distinguen",
   "pilar": "Nariz",
@@ -4708,8 +4848,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 399,
-  "fecha": "2027-12-17",
+  "n": 409,
+  "fecha": "2027-12-27",
   "keyword": "mewing antes y después",
   "titulo": "Mewing antes y después: qué fotos son reales y cuáles no",
   "pilar": "Looksmaxxing",
@@ -4719,8 +4859,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 400,
-  "fecha": "2027-12-18",
+  "n": 410,
+  "fecha": "2027-12-28",
   "keyword": "cómo ser más atractivo para las mujeres",
   "titulo": "Cómo verte más atractivo para las mujeres, según lo que sí se mide",
   "pilar": "Looksmaxxing",
@@ -4730,8 +4870,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 401,
-  "fecha": "2027-12-19",
+  "n": 411,
+  "fecha": "2027-12-29",
   "keyword": "retinol para arrugas",
   "titulo": "Retinol para las arrugas: cómo empezar sin irritarte",
   "pilar": "Piel y envejecimiento",
@@ -4741,8 +4881,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 402,
-  "fecha": "2027-12-20",
+  "n": 412,
+  "fecha": "2027-12-30",
   "keyword": "tipo de rostro redondo",
   "titulo": "Rostro redondo: características y qué te favorece",
   "pilar": "Armonía y medidas",
@@ -4752,8 +4892,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 403,
-  "fecha": "2027-12-21",
+  "n": 413,
+  "fecha": "2027-12-31",
   "keyword": "blefaroplastia",
   "titulo": "Blefaroplastia: qué es, recuperación y resultados",
   "pilar": "Procedimientos",
@@ -4765,8 +4905,8 @@
   "mercado_busquedas": "MX"
  },
  {
-  "n": 404,
-  "fecha": "2027-12-22",
+  "n": 414,
+  "fecha": "2028-01-01",
   "keyword": "como saber mi tipo de rostro hombre",
   "titulo": "Cómo saber tu tipo de rostro si eres hombre",
   "pilar": "Armonía y medidas",
@@ -4776,8 +4916,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 405,
-  "fecha": "2027-12-23",
+  "n": 415,
+  "fecha": "2028-01-02",
   "keyword": "cómo saber si soy guapo",
   "titulo": "¿Cómo saber si soy guapo? Lo que sí se puede medir",
   "pilar": "Armonía y medidas",
@@ -4787,8 +4927,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 406,
-  "fecha": "2027-12-24",
+  "n": 416,
+  "fecha": "2028-01-03",
   "keyword": "proporción áurea rostro",
   "titulo": "Proporción áurea en el rostro: mito y realidad",
   "pilar": "Armonía y medidas",
@@ -4798,8 +4938,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 407,
-  "fecha": "2027-12-25",
+  "n": 417,
+  "fecha": "2028-01-04",
   "keyword": "ejercicios faciales para arrugas",
   "titulo": "Ejercicios faciales para las arrugas: lo que sí y lo que no",
   "pilar": "Piel y envejecimiento",
@@ -4809,8 +4949,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 408,
-  "fecha": "2027-12-26",
+  "n": 418,
+  "fecha": "2028-01-05",
   "keyword": "arrugas normales a los 40",
   "titulo": "¿Qué arrugas son normales a los 40?",
   "pilar": "Piel y envejecimiento",
@@ -4820,8 +4960,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 409,
-  "fecha": "2027-12-27",
+  "n": 419,
+  "fecha": "2028-01-06",
   "keyword": "qué provoca el acné",
   "titulo": "¿Qué provoca el acné? Causas reales",
   "pilar": "Piel y envejecimiento",
@@ -4831,8 +4971,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 410,
-  "fecha": "2027-12-28",
+  "n": 420,
+  "fecha": "2028-01-07",
   "keyword": "corte de cabello para frente amplia",
   "titulo": "Cortes de cabello para frente amplia",
   "pilar": "Barba, pelo y lentes",
@@ -4842,8 +4982,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 411,
-  "fecha": "2027-12-29",
+  "n": 421,
+  "fecha": "2028-01-08",
   "keyword": "tipo de rostro online",
   "titulo": "Detector de tipo de rostro online: qué tan precisos son",
   "pilar": "Armonía y medidas",
@@ -4853,8 +4993,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 412,
-  "fecha": "2027-12-30",
+  "n": 422,
+  "fecha": "2028-01-09",
   "keyword": "almohada para evitar arrugas",
   "titulo": "Almohadas para evitar arrugas: ¿funcionan?",
   "pilar": "Piel y envejecimiento",
@@ -4864,8 +5004,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 413,
-  "fecha": "2027-12-31",
+  "n": 423,
+  "fecha": "2028-01-10",
   "keyword": "skincare hombre",
   "titulo": "Rutina de skincare para hombre: lo básico que sí funciona",
   "pilar": "Piel y envejecimiento",
@@ -4875,8 +5015,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 414,
-  "fecha": "2028-01-01",
+  "n": 424,
+  "fecha": "2028-01-11",
   "keyword": "mewing ejercicios",
   "titulo": "Ejercicios de mewing: qué hacer y qué evitar",
   "pilar": "Looksmaxxing",
@@ -4886,8 +5026,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 415,
-  "fecha": "2028-01-02",
+  "n": 425,
+  "fecha": "2028-01-12",
   "keyword": "recuperacion rinoplastia fotos",
   "titulo": "Recuperación de rinoplastia: qué esperar en cada etapa",
   "pilar": "Nariz",
@@ -4897,8 +5037,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 416,
-  "fecha": "2028-01-03",
+  "n": 426,
+  "fecha": "2028-01-13",
   "keyword": "como prevenir arrugas",
   "titulo": "Cómo prevenir arrugas desde los 20",
   "pilar": "Piel y envejecimiento",
@@ -4908,8 +5048,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 417,
-  "fecha": "2028-01-04",
+  "n": 427,
+  "fecha": "2028-01-14",
   "keyword": "arrugas hombre",
   "titulo": "Arrugas en hombres: qué hacer sin complicarte",
   "pilar": "Piel y envejecimiento",
@@ -4919,8 +5059,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 418,
-  "fecha": "2028-01-05",
+  "n": 428,
+  "fecha": "2028-01-15",
   "keyword": "colorimetría hombre",
   "titulo": "Colorimetría para hombres: qué colores usar según tu cara",
   "pilar": "Colorimetría",
@@ -4933,8 +5073,8 @@
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
  },
  {
-  "n": 419,
-  "fecha": "2028-01-06",
+  "n": 429,
+  "fecha": "2028-01-16",
   "keyword": "rutina facial hombre",
   "titulo": "Rutina facial para hombre en 3 pasos",
   "pilar": "Piel y envejecimiento",
@@ -4944,8 +5084,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 420,
-  "fecha": "2028-01-07",
+  "n": 430,
+  "fecha": "2028-01-17",
   "keyword": "arrugas prematuras",
   "titulo": "Arrugas prematuras: causas y cómo frenarlas",
   "pilar": "Piel y envejecimiento",
@@ -4955,8 +5095,8 @@
   "estado": "pendiente"
  },
  {
-  "n": 421,
-  "fecha": "2028-01-08",
+  "n": 431,
+  "fecha": "2028-01-18",
   "keyword": "colágeno para las arrugas",
   "titulo": "¿El colágeno sirve para las arrugas?",
   "pilar": "Piel y envejecimiento",
