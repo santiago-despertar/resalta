@@ -26,7 +26,7 @@ const CTL_FRENTE = [
 ];
 // each preset says which controls it may touch and in which direction; the values are searched per face
 const PRE_FRENTE = [
-  ["Mejor versión", { mandibula: [-2, 4], menton_largo: [-2, 2.5], menton_ancho: [-1.5, 2], pomulos: [-1, 2.5], nariz_ancho: [-3, 1], nariz_punta: [-2, 1], labios: [-1, 2.5], boca_ancho: [-2, 2], boca_altura: [-2, 1.5], cejas_altura: [-1.5, 2.5], cejas_cola: [-1.5, 2.5] }],
+  ["Mejor versión", { mandibula: [-2, 2], menton_largo: [-2, 2], menton_ancho: [-1.5, 1.5], pomulos: [-1, 1.5], nariz_ancho: [-3, 1], nariz_punta: [-2, 1], labios: [-1, 2.5], boca_ancho: [-2, 2], boca_altura: [-2, 1.5], cejas_altura: [-1.5, 2.5], cejas_cola: [-1.5, 2.5] }],
   ["Mandíbula marcada", { mandibula: [0, 4], menton_largo: [-1.5, 2], menton_ancho: [-1, 2] }],
   ["Relleno de mandíbula", { mandibula: [0, 4] }],
   ["Botox de maseteros", { mandibula: [-4, 0] }],
@@ -257,22 +257,28 @@ function evaluar(vals) {
   for (const k in valores) delete valores[k]; Object.assign(valores, guard); mezcla = prev;
   return r;
 }
+// Each millimetre of change costs a little, so it keeps only the changes that really help:
+// otherwise the score tends to push everything (especially width) to the end of its range.
+const COSTO_MM = 0.035;
 function optimizar(rangos) {
   const v = {}; for (const k in rangos) v[k] = 0;
-  let mejor = evaluar(v); const base = mejor;
+  const total = (x) => Object.values(x).reduce((t, n) => t + Math.abs(n), 0);
+  const base = evaluar(v);
+  let mejor = base;
   for (let pasada = 0; pasada < 3; pasada++) {
     let cambio = false;
     for (const k in rangos) {
       const [lo, hi] = rangos[k];
       for (let x = lo; x <= hi + 1e-9; x += 0.5) {
         if (x === v[k]) continue;
-        const r = evaluar({ ...v, [k]: x });
+        const prueba = { ...v, [k]: x };
+        const r = evaluar(prueba) - COSTO_MM * total(prueba);
         if (r > mejor + 0.005) { mejor = r; v[k] = x; cambio = true; }
       }
     }
     if (!cambio) break;
   }
-  return { v, gana: mejor - base };
+  return { v, gana: evaluar(v) - base };
 }
 const refrescar = () => { if (raf) return; raf = true; requestAnimationFrame(() => { raf = false; pintar(); numeros(); }); };
 
@@ -287,25 +293,38 @@ function controles() {
   const decir = (t) => { nota.textContent = t || ""; nota.hidden = !t; };
   decir("");
   S.optimos ||= {};
-  $("#simPre").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
-    const i = +b.dataset.i, [nombre, rangos] = S.presets[i];
-    const o = S.optimos[i] ||= optimizar(rangos);
+  // Treatments can be combined and switched off again. "Mejor versión" already covers everything, so it goes alone.
+  const activos = new Set();
+  const esMejor = (i) => /^Mejor/.test(S.presets[i][0]);
+  const aplicar = () => {
     S.controles.forEach(([k]) => poner(k, 0));
-    $("#simPre").querySelectorAll("button").forEach(x => x.classList.toggle("active", x === b));
-    const mejor = /^Mejor/.test(nombre);
+    $("#simPre").querySelectorAll("button").forEach(x => x.classList.toggle("active", activos.has(+x.dataset.i)));
+    if (!activos.size) { decir(""); refrescar(); return; }
+    const ids = [...activos].sort((p, q) => p - q), nombres = ids.map(i => S.presets[i][0]);
+    // the controls of all chosen treatments, each one in the widest range any of them allows
+    const rangos = {};
+    ids.forEach(i => { const r = S.presets[i][1]; for (const k in r) { const [lo, hi] = r[k]; rangos[k] = rangos[k] ? [Math.min(rangos[k][0], lo), Math.max(rangos[k][1], hi)] : [lo, hi]; } });
+    const o = S.optimos[ids.join(",")] ||= optimizar(rangos);
+    const uno = ids.length === 1, mejor = uno && esMejor(ids[0]);
     if (o.gana < 0.05 && mejor) { decir("Tu cara ya está muy bien proporcionada: no encontramos cambios que suban tu armonía."); refrescar(); return; }
     if (o.gana < 0.05) {
       // the treatment would not raise the score here, but the customer still wants to see it: a moderate amount
       for (const k in rangos) { const [lo, hi] = rangos[k]; poner(k, Math.round((Math.abs(hi) >= Math.abs(lo) ? hi : lo) * 0.6 * 2) / 2); }
-      decir(`En tu cara, ${nombre.toLowerCase()} no subiría tu armonía, pero así se vería. Puedes ajustarlo a mano.`);
+      decir(uno ? `En tu cara, ${nombres[0].toLowerCase()} no subiría tu armonía, pero así se vería. Puedes ajustarlo a mano.` : "En tu cara estos tratamientos no subirían tu armonía, pero así se verían. Puedes ajustarlo a mano.");
     } else {
       for (const k in o.v) poner(k, o.v[k]);
-      decir("Valores calculados para tu cara. Puedes ajustarlos a mano.");
+      decir(uno ? "Valores calculados para tu cara. Puedes ajustarlos a mano. Toca otro tratamiento para sumarlo o este mismo para quitarlo." : `Combinando ${nombres.join(", ").toLowerCase()}. Toca uno para quitarlo.`);
     }
     refrescar();
-    if (/^Mejor/.test(nombre)) setTimeout(() => realista(), 50);
+    if (mejor) setTimeout(() => realista(), 50);
+  };
+  $("#simPre").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    const i = +b.dataset.i;
+    if (activos.has(i)) activos.delete(i);
+    else { if (esMejor(i)) activos.clear(); else [...activos].forEach(x => { if (esMejor(x)) activos.delete(x); }); activos.add(i); }
+    aplicar();
   }));
-  $("#simReset").onclick = () => { S.controles.forEach(([k]) => poner(k, 0)); $("#simPre").querySelectorAll("button").forEach(x => x.classList.remove("active")); decir(""); refrescar(); };
+  $("#simReset").onclick = () => { activos.clear(); aplicar(); };
 }
 
 // ---------- realistic render: the same changes, applied to the photo by the image model
