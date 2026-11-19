@@ -2388,3 +2388,7 @@ body[data-page=index] .notes{padding-bottom:32px}
 .doc .pl-n{width:auto;margin-right:8px}
 .cu-foto:not(.done){background:var(--mist);border-color:#B8C0C8}
 .site-header .nav-links .menu-salir{border-top:0!important;padding-top:4px!important}
+.cu-foto:not(.done){background:#AEBBC6;border-color:#8E9DAA}
+.cu-foto:not(.done) small{color:#33414D}
+.cu-foto .slot-guia{opacity:1;filter:drop-shadow(0 1px 2px rgba(30,40,50,.18))}
+@media (max-width:640px){.cu-foto .slot-guia{height:64%;top:5%}}
