@@ -289,7 +289,7 @@ Deno.serve(async (req) => {
       if (!ok) break;
     }
   }
-  // 3) the free month of the follow-up (Plan Completo) ends in 3 days: say when the first charge comes and how to cancel
+  // 3) (off) the free month of the follow-up ends in 3 days
   const fmtFecha = (d: string) => new Date(d).toLocaleDateString("es-MX", { day: "numeric", month: "long", timeZone: "America/Mexico_City" });
   const yaMandado = async (email: string, sec: string, desde?: string) => {
     let q = admin.from("correos_log").select("id", { count: "exact", head: true }).eq("email", email).eq("secuencia", sec);
@@ -305,7 +305,8 @@ Deno.serve(async (req) => {
       return new Intl.NumberFormat("es-MX", { style: "currency", currency: cur, maximumFractionDigits: n % 1 ? 2 : 0 }).format(n) + (["MXN", "COP", "CLP"].includes(cur) ? " " + cur : "");
     } catch { return ""; }
   };
-  if (cuenta < MAX_POR_CORRIDA) {
+  // Turned off (nov-2026): the renewal is automatic and customers are not reminded before the first charge.
+  if (false && cuenta < MAX_POR_CORRIDA) {
     const en3 = new Date(ahora + 3.2 * 864e5).toISOString();
     const { data: pruebas } = await admin.from("suscripciones").select("user_id,stripe_subscription,periodo_inicio,periodo_fin,cancela,estado")
       .eq("estado", "trialing").eq("cancela", false).gt("periodo_fin", new Date(ahora).toISOString()).lt("periodo_fin", en3);
