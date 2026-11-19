@@ -26,7 +26,7 @@ const CTL_FRENTE = [
 ];
 // each preset says which controls it may touch and in which direction; the values are searched per face
 const PRE_FRENTE = [
-  ["Mejor versión", { mandibula: [-2, 2], menton_largo: [-2, 2], menton_ancho: [-1.5, 1.5], pomulos: [-1, 1.5], nariz_ancho: [-3, 1], nariz_punta: [-2, 1], labios: [-1, 2.5], boca_ancho: [-2, 2], boca_altura: [-2, 1.5], cejas_altura: [-1.5, 2.5], cejas_cola: [-1.5, 2.5] }],
+  ["Mejor versión", { mandibula: [-2, 0.5], menton_largo: [-2, 2], menton_ancho: [-1.5, 0.5], pomulos: [-1, 1], nariz_ancho: [-3, 1], nariz_punta: [-2, 1], labios: [-1, 2.5], boca_ancho: [-2, 2], boca_altura: [-2, 1.5], cejas_altura: [-1.5, 2.5], cejas_cola: [-1.5, 2.5] }],
   ["Mandíbula marcada", { mandibula: [0, 4], menton_largo: [-1.5, 2], menton_ancho: [-1, 2] }],
   ["Relleno de mandíbula", { mandibula: [0, 4] }],
   ["Botox de maseteros", { mandibula: [-4, 0] }],
@@ -299,6 +299,7 @@ function controles() {
   const aplicar = () => {
     S.controles.forEach(([k]) => poner(k, 0));
     $("#simPre").querySelectorAll("button").forEach(x => x.classList.toggle("active", activos.has(+x.dataset.i)));
+    S.esMejor = false;
     if (!activos.size) { decir(""); refrescar(); return; }
     const ids = [...activos].sort((p, q) => p - q), nombres = ids.map(i => S.presets[i][0]);
     // the controls of all chosen treatments, each one in the widest range any of them allows
@@ -315,8 +316,8 @@ function controles() {
       for (const k in o.v) poner(k, o.v[k]);
       decir(uno ? "Valores calculados para tu cara. Puedes ajustarlos a mano. Toca otro tratamiento para sumarlo o este mismo para quitarlo." : `Combinando ${nombres.join(", ").toLowerCase()}. Toca uno para quitarlo.`);
     }
+    S.esMejor = mejor;
     refrescar();
-    if (mejor) setTimeout(() => realista(), 50);
   };
   $("#simPre").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
     const i = +b.dataset.i;
@@ -343,7 +344,7 @@ async function realista() {
   $("#simIALista").innerHTML = cambios.map(c => `<li>${esc((S.controles.find(x => EN[x[0]] && EN[x[0]][0] === c.que) || [, c.que])[1])} <span class="mono">${c.mm > 0 ? "+" : ""}${c.mm} mm</span></li>`).join("") + (magro ? '<li>Menos grasa en la cara</li>' : "") + extras.map(x => `<li>${x === "piel" ? "Piel más limpia" : "Ojeras corregidas"}</li>`).join("");
   const etiquetas = [...$("#simIALista").querySelectorAll("li")].map(li => li.textContent);
   try {
-    const r = await actuales.ia({ tipo: "sim", order_id: actuales.id, vista: modoActual, foto: actuales.fotoPerfil, cambios, magro, extras, etiquetas });
+    const r = await actuales.ia({ tipo: "sim", order_id: actuales.id, vista: modoActual, foto: actuales.fotoPerfil, cambios, magro, extras, etiquetas, mejor: !!S.esMejor });
     $("#simIADesp").src = r.imagen;
     box.classList.remove("cargando");
     galeria();
