@@ -1056,9 +1056,11 @@
       $$("[data-sub-price]").forEach(e => { e.textContent = conCodigo(SUB); });
       tarjetaAcceso($("#acceso"));
       if (!sb || !id || !(await getUser())) return;
+      // Ask for the follow-up status right away, in parallel with everything below, so the offer shows sooner.
+      const estadoP = (q.get("mejora") === "1" ? Promise.resolve({}) : fnCall("suscripcion", { accion: "estado" })).catch(() => ({}));
 
-      // purchase event, once per order
-      try {
+      // purchase event, once per order (doesn't hold up the offer)
+      (async () => { try {
         const k = "resalta_compra_" + id;
         if (!localStorage.getItem(k)) {
           const { data: od } = await sb.from("orders").select("tier,status,amount_mxn").eq("id", id).maybeSingle();
@@ -1068,7 +1070,7 @@
             localStorage.setItem(k, "1");
           }
         }
-      } catch (e) {}
+      } catch (e) {} })();
 
       const fecha = d => d.toLocaleDateString("es-MX", { day: "numeric", month: "long" });
       const listoSub = r => (r && r.prueba ? "Tu seguimiento está activo y tu primer mes es gratis." : "Tu seguimiento está activo.") + " En tu cuenta, en la sección Cuerpo, llena tus datos para recibir tu plan de nutrición y ejercicio.";
@@ -1088,14 +1090,14 @@
 
       // The payment confirmation can take a few seconds to arrive, so check a few times.
       let o = null;
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 15; i++) {
         const { data } = await sb.from("orders").select("id,status,tier,origen").eq("id", id).maybeSingle();
         o = data;
         if (!o || o.status !== "borrador") break;
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise(r => setTimeout(r, 800));
       }
       if (!o || o.status === "borrador" || o.origen === "suscripcion" || !box) return;
-      let st = {}; try { st = await fnCall("suscripcion", { accion: "estado" }); } catch (e) {}
+      const st = (await estadoP) || {};
       const conUp = o.tier === "soft" && q.get("mejora") !== "1", conSub = !st.activa;
       if (!conUp && !conSub) return;
 
