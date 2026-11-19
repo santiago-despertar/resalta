@@ -151,7 +151,7 @@
   "busquedas": 6600,
   "dificultad": 6,
   "slug": "corte-de-cabello-para-cara-redonda-mujer",
-  "estado": "pendiente",
+  "estado": "escrito",
   "tipo": "programática",
   "mercado_busquedas": "MX",
   "nota": "Cluster forma de cara. Abre con cómo identificar esa forma y lleva a la calificación gratis para medirla con foto."
@@ -165,7 +165,7 @@
   "busquedas": 33100,
   "dificultad": 10,
   "slug": "pomulos",
-  "estado": "pendiente"
+  "estado": "escrito"
  },
  {
   "n": 15,
@@ -176,7 +176,7 @@
   "busquedas": 49500,
   "dificultad": 14,
   "slug": "otoplastia",
-  "estado": "pendiente"
+  "estado": "escrito"
  },
  {
   "n": 16,
