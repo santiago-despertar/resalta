@@ -1,0 +1,131 @@
+<main class="app-main tool-main" data-tool="cuerpo">
+  <section class="onb cal tool-hero">
+    <div class="onb-bg" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="wrap">
+      <div class="tool-intro">
+        <span class="tag">Herramienta gratis</span>
+        <h1>¿Qué tipo de cuerpo <span>tengo?</span></h1>
+        <p>Escribe tres medidas en centímetros y te decimos tu tipo de cuerpo, para mujer o para hombre, con ideas de ropa para equilibrar tu silueta.</p>
+        <ul class="checks"><li>Para mujer y para hombre</li><li>Solo necesitas una cinta métrica</li><li>Ideas de ropa para tu silueta</li></ul>
+      </div>
+      <div class="panel cal-panel">
+      <section class="cal-paso on" data-p="foto">
+        <h2 class="onb-title">Calcula tu<br><span>tipo de cuerpo</span></h2>
+        <p class="onb-sub">Mide sobre ropa ligera, con la cinta recta y sin apretar.</p>
+        <form class="tool-form" id="cuerpoForm" novalidate>
+          <div class="quiz tool-sexo"><div class="opts opts-2">
+            <button type="button" class="opt" data-sexo="mujer">Mujer</button>
+            <button type="button" class="opt" data-sexo="hombre">Hombre</button>
+          </div></div>
+          <div class="field" data-solo="mujer"><label for="cBusto">Busto en cm</label><input id="cBusto" type="number" inputmode="decimal" min="40" max="250" placeholder="Busto (cm)"></div>
+          <div class="field" data-solo="hombre" hidden><label for="cPecho">Pecho en cm</label><input id="cPecho" type="number" inputmode="decimal" min="40" max="250" placeholder="Pecho (cm)"></div>
+          <div class="tool-medidas">
+            <div class="field"><label for="cCintura">Cintura en cm</label><input id="cCintura" type="number" inputmode="decimal" min="40" max="250" placeholder="Cintura (cm)"></div>
+            <div class="field"><label for="cCadera">Cadera en cm</label><input id="cCadera" type="number" inputmode="decimal" min="40" max="250" placeholder="Cadera (cm)"></div>
+          </div>
+          <ul class="cal-tips"><li data-solo="mujer">Busto: la parte más llena</li><li data-solo="hombre" hidden>Pecho: debajo de las axilas</li><li>Cintura: la parte más estrecha</li><li>Cadera: la parte más ancha</li></ul>
+          <div class="msg" id="toolMsg"></div>
+          <button class="btn btn-primary btn-block" type="submit">Ver mi tipo de cuerpo</button>
+        </form>
+        <p class="hint cal-priv">Tus medidas no se guardan ni se mandan a ningún lado.</p>
+      </section>
+      <section class="cal-paso" data-p="resultado">
+        <p class="label">Tu tipo de cuerpo</p>
+        <h2 class="tool-big" id="resNombre"></h2>
+        <p class="tool-sub" id="resDesc"></p>
+        <div class="tool-filas" id="resRows"></div>
+        <p class="label">Ropa que equilibra tu silueta</p>
+        <div class="tool-tips" id="resTips"></div>
+        <div class="tool-puente">
+          <p class="label">Ahora tu cara</p>
+          <h2 class="su-h">¿Qué tan armónica es tu cara?</h2>
+          <p class="hint">Sube una foto de frente y te damos tu puntaje de armonía facial del 0 al 100. Gratis y en 30 segundos.</p>
+          <a class="btn btn-primary btn-block" href="/calificacion?utm_source=herramienta&amp;utm_medium=resultado&amp;utm_campaign=tipo-de-cuerpo">Calcular mi puntaje gratis</a>
+        </div>
+        <button type="button" class="tool-otra" data-otra>Calcular con otras medidas</button>
+      </section>
+
+      <p class="hint cal-legal">Resultado orientativo basado en tus medidas. No es una evaluación de salud.</p>
+      </div>
+    </div>
+  </section>
+
+  <article class="post tool-content">
+    <div class="post-body">
+      <h2>Cómo medirte</h2>
+      <p>Necesitas una cinta métrica de costura. Mídete de pie, relajado, con ropa ligera o en ropa interior, y sin apretar la cinta.</p>
+      <ul>
+        <li><b>Busto (mujer):</b> alrededor de la parte más llena del busto, con la cinta recta por la espalda.</li>
+        <li><b>Pecho (hombre):</b> justo debajo de las axilas, a la altura de los pezones, con los brazos relajados.</li>
+        <li><b>Cintura:</b> la parte más estrecha del torso, normalmente un poco arriba del ombligo.</li>
+        <li><b>Cadera:</b> la parte más ancha de la cadera y los glúteos.</li>
+      </ul>
+
+      <h2>Los tipos de cuerpo en mujer</h2>
+      <ul>
+        <li><b>Reloj de arena:</b> busto y cadera parecidos, con la cintura marcada.</li>
+        <li><b>Triángulo:</b> la cadera es más ancha que el busto.</li>
+        <li><b>Triángulo invertido:</b> hombros y busto más anchos que la cadera.</li>
+        <li><b>Rectángulo:</b> busto, cintura y cadera de medidas parecidas.</li>
+        <li><b>Ovalado:</b> la cintura es igual o más amplia que el busto y la cadera.</li>
+      </ul>
+
+      <h2>Los tipos de cuerpo en hombre</h2>
+      <ul>
+        <li><b>Triángulo invertido (V):</b> pecho y hombros claramente más anchos que la cintura.</li>
+        <li><b>Trapecio:</b> pecho un poco más ancho que la cintura y la cadera. Es la silueta más equilibrada.</li>
+        <li><b>Rectángulo:</b> pecho, cintura y cadera parecidos.</li>
+        <li><b>Triángulo:</b> la cadera es más ancha que el pecho.</li>
+        <li><b>Ovalado:</b> la cintura es igual o más amplia que el pecho.</li>
+      </ul>
+
+      <h2>Para qué sirve</h2>
+      <p>Tu tipo de cuerpo no es bueno ni malo. Sirve para elegir ropa que equilibre tu silueta: sumar volumen donde hay menos y mantener simple donde hay más. Con el entrenamiento y el tiempo tu tipo puede cambiar, así que vale la pena volver a medirte cada tanto.</p>
+      <p>La cara funciona igual: lo que llevas cerca de ella, como el corte de pelo, la barba o los lentes, cambia cómo se lee. Si quieres saber qué tan armónica es tu cara, haz la <a href="/calificacion?utm_source=herramienta&amp;utm_medium=contenido&amp;utm_campaign=tipo-de-cuerpo">calificación facial gratis</a>.</p>
+
+      <h2 id="preguntas">Preguntas frecuentes</h2>
+      <div class="faq post-faq">
+        <details><summary>¿Cuál es el tipo de cuerpo más común?</summary><p>En mujeres, el triángulo y el rectángulo son de los más comunes. En hombres, el rectángulo y el trapecio.</p></details>
+        <details><summary>¿Mi tipo de cuerpo puede cambiar?</summary><p>Sí. Ganar músculo o cambios en tu cuerpo con el tiempo mueven tus medidas, sobre todo la cintura, así que tu tipo puede cambiar.</p></details>
+        <details><summary>¿Cómo me mido la cintura?</summary><p>En la parte más estrecha del torso, normalmente un poco arriba del ombligo. Respira normal y no metas el abdomen.</p></details>
+        <details><summary>¿Guardan mis medidas?</summary><p>No. El cálculo pasa en tu navegador y no se manda a ningún lado.</p></details>
+        <details><summary>¿Sirve para elegir ropa?</summary><p>Sí. En el resultado te damos ideas de qué usar arriba, qué usar abajo y qué evitar para equilibrar tu silueta.</p></details>
+      </div>
+    </div>
+  </article>
+
+  <section class="tool-otras">
+    <div class="blog-head">
+      <span class="tag">Herramientas gratis</span>
+      <h2 class="h-lg">Otras herramientas <span class="muted">para tu cara</span></h2>
+    </div>
+    <div class="blog-grid">
+    <a class="blog-card" href="/herramientas/test-de-belleza">
+      <span class="blog-img"><img src="/assets/img/herramientas/test-de-belleza.jpg" alt="" loading="lazy"></span>
+      <span class="tag">Gratis</span>
+      <h2>Test de belleza facial</h2>
+      <p>Tu puntaje de armonía del 0 al 100 con 7 medidas de tu cara.</p>
+    </a>
+    <a class="blog-card" href="/herramientas/forma-de-cara">
+      <span class="blog-img"><img src="/assets/img/herramientas/forma-de-cara.jpg" alt="" loading="lazy"></span>
+      <span class="tag">Gratis</span>
+      <h2>Forma de cara</h2>
+      <p>Ovalada, redonda, cuadrada, alargada, corazón o diamante, medida con tu foto.</p>
+    </a>
+    <a class="blog-card" href="/herramientas/simetria-facial">
+      <span class="blog-img"><img src="/assets/img/herramientas/simetria-facial.jpg" alt="" loading="lazy"></span>
+      <span class="tag">Gratis</span>
+      <h2>Test de simetría facial</h2>
+      <p>Tu porcentaje de simetría por zona y tu cara con dos lados iguales.</p>
+    </a>
+    </div>
+  </section>
+
+  <section class="final-cta post-final">
+    <h2 class="h-lg" style="color:#fff">Ya sabes tu silueta. <span class="muted">¿Y tu cara?</span></h2>
+    <div class="hero-actions" style="justify-content:center"><a class="btn btn-primary" href="/calificacion?utm_source=herramienta&amp;utm_medium=final&amp;utm_campaign=tipo-de-cuerpo">Calificación gratis</a><a class="btn btn-ghost" href="/analisis">Análisis completo</a></div>
+  </section>
+</main>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Cuál es el tipo de cuerpo más común?", "acceptedAnswer": {"@type": "Answer", "text": "En mujeres, el triángulo y el rectángulo son de los más comunes. En hombres, el rectángulo y el trapecio."}}, {"@type": "Question", "name": "¿Mi tipo de cuerpo puede cambiar?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. Ganar músculo o cambios en tu cuerpo con el tiempo mueven tus medidas, sobre todo la cintura, así que tu tipo puede cambiar."}}, {"@type": "Question", "name": "¿Cómo me mido la cintura?", "acceptedAnswer": {"@type": "Answer", "text": "En la parte más estrecha del torso, normalmente un poco arriba del ombligo. Respira normal y no metas el abdomen."}}, {"@type": "Question", "name": "¿Guardan mis medidas?", "acceptedAnswer": {"@type": "Answer", "text": "No. El cálculo pasa en tu navegador y no se manda a ningún lado."}}, {"@type": "Question", "name": "¿Sirve para elegir ropa?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. En el resultado te damos ideas de qué usar arriba, qué usar abajo y qué evitar para equilibrar tu silueta."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Tipo de cuerpo · Resalta", "url": "https://resalta.co/herramientas/tipo-de-cuerpo", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web", "inLanguage": "es", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "MXN"}, "description": "Calcula tu tipo de cuerpo con tus medidas de busto o pecho, cintura y cadera. Reloj de arena, triángulo, rectángulo y más, con qué ropa te favorece. Para mujer y hombre."}</script>
+<script type="module" src="/assets/js/herramientas.js?v=__V__"></script>

@@ -1,0 +1,168 @@
+<main class="app-main tool-main" data-tool="simetria">
+  <section class="onb cal tool-hero">
+    <div class="onb-bg" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="wrap">
+      <div class="tool-intro">
+        <span class="tag">Herramienta gratis</span>
+        <h1>Test de simetría facial <span>con tu foto</span></h1>
+        <p>Sube una foto de frente y comparamos los dos lados de tu cara, zona por zona. Te damos tu porcentaje de simetría y te enseñamos cómo se vería tu cara con dos lados izquierdos y con dos lados derechos.</p>
+        <ul class="checks"><li>Simetría por zona: cejas, ojos, nariz, boca, pómulos y mandíbula</li><li>Tu cara con dos lados iguales</li><li>Gratis y sin registro</li></ul>
+      </div>
+      <div class="panel cal-panel">
+      <section class="cal-paso on" data-p="foto">
+        <h2 class="onb-title">Mide tu<br><span>simetría facial</span></h2>
+        <p class="onb-sub">Una foto de frente, con la cabeza derecha y la cámara a la altura de tus ojos.</p>
+        <label class="cal-foto" id="toolDrop">
+          <span class="slot-guia" style="background-image:url(https://jxluabbugwdonqchbaxm.supabase.co/storage/v1/object/public/publico/poses/frente.png)"></span>
+          <b>Sube tu foto de frente</b><small>Toca para elegir una foto</small>
+          <input type="file" accept="image/*" id="toolFile" aria-label="Foto de frente">
+          <div class="cal-cam" id="camBox" hidden>
+            <video id="camVideo" playsinline muted></video>
+            <i class="cal-cam-ovalo"></i>
+            <p class="cal-cam-txt">Acomoda tu cara dentro del óvalo</p>
+            <div class="cal-cam-acc">
+              <button type="button" class="cal-cam-x" id="camX">Cancelar</button>
+              <button type="button" class="cal-cam-shot" id="camShot" aria-label="Tomar foto"></button>
+              <span></span>
+            </div>
+          </div>
+        </label>
+        <button type="button" class="btn btn-ghost btn-block cal-cam-btn" id="camBtn">Tomar foto con mi cámara</button>
+        <ul class="cal-tips"><li>Mira directo a la cámara</li><li>Luz de frente</li><li>Sin lentes ni filtros</li></ul>
+        <label class="check"><input type="checkbox" id="toolAdult"> <span>Tengo 18 años o más y la foto es mía.</span></label>
+        <div class="msg" id="toolMsg"></div>
+        <button class="btn btn-primary btn-block" id="toolGo" disabled>Medir mi simetría</button>
+        <p class="hint cal-priv">Tu foto se analiza en tu dispositivo. No la subimos a ningún servidor.</p>
+      </section>
+      <section class="cal-paso" data-p="proceso">
+        <div class="cal-scan"><canvas id="scanCanvas"></canvas><i class="cal-linea"></i></div>
+        <ul class="cal-pasos" id="calPasos">
+          <li>Detectando 478 puntos de tu cara</li>
+          <li>Trazando la línea media de tu cara</li>
+          <li>Comparando cada lado, zona por zona</li>
+          <li>Armando tu cara con dos lados iguales</li>
+          <li>Calculando tu porcentaje</li>
+        </ul>
+      </section>
+      <section class="cal-paso" data-p="resultado">
+        <p class="label">Tu simetría facial</p>
+        <p class="tool-big"><span class="mono" id="resScore">00</span><small>%</small></p>
+        <p class="tool-sub" id="resVerdict"></p>
+        <canvas class="tool-canvas" id="resCanvas"></canvas>
+        <div class="tool-filas" id="resRows"></div>
+        <p class="label">Tu cara con dos lados iguales</p>
+        <div class="tool-dos">
+          <figure><canvas id="resIzq"></canvas><figcaption>Dos veces el lado izquierdo de la foto</figcaption></figure>
+          <figure><canvas id="resDer"></canvas><figcaption>Dos veces el lado derecho de la foto</figcaption></figure>
+        </div>
+        <p class="hint" style="margin:0 0 4px">Ninguna cara real es igual a sus versiones espejo. Las caras perfectamente simétricas incluso se ven raras: un poco de asimetría es lo normal.</p>
+        <form class="tool-puente" id="leadForm" novalidate>
+          <p class="label">Gratis con la misma foto</p>
+          <h2 class="su-h">¿Y tu puntaje de armonía?</h2>
+          <p class="hint">Con esta misma foto calculamos tu puntaje de armonía facial del 0 al 100 y tus 7 medidas principales. Te lo mandamos a tu correo.</p>
+          <div class="field"><label for="lead-name">Tu nombre</label><input id="lead-name" name="nombre" type="text" autocomplete="given-name" maxlength="60" placeholder="Tu nombre" required></div>
+          <div class="field"><label for="lead-email">Correo</label><input id="lead-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="tu@correo.com" required></div>
+          <div class="msg" id="leadMsg"></div>
+          <button class="btn btn-primary btn-block" type="submit">Mandarme mi puntaje</button>
+          <p class="hint cal-priv">Guardamos tu correo y tu puntaje. La imagen con tus medidas que va en el correo se borra en 30 días. <a href="/privacidad">Aviso de privacidad</a>.</p>
+        </form>
+        <button type="button" class="tool-otra" data-otra>Probar con otra foto</button>
+      </section>
+      <section class="cal-paso" data-p="gracias">
+        <h2 class="onb-title">Listo, <span data-cal-nombre></span>.<br><span>Revisa tu correo.</span></h2>
+        <p class="onb-sub">Tu puntaje te llega en unos 5 minutos a <b data-cal-email></b>. Si no lo ves, búscalo en Promociones o Spam.</p>
+        <div class="cal-video">
+          <span class="label">El siguiente paso</span>
+          <h2>Tu análisis completo</h2>
+          <p>Tu puntaje mide 7 cosas de tu cara de frente. El análisis completo revisa más de 110 rasgos con tus fotos de frente, sonriendo y de perfil, y te da un plan en orden: qué cambiar primero, qué no vale la pena y cómo te verías.</p>
+          <ul class="checks">
+            <li>Más de 110 rasgos de tu cara</li>
+            <li>Tu proyección: cómo te verías con tu plan</li>
+            <li>Tu edad visual contra tu edad real</li>
+            <li>Plan por fases: piel, cabello, barba, cejas y estilo</li>
+          </ul>
+          <a class="btn btn-primary btn-block" href="/cuenta?next=/analisis">Quiero mi análisis completo</a>
+        </div>
+        <button type="button" class="tool-otra" data-otra>Probar con otra foto</button>
+      </section>
+      <p class="hint cal-legal">Resultado estético y educativo basado en medidas de una foto. No es un juicio sobre tu valor ni un diagnóstico.</p>
+      </div>
+    </div>
+  </section>
+
+  <article class="post tool-content">
+    <div class="post-body">
+      <h2>Qué mide este test de simetría</h2>
+      <p>Trazamos la línea media de tu cara con puntos del centro: la frente, el entrecejo, la nariz, los labios y el mentón. Luego comparamos cada punto de un lado con su pareja del otro lado, reflejada sobre esa línea. Lo hacemos en seis zonas:</p>
+      <ul>
+        <li><b>Cejas:</b> altura y forma de cada ceja.</li>
+        <li><b>Ojos:</b> esquinas, párpados y posición de las pupilas.</li>
+        <li><b>Nariz:</b> las alas y la base.</li>
+        <li><b>Boca:</b> las comisuras y el arco del labio.</li>
+        <li><b>Pómulos:</b> el ancho y la altura de cada lado.</li>
+        <li><b>Mandíbula:</b> el ángulo y la línea hasta el mentón.</li>
+      </ul>
+      <p>Cada zona recibe un porcentaje, y el total es el promedio ponderado. Pesan más los ojos y la mandíbula porque son las zonas donde una diferencia se nota más.</p>
+
+      <h2>Qué porcentaje de simetría es normal</h2>
+      <p>Ninguna cara es 100% simétrica. En fotos bien tomadas, la mayoría de las personas sale entre 80% y 92%. Arriba de 92% es una cara muy simétrica. Las diferencias pequeñas son normales y vienen de cosas como el lado sobre el que duermes, el lado con el que masticas o tu postura.</p>
+      <p>De hecho, las caras perfectamente simétricas, como las que ves en las imágenes de dos lados iguales, suelen verse raras. El cerebro está acostumbrado a un poco de asimetría.</p>
+
+      <h2>Por qué la foto importa tanto</h2>
+      <p>Un giro de cabeza de pocos grados hace que un lado se vea más ancho que el otro, y eso baja tu porcentaje aunque tu cara sea simétrica. Para medir bien:</p>
+      <ul>
+        <li>Mira directo a la cámara, con la cabeza derecha y sin inclinarla.</li>
+        <li>Pon la cámara a la altura de los ojos, no de lado ni desde abajo.</li>
+        <li>Usa luz pareja de frente: una sombra fuerte en un lado mueve los puntos.</li>
+        <li>No uses la cámara frontal muy cerca: a menos de 30 cm deforma la cara.</li>
+      </ul>
+
+      <h2>Se puede mejorar la simetría</h2>
+      <p>Mucha de la asimetría visible viene de cosas que sí se pueden trabajar: cejas con distinta forma, una raya de pelo que carga un lado, una barba dispareja o la postura de cabeza y cuello. Otras diferencias son de hueso y no cambian sin procedimientos. Lo explicamos con detalle en nuestro artículo de <a href="/blog/simetria-facial">simetría facial</a>.</p>
+
+      <h2 id="preguntas">Preguntas frecuentes</h2>
+      <div class="faq post-faq">
+        <details><summary>¿Qué es una cara simétrica?</summary><p>Una cara donde el lado izquierdo y el derecho se parecen mucho cuando los reflejas sobre la línea media. Todas las caras tienen pequeñas diferencias.</p></details>
+        <details><summary>¿Las caras simétricas son más atractivas?</summary><p>Los estudios encuentran que la simetría influye un poco en el atractivo, pero mucho menos que la piel, las proporciones y la expresión. Una cara muy armónica puede tener asimetrías visibles.</p></details>
+        <details><summary>¿Qué son las imágenes de dos lados iguales?</summary><p>Tomamos la mitad izquierda de la foto y la reflejamos para armar una cara completa, y lo mismo con la mitad derecha. Sirven para ver qué lado tiene cada rasgo, no son tu cara real.</p></details>
+        <details><summary>¿Por qué mi cara se ve distinta en el espejo y en las fotos?</summary><p>El espejo te muestra invertido y estás acostumbrado a esa versión. En una foto ves tu cara como la ven los demás, y tus asimetrías quedan del otro lado.</p></details>
+        <details><summary>¿Mi foto se guarda?</summary><p>No. El análisis pasa en tu dispositivo y la foto no se sube a ningún servidor.</p></details>
+      </div>
+    </div>
+  </article>
+
+  <section class="tool-otras">
+    <div class="blog-head">
+      <span class="tag">Herramientas gratis</span>
+      <h2 class="h-lg">Otras herramientas <span class="muted">para tu cara</span></h2>
+    </div>
+    <div class="blog-grid">
+    <a class="blog-card" href="/herramientas/test-de-belleza">
+      <span class="blog-img"><img src="/assets/img/herramientas/test-de-belleza.jpg" alt="" loading="lazy"></span>
+      <span class="tag">Gratis</span>
+      <h2>Test de belleza facial</h2>
+      <p>Tu puntaje de armonía del 0 al 100 con 7 medidas de tu cara.</p>
+    </a>
+    <a class="blog-card" href="/herramientas/forma-de-cara">
+      <span class="blog-img"><img src="/assets/img/herramientas/forma-de-cara.jpg" alt="" loading="lazy"></span>
+      <span class="tag">Gratis</span>
+      <h2>Forma de cara</h2>
+      <p>Ovalada, redonda, cuadrada, alargada, corazón o diamante, medida con tu foto.</p>
+    </a>
+    <a class="blog-card" href="/herramientas/test-de-colorimetria">
+      <span class="blog-img"><img src="/assets/img/herramientas/test-de-colorimetria.jpg" alt="" loading="lazy"></span>
+      <span class="tag">Gratis</span>
+      <h2>Test de colorimetría</h2>
+      <p>Tu estación, tu subtono y tu paleta de colores, medidos con tu foto.</p>
+    </a>
+    </div>
+  </section>
+
+  <section class="final-cta post-final">
+    <h2 class="h-lg" style="color:#fff">La simetría es una de 7 medidas. <span class="muted">¿Y las otras?</span></h2>
+    <div class="hero-actions" style="justify-content:center"><a class="btn btn-primary" href="/calificacion?utm_source=herramienta&amp;utm_medium=final&amp;utm_campaign=simetria-facial">Calificación gratis</a><a class="btn btn-ghost" href="/analisis">Análisis completo</a></div>
+  </section>
+</main>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Qué es una cara simétrica?", "acceptedAnswer": {"@type": "Answer", "text": "Una cara donde el lado izquierdo y el derecho se parecen mucho cuando los reflejas sobre la línea media. Todas las caras tienen pequeñas diferencias."}}, {"@type": "Question", "name": "¿Las caras simétricas son más atractivas?", "acceptedAnswer": {"@type": "Answer", "text": "Los estudios encuentran que la simetría influye un poco en el atractivo, pero mucho menos que la piel, las proporciones y la expresión. Una cara muy armónica puede tener asimetrías visibles."}}, {"@type": "Question", "name": "¿Qué son las imágenes de dos lados iguales?", "acceptedAnswer": {"@type": "Answer", "text": "Tomamos la mitad izquierda de la foto y la reflejamos para armar una cara completa, y lo mismo con la mitad derecha. Sirven para ver qué lado tiene cada rasgo, no son tu cara real."}}, {"@type": "Question", "name": "¿Por qué mi cara se ve distinta en el espejo y en las fotos?", "acceptedAnswer": {"@type": "Answer", "text": "El espejo te muestra invertido y estás acostumbrado a esa versión. En una foto ves tu cara como la ven los demás, y tus asimetrías quedan del otro lado."}}, {"@type": "Question", "name": "¿Mi foto se guarda?", "acceptedAnswer": {"@type": "Answer", "text": "No. El análisis pasa en tu dispositivo y la foto no se sube a ningún servidor."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Test de simetría facial · Resalta", "url": "https://resalta.co/herramientas/simetria-facial", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web", "inLanguage": "es", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "MXN"}, "description": "Mide tu simetría facial con una foto. Comparamos cejas, ojos, nariz, boca, pómulos y mandíbula de cada lado y te enseñamos tu cara con dos lados iguales."}</script>
+<script type="module" src="/assets/js/herramientas.js?v=__V__"></script>
