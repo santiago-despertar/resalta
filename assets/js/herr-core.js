@@ -151,13 +151,13 @@ export function estacion(c) {
   if (t > 0) {
     est = (v > 0.3 && k < 0.6) ? "primavera" : "otono";
     if (est === "primavera") sub = Math.abs(v) >= Math.abs(t) && Math.abs(v) >= Math.abs(s) ? "clara" : (s > Math.abs(t) ? "brillante" : "calida");
-    else sub = -v >= Math.max(t, Math.abs(s)) ? "profundo" : (s < -0.3 && -s > t ? "suave" : "calido");
+    else sub = -v >= Math.max(t, Math.abs(s)) ? "profundo" : (s < -0.3 && -s > t && k < 0.3 ? "suave" : "calido");
   } else {
     est = (k > 0.3 || v < -0.5) ? "invierno" : "verano";
     if (est === "invierno") sub = -v >= Math.max(-t, k) ? "profundo" : (k > -t ? "brillante" : "frio");
     else sub = v >= Math.max(-t, -s) ? "claro" : (-s > -t ? "suave" : "frio");
   }
-  const tono = t > 0.5 ? "calido" : t < -0.5 ? "frio" : "neutro";
+  const tono = t > 0.5 ? "calido" : t < -0.5 ? "frio" : t > 0 ? "neutro_c" : "neutro_f";
   const nivel = k > 0.5 ? "alto" : k < -0.5 ? "bajo" : "medio";
   return { est, sub, tono, nivel, t, v, k, s };
 }

@@ -216,7 +216,7 @@ const RESULTADOS = {
     [50, 101, 118, 205, 280, 330, 347, 425, 151, 108, 337].forEach(i => { const [x, y] = d.p(i); d.g.beginPath(); d.g.arc(x, y, Math.max(6, d.W / 70), 0, 7); d.g.stroke(); });
     $("#resNombre").textContent = info.nombre;
     $("#resDesc").textContent = info.desc;
-    $("#resPiel").innerHTML = `<i style="background:rgb(${c.rgb.join(",")})"></i><p>Subtono <b>${{ calido: "cálido", frio: "frío", neutro: "neutro" }[e.tono]}</b> · contraste <b>${e.nivel}</b><br><span style="opacity:.8">Metales: ${e.tono === "calido" ? "dorado y cobre" : e.tono === "frio" ? "plateado y oro blanco" : "dorado y plateado"}</span></p>`;
+    $("#resPiel").innerHTML = `<i style="background:rgb(${c.rgb.join(",")})"></i><p>Subtono <b>${{ calido: "cálido", frio: "frío", neutro_c: "neutro tirando a cálido", neutro_f: "neutro tirando a frío" }[e.tono]}</b> · contraste <b>${e.nivel}</b><br><span style="opacity:.8">Metales: ${e.tono === "calido" ? "dorado y cobre" : e.tono === "frio" ? "plateado y oro blanco" : e.tono === "neutro_c" ? "dorado, y también plateado" : "plateado, y también dorado"}</span></p>`;
     $("#resPaleta").innerHTML = info.sí.map(h => `<i style="background:${h}" title="${h}"></i>`).join("");
     $("#resEvita").innerHTML = info.no.map(h => `<i style="background:${h}" title="${h}"></i>`).join("");
     $("#resTips").innerHTML = [["Ropa", info.ropa], ["Cabello", info.pelo], ["Maquillaje y lentes", info.make]].map(([k, v]) => `<div><b>${k}</b><p>${esc(v)}</p></div>`).join("");
@@ -235,7 +235,7 @@ const RESULTADOS = {
     if (real >= 18 && real <= 99) {
       const dif = est - real;
       txt = dif <= -2 ? `Aparentas unos ${-dif} años menos que tu edad real.`
-        : dif >= 2 ? `Aparentas unos ${dif} años más que tu edad real. La piel, las ojeras, el cabello y la postura son lo que más suma, y casi todo se trabaja con hábitos.`
+        : dif >= 2 ? `Tu foto se lee unos ${dif} años mayor que tu edad real. La piel, la zona de los ojos, el cabello y la luz de la foto son lo que más influye, y casi todo se trabaja con hábitos.`
         : "Aparentas más o menos tu edad real.";
     }
     $("#resVerdict").textContent = txt;
