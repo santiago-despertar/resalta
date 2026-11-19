@@ -1,6 +1,7 @@
 // Free tools (/herramientas/*). One controller for every tool: the page says which one with <main data-tool="...">.
 // The photo never leaves the device. After the free result, the same photo gives the full harmony score by email.
 import * as H from "./herr-core.js";
+import * as D from "./herr-dibujo.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const main = $("main[data-tool]");
@@ -134,28 +135,6 @@ async function procesar() {
   await espera(250);
 }
 
-// ---------- drawing helpers: a face crop with lines on it
-function recorte(pad = 0.45) {
-  const xs = P.map(q => q.x), ys = P.map(q => q.y);
-  const bx0 = Math.min(...xs), bx1 = Math.max(...xs), by0 = Math.min(...ys), by1 = Math.max(...ys);
-  const pw = (bx1 - bx0) * pad, ph = (by1 - by0) * 0.35;
-  const x0 = Math.max(0, bx0 - pw), x1 = Math.min(img.width, bx1 + pw), y0 = Math.max(0, by0 - ph), y1 = Math.min(img.height, by1 + ph * 0.7);
-  return { x0, y0, x1, y1 };
-}
-function lienzo(canvas, box) {
-  const W = Math.min(900, Math.round(box.x1 - box.x0)), k = W / (box.x1 - box.x0), Hh = Math.round((box.y1 - box.y0) * k);
-  canvas.width = W; canvas.height = Hh;
-  const g = canvas.getContext("2d");
-  g.drawImage(img, box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0, 0, 0, W, Hh);
-  g.fillStyle = "rgba(22,25,29,.2)"; g.fillRect(0, 0, W, Hh);
-  const p = (i) => [(P[i].x - box.x0) * k, (P[i].y - box.y0) * k];
-  g.strokeStyle = "#fff"; g.fillStyle = "#fff"; g.lineWidth = Math.max(1.5, W / 600);
-  const linea = (a, b, dash) => { g.setLineDash(dash ? [6, 6] : []); g.beginPath(); g.moveTo(...p(a)); g.lineTo(...p(b)); g.stroke(); };
-  const punto = (i, r) => { const [x, y] = p(i); g.beginPath(); g.arc(x, y, r || Math.max(3, W / 250), 0, 7); g.fill(); };
-  return { g, W, H: Hh, k, p, linea, punto };
-}
-const OVAL = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109];
-
 // =====================================================================
 // Results, one per tool
 // =====================================================================
@@ -171,12 +150,7 @@ const RESULTADOS = {
 
   forma: async () => {
     const f = H.formaCara(P), info = FORMAS[f.forma];
-    const d = lienzo($("#resCanvas"), recorte(0.35));
-    d.g.setLineDash([]); d.g.lineWidth = Math.max(2, d.W / 380); d.g.beginPath();
-    OVAL.forEach((i, n) => { const [x, y] = d.p(i); n ? d.g.lineTo(x, y) : d.g.moveTo(x, y); }); d.g.closePath(); d.g.stroke();
-    d.g.lineWidth = Math.max(1.5, d.W / 600);
-    d.linea(54, 284, true); d.linea(234, 454, true); d.linea(172, 397, true); d.linea(10, 152, true);
-    [54, 284, 234, 454, 172, 397, 10, 152].forEach(i => d.punto(i));
+    D.dibujarForma($("#resCanvas"), img, P);
     $("#resNombre").textContent = info.nombre;
     $("#resDesc").textContent = info.desc + (f.segunda ? ` También tiene rasgos de cara ${FORMAS[f.segunda].corto}.` : "");
     const pct = (v) => Math.round(v * 100) + "%";
@@ -193,13 +167,8 @@ const RESULTADOS = {
 
   simetria: async () => {
     const s = H.simetria(P);
-    const d = lienzo($("#resCanvas"), recorte(0.35));
-    const box = recorte(0.35), k = d.k;
-    const q = (pt) => [(pt.x - box.x0) * k, (pt.y - box.y0) * k];
-    const [ax, ay] = q(s.linea.a), [bx, by] = q(s.linea.b), ext = 0.18;
-    d.g.setLineDash([6, 6]); d.g.beginPath(); d.g.moveTo(ax - (bx - ax) * ext, ay - (by - ay) * ext); d.g.lineTo(bx + (bx - ax) * ext, by + (by - ay) * ext); d.g.stroke();
-    d.g.setLineDash([]);
-    Object.values(H.ZONAS).flat().forEach(([l, r]) => { if (l >= 468) return; d.g.save(); d.g.globalAlpha = .45; d.linea(l, r); d.g.restore(); d.punto(l); d.punto(r); });
+    D.dibujarSimetria($("#resCanvas"), img, P);
+    nota("Cada círculo marca dónde estaría ese punto si tu cara fuera idéntica de los dos lados. Entre más cerca del punto, más simétrica es esa zona.");
     const total = Math.round(s.total);
     $("#resScore").textContent = total;
     $("#resVerdict").textContent = total >= 92 ? "Muy simétrica" : total >= 85 ? "Simétrica" : total >= 78 ? "Simetría media" : "Con diferencias visibles entre lados";
@@ -212,8 +181,8 @@ const RESULTADOS = {
     const c = H.colorimetria(img, P);
     if (c.gris) throw new Error("gris");
     const e = H.estacion(c), key = e.est + "_" + e.sub, info = PALETAS[key];
-    const d = lienzo($("#resCanvas"), recorte(0.4));
-    [50, 101, 118, 205, 280, 330, 347, 425, 151, 108, 337].forEach(i => { const [x, y] = d.p(i); d.g.beginPath(); d.g.arc(x, y, Math.max(6, d.W / 70), 0, 7); d.g.stroke(); });
+    D.dibujarColor($("#resCanvas"), img, P);
+    nota("Los círculos son las zonas donde medimos el color de tu piel, tus ojos y tus cejas.");
     $("#resNombre").textContent = info.nombre;
     $("#resDesc").textContent = info.desc;
     $("#resPiel").innerHTML = `<i style="background:rgb(${c.rgb.join(",")})"></i><p>Subtono <b>${{ calido: "cálido", frio: "frío", neutro_c: "neutro tirando a cálido", neutro_f: "neutro tirando a frío" }[e.tono]}</b> · contraste <b>${e.nivel}</b><br><span style="opacity:.8">Metales: ${e.tono === "calido" ? "dorado y cobre" : e.tono === "frio" ? "plateado y oro blanco" : e.tono === "neutro_c" ? "dorado, y también plateado" : "plateado, y también dorado"}</span></p>`;
@@ -227,8 +196,8 @@ const RESULTADOS = {
     const r = await pre;
     if (!r) throw new Error("edad");
     const est = Math.round(r.edad), lo = Math.max(18, est - 2), hi = Math.max(lo + 3, est + 2);
-    const d = lienzo($("#resCanvas"), recorte(0.4));
-    [33, 263, 133, 362, 61, 291, 9, 168].forEach(i => d.punto(i));
+    D.dibujarEdad($("#resCanvas"), img, P);
+    nota("Estos son los 478 puntos de tu cara que usamos para leer tu foto.");
     $("#resScore").textContent = `${lo}–${hi}`.replace("–", " a ");
     const real = parseInt($("#toolEdadReal")?.value, 10);
     let txt = "Esta es la edad que suele leer la gente al verte en una foto.";
@@ -329,13 +298,11 @@ function puntaje() {
   _puntaje = { score: Math.round(35 + raw * 0.6), parts };
   return _puntaje;
 }
-function dibujarPuntaje(canvas) {
-  const d = lienzo(canvas, recorte(0.45));
-  d.linea(10, 152, true); d.linea(33, 263); d.linea(234, 454); d.linea(172, 152); d.linea(397, 152);
-  const rx = Math.min(d.W - 8, Math.max(d.p(454)[0], d.p(234)[0]) + d.W * 0.035), tk = Math.max(6, d.W / 90);
-  d.g.setLineDash([]); d.g.beginPath(); d.g.moveTo(rx, d.p(9)[1]); d.g.lineTo(rx, d.p(152)[1]); d.g.stroke();
-  [9, 2, 152].forEach(i => { const [x, y] = d.p(i); d.g.beginPath(); d.g.moveTo(rx - tk, y); d.g.lineTo(rx + tk, y); d.g.stroke(); d.g.save(); d.g.globalAlpha = .45; d.g.setLineDash([4, 6]); d.g.beginPath(); d.g.moveTo(x, y); d.g.lineTo(rx - tk, y); d.g.stroke(); d.g.restore(); });
-  [33, 133, 362, 263, 234, 454, 172, 397, 152, 2, 9, 61, 291, 13].forEach(i => d.punto(i));
+function dibujarPuntaje(canvas) { D.dibujarBelleza(canvas, img, P); }
+function nota(t) {
+  let n = $("#resCanvasNota");
+  if (!n) { $("#resCanvas").insertAdjacentHTML("afterend", '<p class="hint" id="resCanvasNota" style="margin:-8px 0 16px;font-size:13px"></p>'); n = $("#resCanvasNota"); }
+  n.textContent = t;
 }
 function fotoCorreo() {
   try {
