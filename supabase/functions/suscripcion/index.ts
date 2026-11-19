@@ -36,8 +36,8 @@ async function guardarFila(userId: string, sub: Stripe.Subscription) {
   const customer = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
   await admin.from("suscripciones").upsert({
     user_id: userId, stripe_customer: customer, stripe_subscription: sub.id, estado: sub.status,
-    periodo_inicio: new Date(sub.current_period_start * 1000).toISOString(),
-    periodo_fin: new Date(sub.current_period_end * 1000).toISOString(),
+    periodo_inicio: new Date(periodo(sub, "current_period_start") * 1000).toISOString(),
+    periodo_fin: new Date(periodo(sub, "current_period_end") * 1000).toISOString(),
     cancela: sub.cancel_at_period_end, actualizado: new Date().toISOString(),
   }, { onConflict: "user_id" });
 }
@@ -107,8 +107,8 @@ async function leer(userId: string) {
   const sub = await stripe.subscriptions.retrieve(row.stripe_subscription);
   const upd = {
     estado: sub.status,
-    periodo_inicio: new Date(sub.current_period_start * 1000).toISOString(),
-    periodo_fin: new Date(sub.current_period_end * 1000).toISOString(),
+    periodo_inicio: new Date(periodo(sub, "current_period_start") * 1000).toISOString(),
+    periodo_fin: new Date(periodo(sub, "current_period_end") * 1000).toISOString(),
     cancela: sub.cancel_at_period_end,
     actualizado: new Date().toISOString(),
   };
@@ -140,6 +140,10 @@ async function esTester(db: any, userId: string) {
   const { data } = await db.from("testers").select("user_id").eq("user_id", userId).maybeSingle();
   return !!data;
 }
+
+// Newer Stripe API versions keep the billing period on the subscription item, older ones on the subscription.
+const periodo = (sub: Stripe.Subscription, k: "current_period_start" | "current_period_end"): number =>
+  Number((sub as unknown as Record<string, unknown>)[k] ?? (sub.items?.data?.[0] as unknown as Record<string, unknown> | undefined)?.[k] ?? Date.now() / 1000);
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -197,7 +201,7 @@ Deno.serve(async (req) => {
           if (ACTIVAS.includes(nueva.status)) {
             await guardarFila(user.id, nueva);
             await bienvenidaSub(user.id, nueva);
-            return json({ ok: true, prueba: gratis, siguiente_cobro: new Date(((nueva.trial_end ?? nueva.current_period_end)) * 1000).toISOString() });
+            return json({ ok: true, prueba: gratis, siguiente_cobro: new Date(((nueva.trial_end ?? periodo(nueva, "current_period_end"))) * 1000).toISOString() });
           }
           await stripe.subscriptions.cancel(nueva.id).catch(() => {});
         } catch (e) { console.error("one-click subscription failed, sending to checkout", e); }
