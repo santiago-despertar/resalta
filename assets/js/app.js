@@ -1099,21 +1099,21 @@
       const conUp = o.tier === "soft" && q.get("mejora") !== "1", conSub = !st.activa;
       if (!conUp && !conSub) return;
 
-      // The upgrade comes ticked (a one-time price). The monthly follow-up is never pre-ticked: it is a recurring charge.
+      // Both offers come ticked; the person unticks what they don't want.
       // With the Plan Completo (bought now or before) the follow-up's first month is free.
       const up = $("#ofUp"), sub = $("#ofSub"), cUp = up.querySelector("input"), cSub = sub.querySelector("input");
       up.hidden = !conUp; cUp.checked = conUp;
-      sub.hidden = !conSub; cSub.checked = false;
+      sub.hidden = !conSub; cSub.checked = conSub;
       const yaGratis = o.tier === "hard" || !!st.mes_gratis;
       const nuevoSub = st.nuevo !== false;
       const gratisAhora = () => nuevoSub && (yaGratis || (conUp && cUp.checked));
-      $("#ofIntro").textContent = conUp ? "El Plan Completo ya viene marcado. Si no lo quieres, quítale la palomita." : "Tu Plan Completo incluye tu primer mes de seguimiento. Actívalo aquí.";
+      $("#ofIntro").textContent = conUp && conSub ? "Ya vienen marcados. Si no quieres alguno, quítale la palomita." : conUp ? "El Plan Completo ya viene marcado. Si no lo quieres, quítale la palomita." : "Tu Plan Completo incluye tu primer mes de seguimiento. Actívalo aquí.";
       const yes = $("#ofYes");
       const pintar = () => {
         const g = gratisAhora();
         $("#ofSubPrecio").textContent = g ? "1er mes gratis" : conCodigo(SUB) + " al mes";
         $("#ofSubNota").textContent = g
-          ? `Incluido con tu Plan Completo. Después son ${conCodigo(SUB)} al mes en la misma tarjeta, y te avisamos 3 días antes del primer cobro. Cancelas cuando quieras.`
+          ? `Incluido con tu Plan Completo. Después son ${conCodigo(SUB)} al mes en la misma tarjeta. Cancelas cuando quieras.`
           : "Se cobra hoy y cada mes en la misma tarjeta. Cancelas cuando quieras desde tu cuenta.";
         listaValor($("#ofValor"), $("#ofTotal"), g ? `<b>$0</b> el primer mes y luego <b class="mono">${conCodigo(SUB)}</b> al mes` : `<b class="mono">${conCodigo(SUB)}</b> al mes`);
         const hoy = (conUp && cUp.checked ? numero(U.now) : 0) + (cSub.checked && !g ? numero(SUB) : 0);
@@ -1943,7 +1943,7 @@
       if (!st.activa) {
         $("#subL").textContent = "Seguimiento mensual"; $("#subT").textContent = st.mes_gratis ? "Tu primer mes va incluido" : "Mide tu avance cada mes";
         $("#subX").innerHTML = `Un escaneo completo cada mes con reporte nuevo, tu plan de nutrición y ejercicio, y tu progreso de cara y físico. ` + (st.mes_gratis
-          ? `Con tu Plan Completo el primer mes es gratis. Después son <b class="mono">${esc(precio)}</b>${SUFIJO ? " " + SUFIJO : ""} al mes, te avisamos antes del primer cobro y cancelas cuando quieras.`
+          ? `Con tu Plan Completo el primer mes es gratis. Después son <b class="mono">${esc(precio)}</b>${SUFIJO ? " " + SUFIJO : ""} al mes y cancelas cuando quieras.`
           : `<b class="mono">${esc(precio)}</b>${SUFIJO ? " " + SUFIJO : ""} al mes y cancelas cuando quieras.`);
         boton(st.mes_gratis ? "Activar mi mes gratis" : "Activar seguimiento", "btn btn-primary", function () { accion(this, "suscribir"); });
         enlace("Un escaneo suelto", "/analisis", "btn btn-ghost");
