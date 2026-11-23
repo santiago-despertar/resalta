@@ -187,7 +187,7 @@
   "busquedas": 33100,
   "dificultad": 12,
   "slug": "armonizacion-facial",
-  "estado": "pendiente"
+  "estado": "escrito"
  },
  {
   "n": 17,
@@ -198,7 +198,7 @@
   "busquedas": 90500,
   "dificultad": 19,
   "slug": "laminado-de-cejas",
-  "estado": "pendiente"
+  "estado": "escrito"
  },
  {
   "n": 18,
@@ -209,7 +209,7 @@
   "busquedas": 33100,
   "dificultad": 20,
   "slug": "colorimetria",
-  "estado": "pendiente",
+  "estado": "escrito",
   "tipo": "long tail",
   "mercado_busquedas": "MX",
   "nota": "Cluster de colorimetría. Enlaza a la guía principal de colorimetría y al test cuando existan."
@@ -223,7 +223,7 @@
   "busquedas": 165000,
   "dificultad": 26,
   "slug": "mandibula",
-  "estado": "pendiente"
+  "estado": "escrito"
  },
  {
   "n": 20,
