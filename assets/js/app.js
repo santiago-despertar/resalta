@@ -19,6 +19,8 @@
     return MONEDAS.USD ? "USD" : "MXN";
   })();
   const LOCAL = MONEDAS[moneda];
+  // The price level of the visitor's order ({ nivel, soft, hard, up }), set by fijarNivel once their answers are known.
+  let NIV = null;
   // An amount already in the visitor's currency, rounded and written the way that country writes it.
   const FMT = { MXN: n => `$${n.toLocaleString("es-MX")} MXN`, USD: n => `US$${n.toLocaleString("en-US")}`, EUR: n => `${n.toLocaleString("es-ES", { useGrouping: "always" })} €`,
     COP: n => `$${n.toLocaleString("es-CO")} COP`, CLP: n => `$${n.toLocaleString("es-CL")} CLP`, PEN: n => `S/ ${n.toLocaleString("en-US")}` };
@@ -130,6 +132,23 @@
     if (PRICES[k]) e.textContent = PRICES[k];
   });
   $$("[data-plan-name]").forEach(e => { if (C.PLAN_NAMES && C.PLAN_NAMES[plan]) e.textContent = C.PLAN_NAMES[plan]; });
+  // Prices depend on the onboarding answers (age and budget). Public pages show the regular price; once an order's
+  // answers are known, every price on the page switches to that person's level. The server charges the same table.
+  const TXT_PRECIO = { MXN: n => "$" + n.toLocaleString("en-US"), USD: n => "US$" + n.toLocaleString("en-US"), EUR: n => n.toLocaleString("es-ES", { useGrouping: "always" }) + " €",
+    COP: n => "$" + n.toLocaleString("es-CO"), CLP: n => "$" + n.toLocaleString("es-CL"), PEN: n => "S/ " + n.toLocaleString("en-US") };
+  function fijarNivel(a) {
+    const N = C.NIVELES || {}, tabla = N[moneda] || N.MXN; if (!tabla || !C.nivelPrecio) return;
+    const nivel = C.nivelPrecio(a), t = tabla[nivel] || tabla.normal, txt = TXT_PRECIO[N[moneda] ? moneda : "MXN"];
+    NIV = { nivel, soft: t[0], hard: t[1], up: t[2] };
+    C.PRICES = { soft: txt(t[0]), hard: txt(t[1]) };
+    Object.assign(C.UPSELL || (C.UPSELL = {}), { was: txt(t[1] - t[0]), now: txt(t[2]) });
+    $$("[data-price]").forEach(e => {
+      const k = e.dataset.price === "plan" ? plan : (e.dataset.price || "soft");
+      if (C.PRICES[k] && e.textContent !== "Incluido") e.textContent = C.PRICES[k];
+    });
+    $$("[data-upsell-was]").forEach(e => { e.textContent = C.UPSELL.was; });
+    $$("[data-upsell-now]").forEach(e => { e.textContent = conCodigo(C.UPSELL.now); });
+  }
   const header = $(".site-header");
   if (header) addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8), { passive: true });
 
@@ -271,7 +290,7 @@
       }
     } catch (e) {}
   };
-  const precio = tier => (LOCAL && LOCAL.n ? LOCAL.n[tier] : Number(String((C.PRICES || {})[tier] || "").replace(/[^0-9.]/g, ""))) || undefined;
+  const precio = tier => (NIV ? NIV[tier] : LOCAL && LOCAL.n ? LOCAL.n[tier] : Number(String((C.PRICES || {})[tier] || "").replace(/[^0-9.]/g, ""))) || undefined;
   // Affiliate commissions are stored in pesos; the portal shows them in the affiliate's currency.
   const precioMXN = tier => (MONEDAS.MXN && MONEDAS.MXN.n ? MONEDAS.MXN.n[tier] : precio(tier));
   const errES = (e) => {
@@ -699,6 +718,7 @@
       if (data && data[0]) {
         order = data[0];
         const a = order.answers || {};
+        if (order.answers) fijarNivel(order.answers);
         const f = $("#aboutForm");
         Object.keys(a).forEach(k => {
           if (!f[k] || f[k].type === "checkbox") return;
@@ -738,10 +758,12 @@
       if (!sb) { go(2); return; }
       if (order) {
         await sb.from("orders").update({ answers }).eq("id", order.id); order.answers = answers;
+        fijarNivel(answers);
       } else {
         const { data, error } = await sb.from("orders").insert({ user_id: user.id, answers, tier: plan }).select().single();
         if (error) { alertInline(f, "No pudimos guardar tus datos. Inténtalo de nuevo."); return; }
         order = data;
+        fijarNivel(answers);
       }
       go(2);
     });
@@ -1130,6 +1152,8 @@
       $$("[data-sub-price]").forEach(e => { e.textContent = conCodigo(SUB); });
       tarjetaAcceso($("#acceso"));
       if (!sb || !id || !(await getUser())) return;
+      // the upgrade offer is priced at this order's level
+      try { const { data: oa } = await sb.from("orders").select("answers").eq("id", id).maybeSingle(); if (oa && oa.answers) fijarNivel(oa.answers); } catch (e) {}
       // Ask for the follow-up status right away, in parallel with everything below, so the offer shows sooner.
       const estadoP = (q.get("mejora") === "1" ? Promise.resolve({}) : fnCall("suscripcion", { accion: "estado" })).catch(() => ({}));
 
@@ -1456,6 +1480,7 @@
 
       const { data: orders } = await sb.from("orders").select("id,status,tier,created_at,paid_at,medidas,answers").order("created_at", { ascending: false });
       todos = orders || [];
+      { const ult = todos.find(o => o.answers); if (ult) fijarNivel(ult.answers); } // upgrade offers in the panel use this order's price level
       const conNombre = todos.find(o => o.answers && o.answers.nombre);
       if (conNombre) $("#who").textContent = conNombre.answers.nombre.split(" ")[0];
       const box = $("#orders");

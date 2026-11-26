@@ -12,6 +12,17 @@ window.RESALTA = {
   PLAN_NAMES: { soft: "Plan Esencial", hard: "Plan Completo" },
   // Monthly follow-up plan. Must match the Stripe price in STRIPE_PRICE_SUB.
   SUB_PRICE: "$349",
+  // Price levels by onboarding answers: [Esencial, Completo, upgrade to Completo], in each currency's own units.
+  // The visitor only ever sees their own level. The server charges from the same table (create-checkout and
+  // upgrade-order keep a copy: keep all three in sync). "normal" is the regular price shown on the public pages.
+  NIVELES: {
+    MXN: { bajo: [199, 399, 149], medio: [699, 1299, 449], normal: [1499, 2999, 999], alto: [2499, 4999, 1699] },
+    USD: { bajo: [10, 20, 8], medio: [35, 69, 25], normal: [79, 159, 49], alto: [129, 259, 85] },
+    EUR: { bajo: [9, 19, 7], medio: [29, 59, 22], normal: [69, 139, 45], alto: [119, 239, 79] },
+    COP: { bajo: [35000, 69000, 25000], medio: [119000, 229000, 79000], normal: [259000, 519000, 169000], alto: [429000, 859000, 289000] },
+    CLP: { bajo: [10990, 21990, 7990], medio: [36990, 69990, 23990], normal: [79990, 159990, 49990], alto: [129990, 259990, 84990] },
+    PEN: { bajo: [39, 79, 29], medio: [129, 249, 85], normal: [279, 559, 189], alto: [459, 919, 309] }
+  },
   // Local prices, shown and charged in the visitor's currency. Rounded on purpose, not live exchange rates.
   // The amounts the server charges are in supabase/functions/_precios.ts (keep both in sync). MXN uses the Stripe prices above.
   MONEDAS: {
@@ -34,4 +45,20 @@ window.RESALTA = {
            proc: ["Menos de S/ 2,000", "S/ 2,000 a S/ 5,000", "S/ 5,000 a S/ 15,000", "Más de S/ 15,000"],
            dia: ["Menos de S/ 100", "S/ 100 a S/ 350", "S/ 350 a S/ 900", "Más de S/ 900"] }
   }
+};
+
+// Which price level an order gets, from its onboarding answers. Same rules as nivelPrecio() in create-checkout.
+//   bajo:   18 to 21 years old, or the lowest monthly budget
+//   alto:   the highest monthly budget, or $30,000 MXN (or the local equivalent) or more for procedures
+//   medio:  the second monthly budget option
+//   normal: everyone else (the third monthly budget option, or no answer)
+window.RESALTA.nivelPrecio = function (a) {
+  a = a || {};
+  var p = String(a.presupuesto || "").trim(), pp = String(a.presupuesto_procedimientos || "").trim(), edad = Number(a.edad) || 0;
+  var DIA2 = ["$500 a $2,000 MXN", "$500 a $2,000", "US$25 a US$100", "25 € a 100 €", "$100.000 a $400.000 COP", "$25.000 a $100.000 CLP", "S/ 100 a S/ 350"];
+  var PROC3 = ["$30,000 a $80,000 MXN", "$30,000 a $80,000", "US$1,500 a US$4,000", "1.500 € a 4.000 €", "$6.000.000 a $15.000.000 COP", "$1.500.000 a $4.000.000 CLP", "S/ 5,000 a S/ 15,000"];
+  if ((edad >= 18 && edad <= 21) || /^menos/i.test(p)) return "bajo";
+  if (/^m[aá]s/i.test(p) || /^m[aá]s/i.test(pp) || PROC3.indexOf(pp) >= 0) return "alto";
+  if (DIA2.indexOf(p) >= 0) return "medio";
+  return "normal";
 };
