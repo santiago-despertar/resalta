@@ -79,14 +79,21 @@ export async function calificarFotos(fotos: string[], medidas: string) {
     { type: "text", text: (fotos.length > 1 ? "Son fotos de la misma persona: la primera de frente, la otra de perfil. " : "") +
       "Califica esta cara. Responde solo llamando a la herramienta calificacion, sin texto aparte." + (medidas ? `\n\nMedidas de su foto de frente fuera del rango de referencia, por zona:\n${medidas}` : "") },
   ];
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-api-key": Deno.env.get("ANTHROPIC_API_KEY")!, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({ model: MODELO, max_tokens: 3000, system: SISTEMA, tools: [TOOL], tool_choice: { type: "auto" }, messages: [{ role: "user", content }] }),
-  });
-  const j = await r.json();
-  if (!r.ok) throw new Error("anthropic " + JSON.stringify(j).slice(0, 300));
-  const t = (j.content ?? []).find((c: { type: string }) => c.type === "tool_use");
+  // Sometimes the model answers in text instead of calling the tool: one more try, this time requiring the tool.
+  // deno-lint-ignore no-explicit-any
+  let j: any = null, t: any = null;
+  for (const choice of [{ type: "auto" }, { type: "tool", name: TOOL.name }]) {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": Deno.env.get("ANTHROPIC_API_KEY")!, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({ model: MODELO, max_tokens: 3000, system: SISTEMA, tools: [TOOL], tool_choice: choice, messages: [{ role: "user", content }] }),
+    });
+    j = await r.json();
+    if (!r.ok) { if (choice.type === "tool") throw new Error("anthropic " + JSON.stringify(j).slice(0, 300)); continue; }
+    t = (j.content ?? []).find((c: { type: string }) => c.type === "tool_use");
+    if (t) break;
+    console.warn("calificar sin tool_use", choice.type, j.stop_reason, JSON.stringify(j.content ?? []).slice(0, 300));
+  }
   if (!t) throw new Error("sin respuesta");
   const x = t.input;
   const zonas = Object.fromEntries(ZONAS.map(([k]) => [k, dec(curva(Math.max(0, Math.min(10, Number(x.zonas?.[k]) || 0))))]));
