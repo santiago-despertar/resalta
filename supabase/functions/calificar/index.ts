@@ -97,10 +97,34 @@ export async function calificarFotos(fotos: string[], medidas: string) {
   };
 }
 
+// The order, only if it belongs to whoever is calling.
+async function pedidoDe(req: Request, id: unknown): Promise<{ id: string; user_id: string } | null> {
+  if (!id) return null;
+  const u = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: req.headers.get("Authorization") ?? "" } } });
+  const { data: ud } = await u.auth.getUser();
+  const { data: o } = await u.from("orders").select("id,user_id").eq("id", String(id)).maybeSingle();
+  return o && ud?.user && o.user_id === ud.user.id ? o : null;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   try {
     const b = await req.json().catch(() => ({}));
+    // Onboarding: the preview picture (front photo with the measurement lines) for the first follow-up email.
+    // Public only under an unguessable name, like the free-rating email picture; the resultado-gratis function
+    // deletes everything in that bucket after 30 days.
+    if (b.accion === "foto_correo") {
+      const o = await pedidoDe(req, b.order_id);
+      if (!o) return json({ error: "Pedido no encontrado" }, 403);
+      const m = /^data:image\/jpeg;base64,([A-Za-z0-9+/=]+)$/.exec(String(b.foto ?? ""));
+      if (!m || m[1].length > 700_000) return json({ error: "Foto no válida" }, 400);
+      const bytes = Uint8Array.from(atob(m[1]), (c) => c.charCodeAt(0));
+      const path = `orden-${o.id}-${crypto.randomUUID().slice(0, 8)}.jpg`;
+      const { error } = await admin.storage.from("correo").upload(path, bytes, { contentType: "image/jpeg", upsert: true });
+      if (error) { console.error("foto_correo", error.message); return json({ error: "No se pudo guardar" }, 500); }
+      await admin.from("orders").update({ foto_correo: admin.storage.from("correo").getPublicUrl(path).data.publicUrl }).eq("id", o.id);
+      return json({ ok: true });
+    }
     const fotos = (Array.isArray(b.fotos) ? b.fotos : []).slice(0, 2).map((f: unknown) => String(f ?? "").replace(/^data:image\/jpeg;base64,/, ""))
       .filter((f: string) => /^[A-Za-z0-9+/=]+$/.test(f) && f.length > 2000 && f.length < 1_500_000);
     if (!fotos.length) return json({ error: "Falta la foto" }, 400);
@@ -111,12 +135,9 @@ Deno.serve(async (req) => {
     // onboarding: the order has to belong to whoever is calling
     let orderId: string | null = null, userId: string | null = null;
     if (b.order_id) {
-      const auth = req.headers.get("Authorization") ?? "";
-      const u = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: auth } } });
-      const { data: ud } = await u.auth.getUser();
-      const { data: o } = await u.from("orders").select("id,user_id").eq("id", String(b.order_id)).maybeSingle();
-      if (!o || !ud?.user || o.user_id !== ud.user.id) return json({ error: "Pedido no encontrado" }, 403);
-      orderId = o.id; userId = ud.user.id;
+      const o = await pedidoDe(req, b.order_id);
+      if (!o) return json({ error: "Pedido no encontrado" }, 403);
+      orderId = o.id; userId = o.user_id;
     }
 
     // Same photo, same result, no new charge. foto_id is the SHA-256 of the original front photo file, computed in the
