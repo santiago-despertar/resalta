@@ -594,10 +594,9 @@
         n.innerHTML = `<b>${j.descuento}% de descuento</b>${j.nombre ? ` por la invitación de ${j.nombre.replace(/[<>&"]/g, "")}` : " por invitación"}. Se aplica al pagar.`;
         n.hidden = false;
       }).catch(() => {});
-    // The three photos the analysis uses: front, smiling and profile.
+    // The onboarding asks for two photos, front and profile. The smiling one is asked after payment, in the panel.
     const SLOTS = [
       ["frente", "Frente", "Cara relajada, boca cerrada"],
-      ["sonrisa", "Sonriendo", "Sonrisa natural, de frente"],
       ["perfil_izq", "Perfil", "90°, de cualquier lado"],
     ];
     const REQUERIDAS = SLOTS.filter(s => !s[3]).map(s => s[0]);
@@ -1488,7 +1487,40 @@
       let r = await leerReporte(o.id);
       if (r && r.resumen && r.v === 2) await pintar(r, o);
       if (completo(r, o) && r.estado !== "generando") { esperando(false); return; }
+      if (!r && !(await conSonrisa(o))) return; // asks for the smile photo first; generates after
       generar(o);
+    }
+
+    // The smiling photo is no longer part of the onboarding. Before the first report of an order, the panel asks
+    // for it once (it unlocks the smile section). Skipping it builds the report without that section.
+    async function conSonrisa(o) {
+      const k = "rs_sin_sonrisa_" + o.id;
+      try { if (localStorage.getItem(k)) return true; } catch (e) {}
+      const { data: fs } = await sb.storage.from("fotos").list(`${user.id}/${o.id}`, { limit: 50 });
+      if ((fs || []).some(f => f.name === "sonrisa.jpg")) return true;
+      esperando(false);
+      $("#repStatus").textContent = "Un paso más"; $("#repStatus").className = "status paid";
+      const m = $("#repMsg");
+      msg(m, "Antes de armar tu reporte: sube una foto de frente sonriendo, natural y mostrando los dientes. Con ella sumamos la sección de tu sonrisa (dientes, encía y simetría).", "info");
+      const fila = document.createElement("div"); fila.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;margin-top:12px";
+      fila.innerHTML = '<label class="btn btn-primary" style="cursor:pointer"><span>Subir foto sonriendo</span><input type="file" accept="image/*" hidden></label><button type="button" class="btn btn-ghost">Armar mi reporte sin sonrisa</button>';
+      m.appendChild(fila);
+      const lab = fila.querySelector("label"), saltar = fila.querySelector("button");
+      saltar.addEventListener("click", () => { try { localStorage.setItem(k, "1"); } catch (e) {} clearMsg(m); generar(o); });
+      lab.querySelector("input").addEventListener("change", async ev => {
+        const f = ev.target.files[0]; if (!f) return;
+        lab.querySelector("span").textContent = "Subiendo…"; saltar.disabled = true;
+        try {
+          const img = await createImageBitmap(f), s2 = Math.min(1, 1600 / Math.max(img.width, img.height));
+          const c = document.createElement("canvas"); c.width = Math.round(img.width * s2); c.height = Math.round(img.height * s2);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          const blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.9));
+          const { error } = await sb.storage.from("fotos").upload(`${user.id}/${o.id}/sonrisa.jpg`, blob, { upsert: true, contentType: "image/jpeg" });
+          if (error) throw error;
+          clearMsg(m); generar(o);
+        } catch (err) { lab.querySelector("span").textContent = "Subir foto sonriendo"; saltar.disabled = false; }
+      });
+      return false;
     }
 
     function esperando(si, titulo, sub) {
