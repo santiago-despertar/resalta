@@ -487,6 +487,52 @@ Deno.serve(async (req) => {
       return json({ ok: true, usuarios: todas });
     }
 
+    // Delete a person for good: an account (id) with everything tied to it, or someone who only did the free
+    // rating (email). Unsubscribes (bajas) are kept so we never email them again. Admin accounts can't be deleted.
+    if (accion === "borrar") {
+      const id = String(b.id ?? ""), dado = String(b.email ?? "").toLowerCase().trim();
+      let em = dado;
+      if (id) {
+        if (!/^[0-9a-f-]{36}$/.test(id)) return json({ error: "id" }, 400);
+        if (id === yo.id) return json({ error: "No puedes borrar tu propia cuenta" }, 400);
+        const { data: esA } = await admin.from("admins").select("user_id").eq("user_id", id).maybeSingle();
+        if (esA) return json({ error: "Es una cuenta de administrador" }, 400);
+        const { data: ud2 } = await admin.auth.admin.getUserById(id);
+        if (!ud2?.user) return json({ error: "No existe" }, 404);
+        em = (ud2.user.email ?? "").toLowerCase();
+        const ords = ((await admin.from("orders").select("id").eq("user_id", id)).data ?? []).map((o: Obj) => o.id);
+        // photos in storage: fotos/<user id>/... and the email copies correo/orden-<order id>-...
+        const fotos = (await listarFotos(id)).map((f) => f.ruta);
+        for (let i = 0; i < fotos.length; i += 100) await admin.storage.from("fotos").remove(fotos.slice(i, i + 100));
+        for (const oid of ords) {
+          const { data: cs } = await admin.storage.from("correo").list("", { search: `orden-${oid}` });
+          if (cs?.length) await admin.storage.from("correo").remove(cs.map((c) => c.name));
+        }
+        await admin.from("calificaciones").delete().eq("user_id", id);
+        if (ords.length) await admin.from("calificaciones").delete().in("order_id", ords);
+        await admin.from("eventos").delete().eq("user_id", id);
+        await admin.from("secuencia_envios").delete().eq("user_id", id);
+        // orders, reports, chat, subscription row, physical plan, sequence enrollment, profile cascade with the user
+        const { error } = await admin.auth.admin.deleteUser(id);
+        if (error) return json({ error: error.message }, 500);
+      }
+      if (!em) return json({ ok: true });
+      if (!id) {
+        const { data: users } = await admin.from("profiles").select("id").eq("email", em).limit(1);
+        if (users?.length) return json({ error: "Ese correo tiene cuenta: bórrala desde la cuenta" }, 400);
+      }
+      const { data: ls } = await admin.from("leads").select("id").eq("email", em);
+      const lids = (ls ?? []).map((l: Obj) => l.id);
+      await admin.from("lead_envios").delete().eq("email", em);
+      await admin.from("lead_secuencia").delete().eq("email", em);
+      if (lids.length) await admin.from("lead_secuencia").delete().in("lead_id", lids);
+      await admin.from("leads").delete().eq("email", em);
+      await admin.from("secuencia_envios").delete().eq("email", em);
+      await admin.from("secuencia_inscritos").delete().eq("email", em);
+      await admin.from("correos_log").delete().eq("email", em);
+      return json({ ok: true });
+    }
+
     if (accion === "usuario") {
       const id = String(b.id ?? "");
       if (!/^[0-9a-f-]{36}$/.test(id)) return json({ error: "id" }, 400);
