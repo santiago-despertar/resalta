@@ -20,6 +20,33 @@ const PRECIOS: Record<string, { soft: number; hard: number; up: number; sub: num
   CLP: { soft: 79990, hard: 159990, up: 49990, sub: 18990 },
   PEN: { soft: 27900, hard: 55900, up: 18900, sub: 6500 },
 };
+// Price levels by onboarding answers: [Esencial, Completo, upgrade to Completo], in each currency's own units
+// (pesos, dollars...). Keep in sync with NIVELES and nivelPrecio in assets/js/config.js and the other functions.
+const NIVELES: Record<string, Record<string, [number, number, number]>> = {
+  MXN: { bajo: [199, 399, 149], medio: [699, 1299, 449], normal: [1499, 2999, 999], alto: [2499, 4999, 1699] },
+  USD: { bajo: [10, 20, 8], medio: [35, 69, 25], normal: [79, 159, 49], alto: [129, 259, 85] },
+  EUR: { bajo: [9, 19, 7], medio: [29, 59, 22], normal: [69, 139, 45], alto: [119, 239, 79] },
+  COP: { bajo: [35000, 69000, 25000], medio: [119000, 229000, 79000], normal: [259000, 519000, 169000], alto: [429000, 859000, 289000] },
+  CLP: { bajo: [10990, 21990, 7990], medio: [36990, 69990, 23990], normal: [79990, 159990, 49990], alto: [129990, 259990, 84990] },
+  PEN: { bajo: [39, 79, 29], medio: [129, 249, 85], normal: [279, 559, 189], alto: [459, 919, 309] },
+};
+// Stripe amounts are in cents, except CLP, which has none.
+const enStripe = (moneda: string, n: number) => Math.round(n * (moneda === "CLP" ? 1 : 100));
+//   bajo:   18 to 21 years old, or the lowest monthly budget
+//   alto:   the highest monthly budget, or $30,000 MXN (or the local equivalent) or more for procedures
+//   medio:  the second monthly budget option
+//   normal: everyone else
+// deno-lint-ignore no-explicit-any
+function nivelPrecio(a: any): string {
+  a = a ?? {};
+  const p = String(a.presupuesto ?? "").trim(), pp = String(a.presupuesto_procedimientos ?? "").trim(), edad = Number(a.edad) || 0;
+  const DIA2 = ["$500 a $2,000 MXN", "$500 a $2,000", "US$25 a US$100", "25 € a 100 €", "$100.000 a $400.000 COP", "$25.000 a $100.000 CLP", "S/ 100 a S/ 350"];
+  const PROC3 = ["$30,000 a $80,000 MXN", "$30,000 a $80,000", "US$1,500 a US$4,000", "1.500 € a 4.000 €", "$6.000.000 a $15.000.000 COP", "$1.500.000 a $4.000.000 CLP", "S/ 5,000 a S/ 15,000"];
+  if ((edad >= 18 && edad <= 21) || /^menos/i.test(p)) return "bajo";
+  if (/^m[aá]s/i.test(p) || /^m[aá]s/i.test(pp) || PROC3.includes(pp)) return "alto";
+  if (DIA2.includes(p)) return "medio";
+  return "normal";
+}
 const monedaDe = (m: unknown) => { const c = String(m ?? "").toUpperCase(); return PRECIOS[c] ? c : "MXN"; };
 // Any charged amount expressed in pesos, using the same ratio as the price table. Commissions are always in pesos.
 const aPesos = (amount: number | null | undefined, currency: string | null | undefined) => {
@@ -45,7 +72,7 @@ Deno.serve(async (req) => {
     if (!user) return json({ error: "No autorizado" }, 401);
 
     const { order_id, luego } = await req.json();
-    const { data: order } = await userClient.from("orders").select("id,status,tier,stripe_session_id,amount_mxn").eq("id", order_id).single();
+    const { data: order } = await userClient.from("orders").select("id,status,tier,stripe_session_id,amount_mxn,answers").eq("id", order_id).single();
     if (!order || !["pagado", "listo"].includes(order.status) || order.tier !== "soft" || !order.stripe_session_id) return json({ error: "Pedido no válido" }, 400);
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!);
@@ -55,10 +82,14 @@ Deno.serve(async (req) => {
     const customer = typeof session.customer === "string" ? session.customer : session.customer?.id;
     const pi = session.payment_intent as Stripe.PaymentIntent | null;
     const pm = pi && (typeof pi.payment_method === "string" ? pi.payment_method : pi.payment_method?.id);
-    // Charged in the same currency as the first payment. In pesos the UPGRADE_PRICE_MXN secret can override it.
+    // Charged in the same currency as the first payment, at the order's price level (from its saved answers).
+    // At the regular level in pesos the UPGRADE_PRICE_MXN secret can override it.
     const moneda = monedaDe(session.currency);
+    const nivel = nivelPrecio(order.answers);
     const tester = moneda === "MXN" && await esTester(admin, user.id);
-    const diff = tester ? PRUEBA_MXN : moneda === "MXN" ? Math.round(Number(Deno.env.get("UPGRADE_PRICE_MXN") ?? "999") * 100) : PRECIOS[moneda].up;
+    const diff = tester ? PRUEBA_MXN
+      : moneda === "MXN" && nivel === "normal" ? Math.round(Number(Deno.env.get("UPGRADE_PRICE_MXN") ?? "999") * 100)
+      : enStripe(moneda, (NIVELES[moneda] ?? NIVELES.MXN)[nivel][2]);
     if (!(diff > 0)) return json({ error: "Mejora no disponible" }, 400);
     const pesos = aPesos(diff, moneda);
 
