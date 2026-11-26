@@ -82,7 +82,7 @@ export async function calificarFotos(fotos: string[], medidas: string) {
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "content-type": "application/json", "x-api-key": Deno.env.get("ANTHROPIC_API_KEY")!, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({ model: MODELO, max_tokens: 3000, system: SISTEMA, tools: [TOOL], tool_choice: { type: "auto" }, messages: [{ role: "user", content }] }),
+    body: JSON.stringify({ model: MODELO, max_tokens: 3000, temperature: 0, system: SISTEMA, tools: [TOOL], tool_choice: { type: "auto" }, messages: [{ role: "user", content }] }),
   });
   const j = await r.json();
   if (!r.ok) throw new Error("anthropic " + JSON.stringify(j).slice(0, 300));
@@ -119,8 +119,10 @@ Deno.serve(async (req) => {
       orderId = o.id; userId = ud.user.id;
     }
 
-    // same photos, same result, no new charge
-    const hash = await sha(RUBRICA + "|" + fotos.join("|"));
+    // Same photo, same result, no new charge. foto_id is the SHA-256 of the original front photo file, computed in the
+    // browser by every flow (free rating, beauty test, onboarding), so the same picture gets the same number everywhere.
+    const fotoId = /^[0-9a-f]{64}$/.test(String(b.foto_id ?? "")) ? String(b.foto_id) : null;
+    const hash = await sha(RUBRICA + "|" + (fotoId ? "foto:" + fotoId : fotos.join("|")));
     const { data: hecho } = await admin.from("calificaciones").select("id,general,zonas,razon,calidad,nota_fotos,order_id").eq("hash", hash).order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (hecho && hecho.general == null) return json({ ok: false, motivo: hecho.calidad === "mala" ? "foto_mala" : hecho.calidad });
     if (hecho) {
