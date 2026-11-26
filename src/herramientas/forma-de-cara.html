@@ -32,7 +32,7 @@
         <label class="check"><input type="checkbox" id="toolAdult"> <span>Tengo 18 años o más y la foto es mía.</span></label>
         <div class="msg" id="toolMsg"></div>
         <button class="btn btn-primary btn-block" id="toolGo" disabled>Ver mi forma de cara</button>
-        <p class="hint cal-priv">Tu foto se analiza en tu dispositivo. No la subimos a ningún servidor.</p>
+        <p class="hint cal-priv">Tu foto se analiza en tu dispositivo. Solo si pides tu calificación por correo mandamos un recorte de tu cara para calcularla, y no lo guardamos.</p>
       </section>
       <section class="cal-paso" data-p="proceso">
         <div class="cal-scan"><canvas id="scanCanvas"></canvas><i class="cal-linea"></i></div>
@@ -54,12 +54,12 @@
         <div class="tool-tips" id="resTips"></div>
         <form class="tool-puente" id="leadForm" novalidate>
           <p class="label">Gratis con la misma foto</p>
-          <h2 class="su-h">¿Y tu puntaje de armonía?</h2>
-          <p class="hint">Con esta misma foto calculamos tu puntaje de armonía facial del 0 al 100 y tus 7 medidas principales. Te lo mandamos a tu correo.</p>
+          <h2 class="su-h">¿Y tu calificación del 1 al 10?</h2>
+          <p class="hint">Con esta misma foto te damos tu calificación del 1 al 10, en una escala real donde 5 es el promedio, y tu puntaje en cada zona de tu cara. Te la mandamos a tu correo.</p>
           <div class="field"><label for="lead-name">Tu nombre</label><input id="lead-name" name="nombre" type="text" autocomplete="given-name" maxlength="60" placeholder="Tu nombre" required></div>
           <div class="field"><label for="lead-email">Correo</label><input id="lead-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="tu@correo.com" required></div>
           <div class="msg" id="leadMsg"></div>
-          <button class="btn btn-primary btn-block" type="submit">Mandarme mi puntaje</button>
+          <button class="btn btn-primary btn-block" type="submit">Mandarme mi calificación</button>
           <p class="hint cal-priv">Guardamos tu correo y tu puntaje. La imagen con tus medidas que va en el correo se borra en 30 días. <a href="/privacidad">Aviso de privacidad</a>.</p>
         </form>
         <button type="button" class="tool-otra" data-otra>Probar con otra foto</button>
@@ -132,7 +132,7 @@
       <span class="blog-img"><img src="/assets/img/herramientas/test-de-belleza.jpg" alt="" loading="lazy"></span>
       <span class="tag">Gratis</span>
       <h2>Test de belleza facial</h2>
-      <p>Tu puntaje de armonía del 0 al 100 con 7 medidas de tu cara.</p>
+      <p>Tu calificación del 1 al 10, en una escala real donde 5 es el promedio.</p>
     </a>
     <a class="blog-card" href="/herramientas/simetria-facial">
       <span class="blog-img"><img src="/assets/img/herramientas/simetria-facial.jpg" alt="" loading="lazy"></span>
@@ -150,7 +150,7 @@
   </section>
 
   <section class="final-cta post-final">
-    <h2 class="h-lg" style="color:#fff">Tu forma de cara es el inicio. <span class="muted">¿Y tu armonía?</span></h2>
+    <h2 class="h-lg" style="color:#fff">Tu forma de cara es el inicio. <span class="muted">¿Y tu calificación?</span></h2>
     <div class="hero-actions" style="justify-content:center"><a class="btn btn-primary" href="/calificacion?utm_source=herramienta&amp;utm_medium=final&amp;utm_campaign=forma-de-cara">Calificación gratis</a><a class="btn btn-ghost" href="/analisis">Análisis completo</a></div>
   </section>
 </main>

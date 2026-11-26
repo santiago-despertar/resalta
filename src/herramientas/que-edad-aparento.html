@@ -6,7 +6,7 @@
         <span class="tag">Herramienta gratis</span>
         <h1>¿Qué edad <span>aparento?</span></h1>
         <p>Sube una foto de frente y estimamos la edad que la gente suele leer en tu cara. Si quieres, escribe tu edad real y te decimos si aparentas más o menos.</p>
-        <ul class="checks"><li>Modelo entrenado con miles de caras</li><li>Tu edad visual contra tu edad real</li><li>Tu foto no sale de tu dispositivo</li></ul>
+        <ul class="checks"><li>Modelo entrenado con miles de caras</li><li>Tu edad visual contra tu edad real</li><li>Tu edad visual se calcula en tu dispositivo</li></ul>
       </div>
       <div class="panel cal-panel">
       <section class="cal-paso on" data-p="foto">
@@ -33,7 +33,7 @@
         <label class="check"><input type="checkbox" id="toolAdult"> <span>Tengo 18 años o más y la foto es mía.</span></label>
         <div class="msg" id="toolMsg"></div>
         <button class="btn btn-primary btn-block" id="toolGo" disabled>Calcular mi edad visual</button>
-        <p class="hint cal-priv">Tu foto se analiza en tu dispositivo. No la subimos a ningún servidor.</p>
+        <p class="hint cal-priv">Tu foto se analiza en tu dispositivo. Solo si pides tu calificación por correo mandamos un recorte de tu cara para calcularla, y no lo guardamos.</p>
       </section>
       <section class="cal-paso" data-p="proceso">
         <div class="cal-scan"><canvas id="scanCanvas"></canvas><i class="cal-linea"></i></div>
@@ -53,12 +53,12 @@
         <p class="hint" style="margin:0 0 4px">Es una estimación. La luz, el ángulo y la expresión pueden moverla unos años.</p>
         <form class="tool-puente" id="leadForm" novalidate>
           <p class="label">Gratis con la misma foto</p>
-          <h2 class="su-h">¿Y tu puntaje de armonía?</h2>
-          <p class="hint">Con esta misma foto calculamos tu puntaje de armonía facial del 0 al 100 y tus 7 medidas principales. Te lo mandamos a tu correo.</p>
+          <h2 class="su-h">¿Y tu calificación del 1 al 10?</h2>
+          <p class="hint">Con esta misma foto te damos tu calificación del 1 al 10, en una escala real donde 5 es el promedio, y tu puntaje en cada zona de tu cara. Te la mandamos a tu correo.</p>
           <div class="field"><label for="lead-name">Tu nombre</label><input id="lead-name" name="nombre" type="text" autocomplete="given-name" maxlength="60" placeholder="Tu nombre" required></div>
           <div class="field"><label for="lead-email">Correo</label><input id="lead-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="tu@correo.com" required></div>
           <div class="msg" id="leadMsg"></div>
-          <button class="btn btn-primary btn-block" type="submit">Mandarme mi puntaje</button>
+          <button class="btn btn-primary btn-block" type="submit">Mandarme mi calificación</button>
           <p class="hint cal-priv">Guardamos tu correo y tu puntaje. La imagen con tus medidas que va en el correo se borra en 30 días. <a href="/privacidad">Aviso de privacidad</a>.</p>
         </form>
         <button type="button" class="tool-otra" data-otra>Probar con otra foto</button>
@@ -115,7 +115,7 @@
         <details><summary>¿Qué tan exacta es la edad visual?</summary><p>En fotos bien tomadas, el modelo suele acertar con unos 3 o 4 años de diferencia. Por eso te damos un rango. Con otra luz o expresión, el resultado puede moverse un poco.</p></details>
         <details><summary>¿Por qué me salió más edad de la que tengo?</summary><p>Lo más común es la luz: la luz de arriba marca sombras y líneas. Prueba con una foto de día, de frente y sin sonreír. Si sigue saliendo más, la piel y la zona de los ojos suelen ser lo primero que conviene trabajar.</p></details>
         <details><summary>¿Necesito poner mi edad real?</summary><p>No, es opcional. Solo la usamos en tu dispositivo para decirte si aparentas más o menos. No se guarda.</p></details>
-        <details><summary>¿Guardan mi foto?</summary><p>No. Todo el cálculo pasa en tu teléfono o computadora.</p></details>
+        <details><summary>¿Guardan mi foto?</summary><p>No. Tu edad visual se calcula en tu teléfono o computadora. Solo si pides tu calificación por correo mandamos un recorte de tu cara para calcularla, y no lo guardamos.</p></details>
         <details><summary>¿Se puede aparentar menos edad?</summary><p>Sí. Protector solar diario, dormir bien, cuidar la zona de los ojos y un corte de pelo actualizado suelen bajar la edad que la gente lee en tu cara.</p></details>
       </div>
     </div>
@@ -131,7 +131,7 @@
       <span class="blog-img"><img src="/assets/img/herramientas/test-de-belleza.jpg" alt="" loading="lazy"></span>
       <span class="tag">Gratis</span>
       <h2>Test de belleza facial</h2>
-      <p>Tu puntaje de armonía del 0 al 100 con 7 medidas de tu cara.</p>
+      <p>Tu calificación del 1 al 10, en una escala real donde 5 es el promedio.</p>
     </a>
     <a class="blog-card" href="/herramientas/forma-de-cara">
       <span class="blog-img"><img src="/assets/img/herramientas/forma-de-cara.jpg" alt="" loading="lazy"></span>
@@ -153,6 +153,6 @@
     <div class="hero-actions" style="justify-content:center"><a class="btn btn-primary" href="/calificacion?utm_source=herramienta&amp;utm_medium=final&amp;utm_campaign=que-edad-aparento">Calificación gratis</a><a class="btn btn-ghost" href="/analisis">Análisis completo</a></div>
   </section>
 </main>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Qué tan exacta es la edad visual?", "acceptedAnswer": {"@type": "Answer", "text": "En fotos bien tomadas, el modelo suele acertar con unos 3 o 4 años de diferencia. Por eso te damos un rango. Con otra luz o expresión, el resultado puede moverse un poco."}}, {"@type": "Question", "name": "¿Por qué me salió más edad de la que tengo?", "acceptedAnswer": {"@type": "Answer", "text": "Lo más común es la luz: la luz de arriba marca sombras y líneas. Prueba con una foto de día, de frente y sin sonreír. Si sigue saliendo más, la piel y la zona de los ojos suelen ser lo primero que conviene trabajar."}}, {"@type": "Question", "name": "¿Necesito poner mi edad real?", "acceptedAnswer": {"@type": "Answer", "text": "No, es opcional. Solo la usamos en tu dispositivo para decirte si aparentas más o menos. No se guarda."}}, {"@type": "Question", "name": "¿Guardan mi foto?", "acceptedAnswer": {"@type": "Answer", "text": "No. Todo el cálculo pasa en tu teléfono o computadora."}}, {"@type": "Question", "name": "¿Se puede aparentar menos edad?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. Protector solar diario, dormir bien, cuidar la zona de los ojos y un corte de pelo actualizado suelen bajar la edad que la gente lee en tu cara."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Qué tan exacta es la edad visual?", "acceptedAnswer": {"@type": "Answer", "text": "En fotos bien tomadas, el modelo suele acertar con unos 3 o 4 años de diferencia. Por eso te damos un rango. Con otra luz o expresión, el resultado puede moverse un poco."}}, {"@type": "Question", "name": "¿Por qué me salió más edad de la que tengo?", "acceptedAnswer": {"@type": "Answer", "text": "Lo más común es la luz: la luz de arriba marca sombras y líneas. Prueba con una foto de día, de frente y sin sonreír. Si sigue saliendo más, la piel y la zona de los ojos suelen ser lo primero que conviene trabajar."}}, {"@type": "Question", "name": "¿Necesito poner mi edad real?", "acceptedAnswer": {"@type": "Answer", "text": "No, es opcional. Solo la usamos en tu dispositivo para decirte si aparentas más o menos. No se guarda."}}, {"@type": "Question", "name": "¿Guardan mi foto?", "acceptedAnswer": {"@type": "Answer", "text": "No. Tu edad visual se calcula en tu teléfono o computadora. Solo si pides tu calificación por correo mandamos un recorte de tu cara para calcularla, y no lo guardamos."}}, {"@type": "Question", "name": "¿Se puede aparentar menos edad?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. Protector solar diario, dormir bien, cuidar la zona de los ojos y un corte de pelo actualizado suelen bajar la edad que la gente lee en tu cara."}}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Qué edad aparento · Resalta", "url": "https://resalta.co/herramientas/que-edad-aparento", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web", "inLanguage": "es", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "MXN"}, "description": "Descubre qué edad aparentas con una foto. Un modelo entrenado con miles de caras estima tu edad visual y la compara con tu edad real. Gratis."}</script>
 <script type="module" src="/assets/js/herramientas.js?v=__V__"></script>

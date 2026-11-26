@@ -5,12 +5,12 @@
       <div class="tool-intro">
         <span class="tag">Herramienta gratis</span>
         <h1>Test de belleza facial <span>con tu foto, gratis</span></h1>
-        <p>Sube una foto de frente y en 30 segundos medimos 7 proporciones de tu cara: simetría, tercios, ojos, mandíbula y más. Te damos tu puntaje de armonía del 0 al 100.</p>
-        <ul class="checks"><li>478 puntos medidos en tu cara</li><li>Tu foto se analiza en tu dispositivo</li><li>Sin registro para ver tu puntaje</li></ul>
+        <p>Sube una foto de frente y en 30 segundos te damos tu calificación del 1 al 10, en una escala real donde 5 es el promedio, y tu puntaje en cada zona de tu cara.</p>
+        <ul class="checks"><li>Escala real: 5 es el promedio</li><li>Sin registro para ver tu calificación</li><li>No guardamos tu foto</li></ul>
       </div>
       <div class="panel cal-panel">
       <section class="cal-paso on" data-p="foto">
-        <h2 class="onb-title">Tu puntaje de<br><span>armonía facial</span></h2>
+        <h2 class="onb-title">Tu calificación<br><span>del 1 al 10</span></h2>
         <p class="onb-sub">Una foto de frente, con buena luz y sin filtros.</p>
         <label class="cal-foto" id="toolDrop">
           <span class="slot-guia" style="background-image:url(https://jxluabbugwdonqchbaxm.supabase.co/storage/v1/object/public/publico/poses/frente.png)"></span>
@@ -31,8 +31,8 @@
         <ul class="cal-tips"><li>Mira directo a la cámara</li><li>Luz de frente</li><li>Sin lentes ni filtros</li></ul>
         <label class="check"><input type="checkbox" id="toolAdult"> <span>Tengo 18 años o más y la foto es mía.</span></label>
         <div class="msg" id="toolMsg"></div>
-        <button class="btn btn-primary btn-block" id="toolGo" disabled>Calcular mi puntaje</button>
-        <p class="hint cal-priv">Tu foto se analiza en tu dispositivo. No la subimos a ningún servidor.</p>
+        <button class="btn btn-primary btn-block" id="toolGo" disabled>Calcular mi calificación</button>
+        <p class="hint cal-priv">Usamos tu foto solo para calificarla y no la guardamos.</p>
       </section>
       <section class="cal-paso" data-p="proceso">
         <div class="cal-scan"><canvas id="scanCanvas"></canvas><i class="cal-linea"></i></div>
@@ -41,34 +41,34 @@
           <li>Midiendo tus tercios faciales</li>
           <li>Revisando tu simetría</li>
           <li>Comparando con proporciones de referencia</li>
-          <li>Calculando tu puntaje</li>
+          <li>Calculando tu calificación</li>
         </ul>
       </section>
       <section class="cal-paso" data-p="resultado">
-        <p class="label">Tu puntaje de armonía</p>
+        <p class="label">Tu calificación</p>
         <div class="cal-res">
           <canvas id="resCanvas"></canvas>
-          <div class="cal-res-num"><span class="mono" id="resScore">00</span><small>/ 100</small><p id="resVerdict"></p></div>
+          <div class="cal-res-num"><span class="mono" id="resScore">0.0</span><small>/ 10</small><p id="resVerdict"></p></div>
         </div>
         <div class="cal-filas" id="resRows"></div>
         <form class="cal-gate" id="leadForm" novalidate>
-          <h2 class="su-h">¿A dónde te mandamos tus 7 medidas?</h2>
-          <p class="hint">Te llega tu puntaje con tus 7 medidas una por una, tu rasgo más fuerte y lo primero que puedes trabajar.</p>
+          <h2 class="su-h">¿A dónde te mandamos tu puntaje por zona?</h2>
+          <p class="hint">Te llega tu puntaje en cada zona de tu cara, tu zona más fuerte y lo primero que puedes trabajar.</p>
           <div class="field"><label for="lead-name">Tu nombre</label><input id="lead-name" name="nombre" type="text" autocomplete="given-name" maxlength="60" placeholder="Tu nombre" required></div>
           <div class="field"><label for="lead-email">Correo</label><input id="lead-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="tu@correo.com" required></div>
           <div class="msg" id="leadMsg"></div>
-          <button class="btn btn-primary btn-block" type="submit">Mandarme mis medidas</button>
-          <p class="hint cal-priv">Guardamos tu correo y tu puntaje. La imagen con tus medidas que va en el correo se borra en 30 días. <a href="/privacidad">Aviso de privacidad</a>.</p>
+          <button class="btn btn-primary btn-block" type="submit">Mandarme mi resultado</button>
+          <p class="hint cal-priv">Guardamos tu correo y tu calificación. La imagen con tus medidas que va en el correo se borra en 30 días. <a href="/privacidad">Aviso de privacidad</a>.</p>
         </form>
         <button type="button" class="tool-otra" data-otra>Probar con otra foto</button>
       </section>
       <section class="cal-paso" data-p="gracias">
         <h2 class="onb-title">Listo, <span data-cal-nombre></span>.<br><span>Revisa tu correo.</span></h2>
-        <p class="onb-sub">Tu puntaje te llega en unos 5 minutos a <b data-cal-email></b>. Si no lo ves, búscalo en Promociones o Spam.</p>
+        <p class="onb-sub">Tu resultado te llega en unos 5 minutos a <b data-cal-email></b>. Si no lo ves, búscalo en Promociones o Spam.</p>
         <div class="cal-video">
           <span class="label">El siguiente paso</span>
           <h2>Tu análisis completo</h2>
-          <p>Tu puntaje mide 7 cosas de tu cara de frente. El análisis completo revisa más de 110 rasgos con tus fotos de frente, sonriendo y de perfil, y te da un plan en orden: qué cambiar primero, qué no vale la pena y cómo te verías.</p>
+          <p>Tu calificación te dice dónde estás. El análisis completo revisa más de 110 rasgos con tus fotos de frente, sonriendo y de perfil, y te da un plan en orden: qué cambiar primero, qué no vale la pena y cómo te verías.</p>
           <ul class="checks">
             <li>Más de 110 rasgos de tu cara</li>
             <li>Tu proyección: cómo te verías con tu plan</li>
@@ -79,7 +79,7 @@
         </div>
         <button type="button" class="tool-otra" data-otra>Probar con otra foto</button>
       </section>
-      <p class="hint cal-legal">Resultado estético y educativo basado en medidas de una foto. No es un juicio sobre tu valor ni un diagnóstico.</p>
+      <p class="hint cal-legal">Calificación estética y educativa basada en una foto. No es un juicio sobre tu valor ni un diagnóstico.</p>
       </div>
     </div>
   </section>
@@ -87,21 +87,27 @@
   <article class="post tool-content">
     <div class="post-body">
       <h2>Qué mide este test de belleza</h2>
-      <p>La belleza tiene mucho de gusto personal, pero hay algo que sí se puede medir: la armonía, o qué tan bien se relacionan las partes de tu cara entre sí. Este test mide 7 cosas con una sola foto de frente:</p>
+      <p>Este test te da una calificación de atractivo facial del 1 al 10 en una escala real: 5 es una persona promedio, 7 ya es claramente atractivo y los modelos más cotizados del mundo andan alrededor de 9. El 10 no existe. Además te da un puntaje en seis zonas de tu cara:</p>
       <ul>
-        <li><b>Simetría.</b> Qué tanto se parecen el lado izquierdo y el derecho, punto por punto.</li>
-        <li><b>Tercios faciales.</b> La relación entre la parte media de tu cara (de las cejas a la base de la nariz) y la inferior (de la nariz al mentón).</li>
-        <li><b>Tercio inferior.</b> El equilibrio entre el labio superior y la distancia del labio al mentón.</li>
-        <li><b>Ojos.</b> La separación entre tus ojos comparada con su ancho.</li>
-        <li><b>Inclinación de los ojos.</b> Si la esquina exterior queda un poco más alta que la interior.</li>
-        <li><b>Mandíbula.</b> El ancho de tu mandíbula contra el ancho de tu cara.</li>
-        <li><b>Proporción del rostro.</b> El ancho de tu cara contra la altura de su parte media.</li>
+        <li><b>Proporciones.</b> Cómo se reparten la frente, la parte media y la parte baja de tu cara, y el ancho contra el largo.</li>
+        <li><b>Ojos.</b> Su forma, su separación, la inclinación y cómo los enmarcan tus cejas.</li>
+        <li><b>Nariz.</b> Su tamaño y su forma en relación con el resto de tu cara.</li>
+        <li><b>Boca y labios.</b> El volumen de los labios y su equilibrio con la nariz y el mentón.</li>
+        <li><b>Mandíbula y mentón.</b> Qué tan definidos se ven y cómo cierran el contorno de tu cara.</li>
+        <li><b>Simetría.</b> Qué tanto se parecen el lado izquierdo y el derecho.</li>
       </ul>
-      <p>Cada medida se compara con rangos que la investigación sobre atractivo facial asocia con caras que la gente percibe como armónicas. El puntaje junta las 7 en un número del 0 al 100.</p>
+      <p>La calificación general no es un promedio de medidas. Toma en cuenta todo lo que pesa cuando alguien ve tu cara: la estructura, las proporciones, la piel, el cabello y cómo se ve el conjunto.</p>
 
-      <h2>Cómo leer tu puntaje</h2>
-      <p>La mayoría de las personas sale entre 60 y 80. Arriba de 80 es una cara muy armónica en lo que se puede medir de frente. Un puntaje medio casi siempre significa que una o dos medidas jalan el promedio, y muchas de esas medidas se pueden equilibrar visualmente con el corte de pelo, la barba, las cejas o el cuidado de la piel.</p>
-      <p>El número no dice cuánto vales ni qué tan atractiva es tu persona. La expresión, la piel, el cabello, el estilo y la forma en que te mueves pesan muchísimo en cómo te perciben, y nada de eso entra en una foto de frente.</p>
+      <h2>Cómo leer tu calificación</h2>
+      <ul>
+        <li><b>Menos de 4.5:</b> por debajo del promedio.</li>
+        <li><b>De 4.5 a 5.5:</b> en el promedio. Aquí está la mayoría de la gente.</li>
+        <li><b>De 5.5 a 6.5:</b> arriba del promedio, más o menos 1 de cada 5 personas.</li>
+        <li><b>De 6.5 a 7.5:</b> atractivo, de las caras que llaman la atención.</li>
+        <li><b>De 7.5 a 8.5:</b> muy atractivo, nivel actor o modelo comercial.</li>
+        <li><b>Más de 8.5:</b> excepcional, muy pocas personas.</li>
+      </ul>
+      <p>El número no dice cuánto vales. Dice cómo se percibe tu cara en una foto hoy, y mucho de lo que lo mueve se puede trabajar: la piel, el corte, la barba, las cejas y la grasa facial cambian bastante cómo se ve una cara.</p>
 
       <h2>Cómo tomar la foto para que salga bien</h2>
       <ul>
@@ -112,16 +118,16 @@
       </ul>
       <p>Una foto girada o tomada muy de cerca cambia las proporciones. Si el resultado te sorprende, repítelo con otra foto bien de frente.</p>
 
-      <h2>Qué hay detrás de la medición</h2>
-      <p>Usamos un modelo que ubica 478 puntos en tu cara, el mismo tipo de tecnología que usan los filtros de realidad aumentada. Con esos puntos calculamos distancias y ángulos. Todo pasa en tu teléfono o computadora: la foto no se sube a ningún servidor para calcular tu puntaje. Si quieres entender más a fondo una de las medidas, lee nuestro artículo sobre <a href="/blog/simetria-facial">simetría facial</a>.</p>
+      <h2>Cómo calculamos tu calificación</h2>
+      <p>Primero ubicamos 478 puntos en tu cara, en tu propio teléfono o computadora, para revisar que la foto esté de frente y dibujar tus medidas. Después un modelo de análisis facial, calibrado con caras de referencia para que una cara promedio salga en 5, califica tu cara completa y cada zona. Usamos tu foto solo para eso y no la guardamos. Si quieres entender mejor una de las zonas, lee nuestro artículo sobre <a href="/blog/simetria-facial">simetría facial</a>.</p>
 
       <h2 id="preguntas">Preguntas frecuentes</h2>
       <div class="faq post-faq">
-        <details><summary>¿El test de belleza es gratis?</summary><p>Sí. Ves tu puntaje gratis y sin registrarte. Si quieres el detalle de tus 7 medidas, te lo mandamos a tu correo, también gratis.</p></details>
-        <details><summary>¿Qué tan exacto es?</summary><p>Las medidas son exactas para la foto que subes. Lo que más cambia el resultado es la foto: el ángulo, la distancia y la luz. Con una foto bien de frente, el puntaje varía muy poco de una foto a otra.</p></details>
-        <details><summary>¿Guardan mi foto?</summary><p>No para calcular tu puntaje: el análisis pasa en tu dispositivo. Solo si pides tus medidas por correo, mandamos una imagen pequeña con las líneas de medición, y se borra en 30 días.</p></details>
-        <details><summary>¿Un puntaje bajo significa que no soy atractivo?</summary><p>No. El puntaje solo mide proporciones de frente. El atractivo depende también de la piel, el cabello, la expresión, el estilo y muchas cosas que una foto no mide.</p></details>
-        <details><summary>¿Puedo subir mi puntaje?</summary><p>Muchas medidas se equilibran visualmente con el corte de pelo, la barba, las cejas o el cuidado de la piel. El análisis completo de Resalta te dice cuáles te convienen en tu caso y en qué orden.</p></details>
+        <details><summary>¿El test de belleza es gratis?</summary><p>Sí. Ves tu calificación gratis y sin registrarte. Si quieres tu puntaje en cada zona de tu cara, te lo mandamos a tu correo, también gratis.</p></details>
+        <details><summary>¿Qué tan exacto es?</summary><p>Está calibrado para que una cara promedio salga en 5 y los modelos más cotizados alrededor de 9. Lo que más lo mueve es la foto: con una foto de frente, nítida y con buena luz, la calificación sale muy parecida de una foto a otra.</p></details>
+        <details><summary>¿Guardan mi foto?</summary><p>No. Mandamos un recorte de tu cara solo para calcular tu calificación y no lo guardamos. Si pides tu resultado por correo, guardamos una imagen pequeña con tus medidas para mostrártela en el correo, y se borra en 30 días.</p></details>
+        <details><summary>¿Una calificación baja significa que no soy atractivo?</summary><p>No. La calificación dice cómo se percibe tu cara en una foto hoy, no cuánto vales. La expresión, el estilo y la forma en que te mueves también pesan, y mucho de lo que baja una calificación se puede trabajar.</p></details>
+        <details><summary>¿Puedo subir mi calificación?</summary><p>Sí. La piel, el corte de pelo, la barba, las cejas y la grasa facial mueven bastante el número. El análisis completo de Resalta te dice qué te conviene en tu caso y en qué orden.</p></details>
       </div>
     </div>
   </article>
@@ -158,6 +164,6 @@
     <div class="hero-actions" style="justify-content:center"><a class="btn btn-primary" href="/calificacion?utm_source=herramienta&amp;utm_medium=final&amp;utm_campaign=test-de-belleza">Calificación gratis</a><a class="btn btn-ghost" href="/analisis">Análisis completo</a></div>
   </section>
 </main>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿El test de belleza es gratis?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. Ves tu puntaje gratis y sin registrarte. Si quieres el detalle de tus 7 medidas, te lo mandamos a tu correo, también gratis."}}, {"@type": "Question", "name": "¿Qué tan exacto es?", "acceptedAnswer": {"@type": "Answer", "text": "Las medidas son exactas para la foto que subes. Lo que más cambia el resultado es la foto: el ángulo, la distancia y la luz. Con una foto bien de frente, el puntaje varía muy poco de una foto a otra."}}, {"@type": "Question", "name": "¿Guardan mi foto?", "acceptedAnswer": {"@type": "Answer", "text": "No para calcular tu puntaje: el análisis pasa en tu dispositivo. Solo si pides tus medidas por correo, mandamos una imagen pequeña con las líneas de medición, y se borra en 30 días."}}, {"@type": "Question", "name": "¿Un puntaje bajo significa que no soy atractivo?", "acceptedAnswer": {"@type": "Answer", "text": "No. El puntaje solo mide proporciones de frente. El atractivo depende también de la piel, el cabello, la expresión, el estilo y muchas cosas que una foto no mide."}}, {"@type": "Question", "name": "¿Puedo subir mi puntaje?", "acceptedAnswer": {"@type": "Answer", "text": "Muchas medidas se equilibran visualmente con el corte de pelo, la barba, las cejas o el cuidado de la piel. El análisis completo de Resalta te dice cuáles te convienen en tu caso y en qué orden."}}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Test de belleza facial · Resalta", "url": "https://resalta.co/herramientas/test-de-belleza", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web", "inLanguage": "es", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "MXN"}, "description": "Haz el test de belleza facial gratis con una foto. Medimos tu simetría, tus tercios y tus proporciones y te damos tu puntaje de armonía del 0 al 100."}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿El test de belleza es gratis?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. Ves tu calificación gratis y sin registrarte. Si quieres tu puntaje en cada zona de tu cara, te lo mandamos a tu correo, también gratis."}}, {"@type": "Question", "name": "¿Qué tan exacto es?", "acceptedAnswer": {"@type": "Answer", "text": "Está calibrado para que una cara promedio salga en 5 y los modelos más cotizados alrededor de 9. Lo que más lo mueve es la foto: con una foto de frente, nítida y con buena luz, la calificación sale muy parecida de una foto a otra."}}, {"@type": "Question", "name": "¿Guardan mi foto?", "acceptedAnswer": {"@type": "Answer", "text": "No. Mandamos un recorte de tu cara solo para calcular tu calificación y no lo guardamos. Si pides tu resultado por correo, guardamos una imagen pequeña con tus medidas para mostrártela en el correo, y se borra en 30 días."}}, {"@type": "Question", "name": "¿Una calificación baja significa que no soy atractivo?", "acceptedAnswer": {"@type": "Answer", "text": "No. La calificación dice cómo se percibe tu cara en una foto hoy, no cuánto vales. La expresión, el estilo y la forma en que te mueves también pesan, y mucho de lo que baja una calificación se puede trabajar."}}, {"@type": "Question", "name": "¿Puedo subir mi calificación?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. La piel, el corte de pelo, la barba, las cejas y la grasa facial mueven bastante el número. El análisis completo de Resalta te dice qué te conviene en tu caso y en qué orden."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Test de belleza facial · Resalta", "url": "https://resalta.co/herramientas/test-de-belleza", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web", "inLanguage": "es", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "MXN"}, "description": "Haz el test de belleza facial gratis con una foto. Te damos tu calificación del 1 al 10, en una escala real donde 5 es el promedio, y tu puntaje en cada zona de tu cara."}</script>
 <script type="module" src="/assets/js/herramientas.js?v=__V__"></script>
