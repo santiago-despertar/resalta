@@ -337,6 +337,21 @@ Deno.serve(async (req) => {
         }));
         const fotos = imagenes.filter(Boolean), nombres = vistas.filter(Boolean);
         if (!fotos.length) { await fallar("sin_fotos"); return; }
+        // Only score and describe what the photos show: no smile photo means no smile section, and the same for
+        // the three-quarter views (both are optional now).
+        const tiene = new Set(FOTOS.filter((_, i) => imagenes[i]).map(([slot]) => slot));
+        const conSonrisa = tiene.has("sonrisa"), conTq = tiene.has("tres_cuartos_izq") || tiene.has("tres_cuartos_der");
+        const CAT = Object.fromEntries(Object.entries(CATALOGO).filter(([id]) => (id !== "sonrisa" || conSonrisa) && (id !== "tres_cuartos" || conTq)));
+        const ids = Object.values(CAT).flatMap((g) => Object.keys(g.items));
+        const tEval: Obj = JSON.parse(JSON.stringify(T_EVAL));
+        const ev0 = tEval.input_schema.properties.evaluaciones; ev0.minItems = ids.length; ev0.maxItems = ids.length; ev0.items.properties.id.enum = ids;
+        const tZonas: Obj = JSON.parse(JSON.stringify(T_ZONAS));
+        for (const [k, ok] of [["sonrisa", conSonrisa], ["tres_cuartos", conTq]] as [string, boolean][]) {
+          if (ok) continue;
+          delete tZonas.input_schema.properties[k];
+          tZonas.input_schema.required = tZonas.input_schema.required.filter((x: string) => x !== k);
+        }
+        const angulos = ["perfil", ...(conSonrisa ? ["sonrisa"] : []), ...(conTq ? ["tres cuartos"] : [])];
 
         const m = order.medidas;
         const fila = (x: Obj) => `${x.nombre} (${x.zona}): ${x.valor}${x.unidad ?? ""} | referencia ${x.rango[0]} a ${x.rango[1]} | ${x.estado} | ${dec(x.puntaje / 10)}/10`;
@@ -376,15 +391,15 @@ ${m.avisos?.length ? `\nAvisos de calidad de la foto de frente: ${m.avisos.join(
         };
 
         const [ev, pr, zo, es] = await Promise.all([
-          pedir(T_EVAL, `Califica de 0 a 10 cada uno de estos rasgos a partir de las fotos, uno por cada id, sin saltarte ninguno:
-${Object.values(CATALOGO).map((g) => `${g.titulo}: ${Object.entries(g.items).map(([id, n]) => `${id} (${n})`).join(", ")}`).join("\n")}
+          pedir(tEval, `Califica de 0 a 10 cada uno de estos rasgos a partir de las fotos, uno por cada id, sin saltarte ninguno:
+${Object.values(CAT).map((g) => `${g.titulo}: ${Object.entries(g.items).map(([id, n]) => `${id} (${n})`).join(", ")}`).join("\n")}
 
 Escala: 5 es una persona promedio de su edad y sexo. La mayoría de la gente queda entre 4 y 6. Un 7 ya es claramente por encima del promedio, un 8 es poco común y un 9 es nivel de modelo profesional. Sé estricto y usa decimales; no regales puntos. Más alto siempre es mejor (por ejemplo, en acné un 9 es piel limpia).
-En dimorfismo, califica qué tanto ese rasgo se acerca a lo que se percibe como atractivo para su sexo. Si un rasgo no aplica o no se alcanza a ver (por ejemplo vello facial en una mujer, o cabello tapado), pon 5 y dilo en la nota.`, okEval, 12000),
+En dimorfismo, califica qué tanto ese rasgo se acerca a lo que se percibe como atractivo para su sexo. Si un rasgo no aplica o no se alcanza a ver (por ejemplo vello facial en una mujer, o cabello tapado), pon 5 y dilo en la nota.`, (r: Obj) => hay(r.evaluaciones) && r.evaluaciones.length >= ids.length * 0.8, 12000),
           pedir(T_PRINCIPAL, `Escribe la parte principal del reporte: resumen, arquetipo, fortalezas, prioridades y plan por fases.${order.tier === "hard"
             ? " Incluye también avanzado: procedimientos estéticos que se suelen considerar para un rostro con estas proporciones, qué hace cada uno y qué pensar antes. Preséntalo como información general que debe evaluar un médico certificado, no como una recomendación tuya, y di cuando algo no parece indicado."
             : " No llenes avanzado, este cliente tiene el plan esencial."}`, okPrincipal, 12000),
-          pedir(T_ZONAS, "Escribe la lectura zona por zona y las de perfil, sonrisa y tres cuartos.", okZonas, 12000),
+          pedir(tZonas, `Escribe la lectura zona por zona y las de ${angulos.join(", ").replace(/, ([^,]*)$/, " y $1")}.${conSonrisa ? "" : " No hay foto sonriendo: no opines sobre dientes ni sonrisa."}`, okZonas, 12000),
           pedir(T_ESTILO, `Escribe piel, color personal y cabello, barba, cejas y lentes. Además: longevidad (edad visual contra su edad real de ${(order.answers ?? {}).edad || "?"} años, y la que podría aparentar con su plan) y potencial (calificación realista que podría alcanzar en general y en cada grupo, en la misma escala estricta donde 5 es el promedio; el potencial casi nunca sube más de 1.5 puntos sin procedimientos).${order.tier === "hard" ? " Incluye general_hard." : " No llenes general_hard."}`, okEstilo, 12000),
         ]);
         if (!pr) { await fallar("modelo"); return; }
