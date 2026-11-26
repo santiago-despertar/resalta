@@ -148,7 +148,7 @@ const RESULTADOS = {
     const c = await pre;
     dibujarPuntaje($("#resCanvas"));
     $("#resScore").textContent = c.general.toFixed(1);
-    $("#resVerdict").textContent = nivel(c.general) + ". 5 es el promedio.";
+    $("#resVerdict").textContent = nivel(c.general) + (nivel(c.general) === "En el promedio" ? ", donde está la mayoría de la gente." : ". 5 es el promedio.");
     $("#resRows").innerHTML = ZONAS.map(([, k]) => `<div class="report-row"><span>${k}</span><b class="mono cal-borroso">8.8</b></div>`).join("");
     return { evento: { score: c.general } };
   },
