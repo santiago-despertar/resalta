@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/site.css?v=1795054331">
+<link rel="stylesheet" href="/assets/css/site.css?v=1795716771">
 <script>try{var _q=new URLSearchParams(location.search),_u={};["utm_source","utm_medium","utm_campaign","utm_content"].forEach(function(k){if(_q.get(k))_u[k]=_q.get(k).slice(0,80)});if(!_u.utm_source&&_q.get("fbclid")){_u.utm_source="facebook";_u.utm_medium=_u.utm_medium||"paid"}if(!_u.utm_source&&_q.get("gclid")){_u.utm_source="google";_u.utm_medium=_u.utm_medium||"cpc"}if(!_u.utm_source&&_q.get("ttclid")){_u.utm_source="tiktok";_u.utm_medium=_u.utm_medium||"paid"}if(_u.utm_source||_u.utm_campaign)sessionStorage.setItem("rs_utm",JSON.stringify(_u))}catch(e){}</script>
 <script>try{var _p=location.pathname;if(/\.html$/.test(_p))history.replaceState(null,"",((/\/index\.html$/.test(_p)?_p.slice(0,-10):_p.slice(0,-5))||"/")+location.search+location.hash)}catch(e){}</script>
 <script>try{var _d=document.documentElement;if(document.fonts&&document.fonts.load){_d.classList.add("fload");var _ok=function(){_d.classList.remove("fload")};Promise.all([document.fonts.load("300 40px Inter"),document.fonts.load("400 16px Inter"),document.fonts.load("600 16px Inter")]).then(_ok,_ok);setTimeout(_ok,900)}}catch(e){}</script>
@@ -117,8 +117,6 @@
         <p class="hint" style="margin-top:6px">Cabello detrás de las orejas, boca cerrada y cabeza derecha. En las de perfil, gira hasta que ya no se vea la otra ceja.</p>
         <p class="label fotos-t">Las 3 que necesitamos</p>
         <div class="photo-grid" id="photoGrid"></div>
-        <p class="label fotos-t">Opcionales <span class="fotos-sub">Hacen tu análisis más preciso, sobre todo pómulos y simetría</span></p>
-        <div class="photo-grid opc" id="photoGridOpc"></div>
         <label class="check"><input type="checkbox" id="consent"> <span>Autorizo a Resalta a tratar mis fotos, que pueden contener datos biométricos, únicamente para generar mi análisis, conforme al <a href="/privacidad" target="_blank">aviso de privacidad</a>. Puedo pedir que se borren en cualquier momento.</span></label>
         <div class="msg" id="photoMsg"></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -144,6 +142,23 @@
               <li>Preparando tu plan</li>
             </ul>
           </div>
+        </div>
+      </section>
+
+      <!-- Paso 2.7: their result, blurred, before the plans -->
+      <section class="wstep" data-step="2.7" style="padding:0" id="prevStep">
+        <span class="label">Tu resultado está listo</span>
+        <h2 style="font-size:34px;margin:10px 0 8px" id="prevH">Ya tenemos tu calificación</h2>
+        <p class="hint" id="prevSub">Medimos tu cara de frente y de perfil. Esto es lo que salió.</p>
+        <div class="cal-res prev-res">
+          <div class="cal-scan prev-foto"><img id="prevImg" alt="Tu foto con las medidas que tomamos"><div class="mide-cont"><b class="mono" id="prevN">0</b><span>medidas</span></div></div>
+          <div class="cal-res-num"><span class="mono cal-borroso" id="prevScore">8.8</span><small>/ 10</small><p>Tu armonía facial</p></div>
+        </div>
+        <div class="cal-filas" id="prevRows"></div>
+        <div class="cal-gate prev-gate">
+          <h2 class="su-h">Tu calificación completa está lista</h2>
+          <p class="hint" id="prevNota">Tu puntaje, cada zona de tu cara y qué hacer primero para subirlo.</p>
+          <button class="btn btn-primary btn-block" id="prevGo" type="button">Ver mi calificación completa</button>
         </div>
       </section>
 
@@ -176,7 +191,7 @@
         <p class="hint" id="refNota" style="margin:-6px 0 14px" hidden></p>
         <div class="msg" id="payMsg"></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-ghost" data-back="2">Atrás</button>
+          <button class="btn btn-ghost" data-back="2" id="payBack">Atrás</button>
           <button class="btn btn-primary" id="payBtn">Pagar y empezar mi análisis</button>
         </div>
         <p class="hint" style="margin-top:14px">Pago seguro con Stripe. Nunca vemos los datos de tu tarjeta.</p>
@@ -219,7 +234,7 @@
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="/assets/js/config.js?v=1795054331"></script>
-<script src="/assets/js/app.js?v=1795054331"></script>
+<script src="/assets/js/app.js?v=1795716771"></script>
 
 </body>
 </html>
