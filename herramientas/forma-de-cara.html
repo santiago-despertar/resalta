@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/site.css?v=1795054331">
+<link rel="stylesheet" href="/assets/css/site.css?v=1795725030">
 <script>try{var _q=new URLSearchParams(location.search),_u={};["utm_source","utm_medium","utm_campaign","utm_content"].forEach(function(k){if(_q.get(k))_u[k]=_q.get(k).slice(0,80)});if(!_u.utm_source&&_q.get("fbclid")){_u.utm_source="facebook";_u.utm_medium=_u.utm_medium||"paid"}if(!_u.utm_source&&_q.get("gclid")){_u.utm_source="google";_u.utm_medium=_u.utm_medium||"cpc"}if(!_u.utm_source&&_q.get("ttclid")){_u.utm_source="tiktok";_u.utm_medium=_u.utm_medium||"paid"}if(_u.utm_source||_u.utm_campaign)sessionStorage.setItem("rs_utm",JSON.stringify(_u))}catch(e){}</script>
 <script>try{var _p=location.pathname;if(/\.html$/.test(_p))history.replaceState(null,"",((/\/index\.html$/.test(_p)?_p.slice(0,-10):_p.slice(0,-5))||"/")+location.search+location.hash)}catch(e){}</script>
 <script>try{var _d=document.documentElement;if(document.fonts&&document.fonts.load){_d.classList.add("fload");var _ok=function(){_d.classList.remove("fload")};Promise.all([document.fonts.load("300 40px Inter"),document.fonts.load("400 16px Inter"),document.fonts.load("600 16px Inter")]).then(_ok,_ok);setTimeout(_ok,900)}}catch(e){}</script>
@@ -93,7 +93,7 @@
         <label class="check"><input type="checkbox" id="toolAdult"> <span>Tengo 18 años o más y la foto es mía.</span></label>
         <div class="msg" id="toolMsg"></div>
         <button class="btn btn-primary btn-block" id="toolGo" disabled>Ver mi forma de cara</button>
-        <p class="hint cal-priv">Tu foto se analiza en tu dispositivo. No la subimos a ningún servidor.</p>
+        <p class="hint cal-priv">Tu foto se analiza en tu dispositivo. Solo si pides tu calificación por correo mandamos un recorte de tu cara para calcularla, y no lo guardamos.</p>
       </section>
       <section class="cal-paso" data-p="proceso">
         <div class="cal-scan"><canvas id="scanCanvas"></canvas><i class="cal-linea"></i></div>
@@ -115,12 +115,12 @@
         <div class="tool-tips" id="resTips"></div>
         <form class="tool-puente" id="leadForm" novalidate>
           <p class="label">Gratis con la misma foto</p>
-          <h2 class="su-h">¿Y tu puntaje de armonía?</h2>
-          <p class="hint">Con esta misma foto calculamos tu puntaje de armonía facial del 0 al 100 y tus 7 medidas principales. Te lo mandamos a tu correo.</p>
+          <h2 class="su-h">¿Y tu calificación del 1 al 10?</h2>
+          <p class="hint">Con esta misma foto te damos tu calificación del 1 al 10, en una escala real donde 5 es el promedio, y tu puntaje en cada zona de tu cara. Te la mandamos a tu correo.</p>
           <div class="field"><label for="lead-name">Tu nombre</label><input id="lead-name" name="nombre" type="text" autocomplete="given-name" maxlength="60" placeholder="Tu nombre" required></div>
           <div class="field"><label for="lead-email">Correo</label><input id="lead-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="tu@correo.com" required></div>
           <div class="msg" id="leadMsg"></div>
-          <button class="btn btn-primary btn-block" type="submit">Mandarme mi puntaje</button>
+          <button class="btn btn-primary btn-block" type="submit">Mandarme mi calificación</button>
           <p class="hint cal-priv">Guardamos tu correo y tu puntaje. La imagen con tus medidas que va en el correo se borra en 30 días. <a href="/privacidad">Aviso de privacidad</a>.</p>
         </form>
         <button type="button" class="tool-otra" data-otra>Probar con otra foto</button>
@@ -193,7 +193,7 @@
       <span class="blog-img"><img src="/assets/img/herramientas/test-de-belleza.jpg" alt="" loading="lazy"></span>
       <span class="tag">Gratis</span>
       <h2>Test de belleza facial</h2>
-      <p>Tu puntaje de armonía del 0 al 100 con 7 medidas de tu cara.</p>
+      <p>Tu calificación del 1 al 10, en una escala real donde 5 es el promedio.</p>
     </a>
     <a class="blog-card" href="/herramientas/simetria-facial">
       <span class="blog-img"><img src="/assets/img/herramientas/simetria-facial.jpg" alt="" loading="lazy"></span>
@@ -211,13 +211,13 @@
   </section>
 
   <section class="final-cta post-final">
-    <h2 class="h-lg" style="color:#fff">Tu forma de cara es el inicio. <span class="muted">¿Y tu armonía?</span></h2>
+    <h2 class="h-lg" style="color:#fff">Tu forma de cara es el inicio. <span class="muted">¿Y tu calificación?</span></h2>
     <div class="hero-actions" style="justify-content:center"><a class="btn btn-primary" href="/calificacion?utm_source=herramienta&amp;utm_medium=final&amp;utm_campaign=forma-de-cara">Calificación gratis</a><a class="btn btn-ghost" href="/analisis">Análisis completo</a></div>
   </section>
 </main>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Cuál es la forma de cara más común?", "acceptedAnswer": {"@type": "Answer", "text": "La ovalada. También es la más versátil, porque casi cualquier corte y armazón le queda bien."}}, {"@type": "Question", "name": "¿Puedo tener dos formas de cara?", "acceptedAnswer": {"@type": "Answer", "text": "Sí, es lo normal. Mucha gente está entre dos formas, por ejemplo ovalada con rasgos de corazón. Si es tu caso, te lo decimos en el resultado."}}, {"@type": "Question", "name": "¿La forma de cara cambia con los años?", "acceptedAnswer": {"@type": "Answer", "text": "Un poco. Con el tiempo cambian el volumen de las mejillas y la definición de la mandíbula, así que una cara puede leerse distinta. Los huesos, que marcan la forma base, casi no cambian en la edad adulta."}}, {"@type": "Question", "name": "¿Sirve para hombre y mujer?", "acceptedAnswer": {"@type": "Answer", "text": "Sí. Las medidas son las mismas. Lo que cambia son las recomendaciones de barba, aretes y cortes."}}, {"@type": "Question", "name": "¿Por qué me salió una forma distinta a la que pensaba?", "acceptedAnswer": {"@type": "Answer", "text": "Lo más común es que la foto esté un poco girada o tomada desde abajo o desde arriba. Prueba con otra foto bien de frente, con la cámara a la altura de los ojos."}}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Forma de cara · Resalta", "url": "https://resalta.co/herramientas/forma-de-cara", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web", "inLanguage": "es", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "MXN"}, "description": "Descubre qué forma de cara tienes con una foto: ovalada, redonda, cuadrada, alargada, corazón o diamante. Gratis, con medidas reales y qué corte, lentes y cejas te favorecen."}</script>
-<script type="module" src="/assets/js/herramientas.js?v=1795107146"></script>
+<script type="module" src="/assets/js/herramientas.js?v=1795725030"></script>
 <footer class="site-footer">
   <div class="wrap">
     <div class="footer-grid">
@@ -252,8 +252,8 @@
   </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="/assets/js/config.js?v=1795054331"></script>
-<script src="/assets/js/app.js?v=1795054331"></script>
+<script src="/assets/js/config.js?v=1795725030"></script>
+<script src="/assets/js/app.js?v=1795725030"></script>
 
 </body>
 </html>
