@@ -175,10 +175,9 @@ Por zona califica en la misma escala de 0 a 10. Las zonas deben ser coherentes c
 const TOOL_IA = {
   name: "calificacion", description: "Entrega la calificación.",
   input_schema: {
-    type: "object", required: ["es_cara", "parece_menor", "calidad", "general", "zonas", "razon"],
+    type: "object", required: ["es_cara", "calidad", "general", "zonas", "razon"],
     properties: {
       es_cara: { type: "boolean", description: "Hay una cara humana real y visible." },
-      parece_menor: { type: "boolean", description: "La persona parece menor de 18 años." },
       calidad: { type: "string", enum: ["buena", "regular", "mala"] },
       general: { type: "number", minimum: 0, maximum: 10 },
       zonas: { type: "object", required: ZONAS_IA.map((z) => z[0]), properties: Object.fromEntries(ZONAS_IA.map(([k]) => [k, { type: "number", minimum: 0, maximum: 10 }])) },
