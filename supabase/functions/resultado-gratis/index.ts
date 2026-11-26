@@ -17,12 +17,13 @@ const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE
 const esc = (s: unknown) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 
 type Parte = { k: string; v: number; tip?: string };
+const MAX_DIA = 3;
 
 // Email styled like the site: a rounded blue-gray panel on a light page, white type, soft translucent cards.
 // Built for Gmail: no width percentages on tables that Gmail can collapse, bars as divs, a 600px panel that
 // shrinks on phones, and solid bgcolor fallbacks where rgba is ignored (Outlook desktop).
 function correo(nombre: string, score: number, partes: Parte[], fuerte: string, debil: { k: string; tip?: string } | null, site: string, foto: string | null) {
-  const nivel = score >= 80 ? "Tienes una cara muy armónica. Tu margen está en los detalles finos." : score >= 65 ? "Tienes una buena base y varias mejoras claras a tu alcance." : "Tienes mucho potencial. Los cambios correctos se van a notar bastante.";
+  const nivel = score >= 72 ? "Tienes una cara muy armónica. Tu margen está en los detalles finos." : score >= 55 ? "Tienes una buena base y varias mejoras claras a tu alcance." : "Tienes mucho potencial. Los cambios correctos se van a notar bastante.";
   const url = `${site}/cuenta?next=/analisis&utm_source=email&utm_medium=resultado&utm_campaign=calificacion`;
   const mono = "'SFMono-Regular',Menlo,Consolas,'Courier New',monospace";
   const sans = "'Inter','Helvetica Neue',Helvetica,Arial,sans-serif";
@@ -111,15 +112,19 @@ Deno.serve(async (req) => {
     const fuerte = String(b.fuerte ?? "").slice(0, 40);
     const debil = b.debil ? { k: String(b.debil.k ?? "").slice(0, 40), tip: String(b.debil.tip ?? "").slice(0, 300) } : null;
 
-    // a few results per address per day at most
+    // Repeating the rating is allowed (new photo, better light), but each result is one email, so an
+    // address gets at most 3 results in 24 hours. Past that nothing is saved or sent and the page says so.
     const desde = new Date(Date.now() - 864e5).toISOString();
     const { count } = await admin.from("leads").select("id", { count: "exact", head: true }).eq("email", email).eq("source", "calificacion").gte("created_at", desde);
-    if ((count ?? 0) >= 5) return json({ ok: true, limitado: true });
+    if ((count ?? 0) >= MAX_DIA) return json({ ok: false, limitado: true, max: MAX_DIA });
 
-    const { data: lead, error } = await admin.from("leads").insert({ email, nombre, score, metrics: { partes, fuerte, debil }, source: "calificacion" }).select("id").single();
+    // device id from the site's tracking, so the admin can show this person's visits
+    const vid = /^[A-Za-z0-9_-]{6,64}$/.test(String(b.vid ?? "")) ? String(b.vid) : null;
+    const base = { partes, fuerte, debil, ...(vid ? { vid } : {}) };
+    const { data: lead, error } = await admin.from("leads").insert({ email, nombre, score, metrics: base, source: "calificacion" }).select("id").single();
     if (error) throw error;
     const foto = await subirFoto(lead.id, b.foto).catch(() => null);
-    if (foto) await admin.from("leads").update({ metrics: { partes, fuerte, debil, foto } }).eq("id", lead.id);
+    if (foto) await admin.from("leads").update({ metrics: { ...base, foto } }).eq("id", lead.id);
     limpiarFotos().catch(() => {});
 
     const key = Deno.env.get("SENDER_API_KEY");
