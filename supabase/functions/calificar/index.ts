@@ -58,9 +58,9 @@ const TOOL = {
 
 const dec = (x: number) => Math.round(x * 10) / 10;
 // Calibration measured on test faces: the model puts ordinary faces at about 4.6, faces a bit above average at 6.4
-// and top models at 8.4 to 8.9. Resalta's published scale puts the average at 6 and top models at about 9,
-// so this curve moves an ordinary face to about 6.0 and a top model to about 9.0. 10 stays out of reach.
-// The prompt keeps the model's own 5-centered scale on purpose: that is what the test faces were measured against.
+// and top models at 8.4 to 8.9. The site still says 5 is the average, but the score is deliberately generous:
+// this curve moves an ordinary face to about 6.0 (reads as a bit above average) and a top model to about 9.0.
+// 10 stays out of reach. The prompt keeps the model's own 5-centered scale: the test faces were measured against it.
 const CURVA: [number, number][] = [[0, 0], [2.5, 3.0], [3.6, 4.6], [4.6, 5.9], [6.4, 7.3], [8.4, 9.0], [9, 9.3], [10, 9.7]];
 const curva = (x: number) => {
   for (let i = 1; i < CURVA.length; i++) {
