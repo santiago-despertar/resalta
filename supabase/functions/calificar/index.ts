@@ -17,7 +17,7 @@ const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE
 const MODELO = "claude-sonnet-5-5";
 const POR_HORA = 12, POR_DIA = 30;
 // bump when the rating prompt changes, so cached results from the old prompt are not reused
-const RUBRICA = "v3";
+const RUBRICA = "v4";
 
 export const ZONAS: [string, string][] = [
   ["proporciones", "Proporciones"], ["ojos", "Ojos"], ["nariz", "Nariz"],
@@ -37,7 +37,6 @@ Usa toda la escala. Una cara poco agraciada saca 3 o 4 y está bien decirlo. Sé
 Califica solo lo que ves: no intentes reconocer a la persona ni uses su fama.
 Cuenta todo lo que pesa en la percepción: estructura ósea, proporciones, ojos y cejas, nariz, labios, mandíbula, piel, cabello y armonía del conjunto.
 La foto: la luz, el ángulo o el lente pueden mover a lo mucho 0.3. Si la cara no se ve bien (borrosa, muy oscura, muy lejos, tapada, muy girada o con filtro fuerte) marca calidad "mala".
-Si te dan medidas de la cara, úsalas solo como apoyo: si una zona tiene medidas fuera de rango y también se nota en la foto, refléjalo; si en la foto no se nota, manda lo que ves.
 Por zona califica en la misma escala de 0 a 10. Las zonas deben ser coherentes con la calificación general: su promedio queda cerca del general.`;
 
 const TOOL = {
@@ -102,7 +101,8 @@ Deno.serve(async (req) => {
       .filter((f: string) => /^[A-Za-z0-9+/=]+$/.test(f) && f.length > 2000 && f.length < 1_500_000);
     if (!fotos.length) return json({ error: "Falta la foto" }, 400);
     const origen = b.order_id ? "onboarding" : "gratis";
-    const medidas = String(b.medidas ?? "").slice(0, 3000);
+    // the measurements are not sent to the model: they are estimates from a phone photo and pulled good faces down
+    const medidas = "";
 
     // onboarding: the order has to belong to whoever is calling
     let orderId: string | null = null, userId: string | null = null;
