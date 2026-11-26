@@ -168,7 +168,6 @@ Usa toda la escala. Una cara poco agraciada saca 3 o 4 y está bien decirlo. Sé
 Califica solo lo que ves: no intentes reconocer a la persona ni uses su fama.
 Cuenta todo lo que pesa en la percepción: estructura ósea, proporciones, ojos y cejas, nariz, labios, mandíbula, piel, cabello y armonía del conjunto.
 La foto: la luz, el ángulo o el lente pueden mover a lo mucho 0.3. Si la cara no se ve bien (borrosa, muy oscura, muy lejos, tapada, muy girada o con filtro fuerte) marca calidad "mala".
-Si te dan medidas de la cara, úsalas solo como apoyo: si una zona tiene medidas fuera de rango y también se nota en la foto, refléjalo; si en la foto no se nota, manda lo que ves.
 Por zona califica en la misma escala de 0 a 10. Las zonas deben ser coherentes con la calificación general: su promedio queda cerca del general.`;
 const TOOL_IA = {
   name: "calificacion", description: "Entrega la calificación.",
@@ -429,7 +428,7 @@ Deno.serve(async (req) => {
           return `${n}: ` + xs.map((x: Obj) => `${x.nombre} (${x.valor}${x.unidad ?? ""}, referencia ${x.rango[0]} a ${x.rango[1]})`).join("; ");
         }).filter(Boolean).join("\n");
         const fotosIA = [imagenes[0], imagenes[2] ?? imagenes[3]].filter(Boolean) as Obj[];
-        const cal = await calificacionIA(admin, order, fotosIA, fueraTxt);
+        const cal = await calificacionIA(admin, order, fotosIA, ""); // rated from the photos only, like the calificar function
         const fila = (x: Obj) => `${x.nombre} (${x.zona}): ${x.valor}${x.unidad ?? ""} | referencia ${x.rango[0]} a ${x.rango[1]} | ${x.estado} | ${dec(x.puntaje / 10)}/10`;
         const datos = `Fotos, en este orden: ${nombres.join("; ")}.
 
