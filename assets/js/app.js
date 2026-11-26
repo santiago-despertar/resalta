@@ -2225,7 +2225,7 @@
         montarAnalisis($("#fqRoot"), {
           frente: { data: o.medidas, src: foto }, perfil: pf ? { data: pf, src: fotoP } : null,
           general: typeof gen === "number" ? gen : null,
-          nivel: v => v < 5.2 ? "Por debajo del promedio" : v < 6.6 ? "En el promedio" : v < 7.4 ? "Arriba del promedio" : v < 8.2 ? "Atractivo" : v < 8.9 ? "Muy atractivo" : "Excepcional"
+          nivel: v => v < 4.5 ? "Por debajo del promedio" : v < 5.5 ? "En el promedio" : v < 6.5 ? "Arriba del promedio" : v < 7.5 ? "Atractivo" : v < 8.5 ? "Muy atractivo" : "Excepcional"
         });
         const peB = $("#peBtns");
         if (peB) {
@@ -2259,9 +2259,9 @@
 
       // ---- inicio
       const P = r.puntajes || {}, f1 = v => (typeof v === "number" ? v.toFixed(1) : "–");
-      const nivel = v => v == null ? "" : v < 5.2 ? "Por debajo del promedio" : v < 6.6 ? "En el promedio" : v < 7.4 ? "Arriba del promedio" : v < 8.2 ? "Atractivo" : v < 8.9 ? "Muy atractivo" : "Excepcional";
+      const nivel = v => v == null ? "" : v < 4.5 ? "Por debajo del promedio" : v < 5.5 ? "En el promedio" : v < 6.5 ? "Arriba del promedio" : v < 7.5 ? "Atractivo" : v < 8.5 ? "Muy atractivo" : "Excepcional";
       $("#dScore").textContent = f1(P.general);
-      $("#dNivel").textContent = nivel(P.general) + (P.general != null ? ". 6 es el promedio de la población." : "");
+      $("#dNivel").textContent = nivel(P.general) + (P.general != null ? ". 5 es el promedio de la población." : "");
       const PIL = [["armonia", "Armonía", "medidas"], ["angularidad", "Angularidad", "rasgos"], ["dimorfismo", "Dimorfismo", "rasgos"], ["rasgos", "Rasgos", "rasgos"]];
       $("#dPilares").innerHTML = PIL.filter(x => P[x[0]] != null).map(([k, n, t]) => `<button type="button" class="visor-zone" data-ir="${t}"><span>${n}</span><i><b style="width:${P[k] * 10}%"></b></i><em class="mono">${f1(P[k])}</em></button>`).join("");
       $("#dEval").textContent = (r.evaluaciones || "") + " evaluaciones";
@@ -2277,7 +2277,7 @@
         const gs = (r.grupos || []).filter(g => g.pilar === k); if (!gs.length) return "";
         return `<div class="pil"><div class="pil-top"><div><h3>${TIT[k][0]}</h3><p class="hint">${TIT[k][1]}</p></div><p class="mono pil-n">${f1(P[k])}<span> / 10</span></p></div><div class="pil-grupos">${gs.map(g =>
           `<div class="card pil-g"><div class="rep-zona-top"><b>${esc(g.titulo)}</b><span class="mono">${f1(g.puntaje)}</span></div>${g.items.map(x =>
-            `<div class="pil-row"><div class="pil-row-t"><span>${esc(x.nombre)}</span><i><b class="${x.puntaje < 5.2 ? "bajo" : x.puntaje >= 7.4 ? "alto" : ""}" style="width:${x.puntaje * 10}%"></b></i><em class="mono">${f1(x.puntaje)}</em></div><p class="hint">${esc(x.nota)}</p></div>`).join("")}</div>`).join("")}</div></div>`;
+            `<div class="pil-row"><div class="pil-row-t"><span>${esc(x.nombre)}</span><i><b class="${x.puntaje < 4.5 ? "bajo" : x.puntaje >= 6.5 ? "alto" : ""}" style="width:${x.puntaje * 10}%"></b></i><em class="mono">${f1(x.puntaje)}</em></div><p class="hint">${esc(x.nota)}</p></div>`).join("")}</div>`).join("")}</div></div>`;
       }).join("");
       $$("#reportArea [data-ir]").forEach(b => { b.onclick = () => irA(b.dataset.ir); });
 

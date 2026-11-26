@@ -148,7 +148,7 @@ const RESULTADOS = {
     const c = await pre;
     dibujarPuntaje($("#resCanvas"));
     $("#resScore").textContent = c.general.toFixed(1);
-    $("#resVerdict").textContent = nivel(c.general) + (nivel(c.general) === "En el promedio" ? ", donde está la mayoría de la gente." : ". 6 es el promedio.");
+    $("#resVerdict").textContent = nivel(c.general) + (nivel(c.general) === "En el promedio" ? ", donde está la mayoría de la gente." : ". 5 es el promedio.");
     $("#resRows").innerHTML = ZONAS.map(([, k]) => `<div class="report-row"><span>${k}</span><b class="mono cal-borroso">8.8</b></div>`).join("");
     let nf = $("#resFotoNota");
     if (!nf) { $("#resRows").insertAdjacentHTML("beforebegin", '<div class="tool-tips" id="resFotoNota" style="margin:4px 0 16px"></div>'); nf = $("#resFotoNota"); }
@@ -279,7 +279,7 @@ const ZONAS = [
   ["mandibula", "Mandíbula y mentón", "Menos grasa facial, postura de cuello y una barba bien definida marcan la mandíbula."],
   ["simetria", "Simetría", "Pequeñas asimetrías se notan menos con el corte, la barba y la postura correctos."]
 ];
-const nivel = v => v < 5.2 ? "Por debajo del promedio" : v < 6.6 ? "En el promedio" : v < 7.4 ? "Arriba del promedio" : v < 8.2 ? "Atractivo" : v < 8.9 ? "Muy atractivo" : "Excepcional";
+const nivel = v => v < 4.5 ? "Por debajo del promedio" : v < 5.5 ? "En el promedio" : v < 6.5 ? "Arriba del promedio" : v < 7.5 ? "Atractivo" : v < 8.5 ? "Muy atractivo" : "Excepcional";
 // the face with some margin, without lines: what the AI looks at
 function recorte() {
   const xs = P.map(q => q.x), ys = P.map(q => q.y);
