@@ -24,10 +24,11 @@ const MAX_DIA = 3;
 // Email styled like the site: a rounded blue-gray panel on a light page, white type, soft translucent cards.
 // Built for Gmail: no width percentages on tables that Gmail can collapse, bars as divs, a 600px panel that
 // shrinks on phones, and solid bgcolor fallbacks where rgba is ignored (Outlook desktop).
-function correo(nombre: string, score: number, partes: Parte[], fuerte: string, debil: { k: string; tip?: string } | null, site: string, foto: string | null, diez = false) {
+function correo(nombre: string, score: number, partes: Parte[], fuerte: string, debil: { k: string; tip?: string } | null, site: string, foto: string | null, diez = false, notaFotos = "") {
   const nivel = diez
-    ? (score >= 7 ? "Estás claramente arriba del promedio. Tu margen está en los detalles finos." : score >= 5.5 ? "Estás arriba del promedio y tienes mejoras claras a tu alcance." : score >= 4.5 ? "Estás en el promedio. Los cambios correctos se van a notar bastante." : "Tienes mucho margen para subir, y los cambios correctos se van a notar bastante.")
+    ? (score >= 7.4 ? "Estás claramente arriba del promedio. Tu margen está en los detalles finos." : score >= 6.6 ? "Estás arriba del promedio y tienes mejoras claras a tu alcance." : score >= 5.2 ? "Estás en el promedio. Los cambios correctos se van a notar bastante." : "Tienes mucho margen para subir, y los cambios correctos se van a notar bastante.")
     : (score >= 72 ? "Tienes una cara muy armónica. Tu margen está en los detalles finos." : score >= 55 ? "Tienes una buena base y varias mejoras claras a tu alcance." : "Tienes mucho potencial. Los cambios correctos se van a notar bastante.");
+  const nf = String(notaFotos || "").trim().replace(/[.\s]+$/, "");
   const tope = diez ? 10 : 100, txt = (v: number) => diez ? v.toFixed(1) : String(Math.round(v));
   const url = `${site}/cuenta?next=/analisis&utm_source=email&utm_medium=resultado&utm_campaign=calificacion`;
   const mono = "'SFMono-Regular',Menlo,Consolas,'Courier New',monospace";
@@ -73,11 +74,12 @@ function correo(nombre: string, score: number, partes: Parte[], fuerte: string, 
     ${card(`<div style="text-align:center">${label(diez ? "Calificación facial" : "Armonía facial", true)}
       <div class="sc" style="margin-top:10px;font-family:${sans};font-size:96px;line-height:1;font-weight:300;letter-spacing:-.045em;color:#FFFFFF">${s}<span style="font-size:24px;letter-spacing:0;color:${W}">&nbsp;/ ${tope}</span></div>
       <div style="margin:16px auto 0;max-width:400px;font-family:${sans};font-size:17px;line-height:26px;color:${W}">${esc(nivel)}</div></div>`, "32px 24px 30px")}
+    ${nf ? card(`${label("Un comentario sobre tu foto")}<div style="margin-top:10px;font-family:${sans};font-size:16px;line-height:25px;color:${W}">${esc(nf)}. Eso suele bajar la calificación unas décimas. Para la más justa, toma otra con luz de frente, el celular a la altura de tus ojos y a un brazo de distancia o más, y la cara relajada. <a href="${site}/calificacion" style="color:#FFFFFF">Calificar otra foto</a>.</div>`) : ""}
     ${filas ? card(`${label("Tus puntajes")}${filas}
       ${fuerte ? `<div style="margin-top:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,.22);font-family:${sans};font-size:16px;line-height:25px;color:${W}">Tu punto más fuerte es <b style="color:#FFFFFF;font-weight:600">${esc(fuerte.toLowerCase())}</b>.${debil && debil.k && debil.k !== fuerte ? ` Lo que más te baja el puntaje es <b style="color:#FFFFFF;font-weight:600">${esc(debil.k.toLowerCase())}</b>.` : ""}</div>` : ""}`) : ""}
     ${card(`<div style="text-align:center">
       <div style="font-family:${sans};font-size:24px;line-height:31px;font-weight:300;letter-spacing:-.01em;color:#FFFFFF">¿Quieres saber por qué te dimos ${s}?</div>
-      <div style="margin:14px auto 26px;max-width:430px;font-family:${sans};font-size:16px;line-height:25px;color:${W}">${diez ? "Esta calificación ve tu cara de frente en una escala real donde 5 es el promedio." : "Este puntaje mide unas cuantas proporciones de tu cara de frente."} El análisis completo revisa más de 110 rasgos con tus fotos de frente y de perfil, y te dice qué cambiar primero, qué no vale la pena y cómo te verías con tu plan.</div>
+      <div style="margin:14px auto 26px;max-width:430px;font-family:${sans};font-size:16px;line-height:25px;color:${W}">${diez ? "Esta calificación ve tu cara de frente en una escala real donde 6 es el promedio." : "Este puntaje mide unas cuantas proporciones de tu cara de frente."} El análisis completo revisa más de 110 rasgos con tus fotos de frente y de perfil, y te dice qué cambiar primero, qué no vale la pena y cómo te verías con tu plan.</div>
       <a href="${url}" style="display:inline-block;background:#FFFFFF;color:#16191D;text-decoration:none;padding:17px 34px;border-radius:999px;font-family:${sans};font-size:16px;font-weight:600">Ver mi análisis completo</a></div>`, "34px 24px 34px")}
   </table>
 </td></tr></table>
@@ -112,10 +114,10 @@ Deno.serve(async (req) => {
     const email = String(b.email ?? "").trim().toLowerCase().slice(0, 200);
     const nombre = String(b.nombre ?? "").trim().slice(0, 60);
     // AI rating from /calificacion: the numbers come from the saved row, not from the browser
-    let cal: { id: string; general: number; zonas: Record<string, number> } | null = null;
+    let cal: { id: string; general: number; zonas: Record<string, number>; nota_fotos: string | null } | null = null;
     if (/^[0-9a-f-]{36}$/.test(String(b.cal_id ?? ""))) {
-      const { data } = await admin.from("calificaciones").select("id,general,zonas").eq("id", String(b.cal_id)).not("general", "is", null).maybeSingle();
-      if (data) cal = { id: data.id, general: Number(data.general), zonas: data.zonas ?? {} };
+      const { data } = await admin.from("calificaciones").select("id,general,zonas,nota_fotos").eq("id", String(b.cal_id)).not("general", "is", null).maybeSingle();
+      if (data) cal = { id: data.id, general: Number(data.general), zonas: data.zonas ?? {}, nota_fotos: data.nota_fotos ?? null };
     }
     const score = cal ? cal.general : Math.round(Number(b.score));
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !nombre || !(score >= 0 && score <= 100)) return json({ error: "Datos no válidos" }, 400);
@@ -138,7 +140,7 @@ Deno.serve(async (req) => {
     // device id from the site's tracking, so the admin can show this person's visits
     const vid = /^[A-Za-z0-9_-]{6,64}$/.test(String(b.vid ?? "")) ? String(b.vid) : null;
     // leads.score keeps 0-100 for both kinds (6.4 is saved as 64); metrics.escala says which one it is
-    const base = { partes, fuerte, debil, ...(vid ? { vid } : {}), ...(cal ? { escala: 10, general: cal.general, cal_id: cal.id } : {}) };
+    const base = { partes, fuerte, debil, ...(vid ? { vid } : {}), ...(cal ? { escala: 10, general: cal.general, cal_id: cal.id, ...(cal.nota_fotos ? { nota_fotos: cal.nota_fotos } : {}) } : {}) };
     const { data: lead, error } = await admin.from("leads").insert({ email, nombre, score: cal ? Math.round(cal.general * 10) : score, metrics: base, source: "calificacion" }).select("id").single();
     if (error) throw error;
     const foto = await subirFoto(lead.id, b.foto).catch(() => null);
@@ -161,7 +163,7 @@ Deno.serve(async (req) => {
   }
 });
 
-type Lead = { id: string; email: string; nombre: string; score: number; metrics: { partes?: Parte[]; fuerte?: string; debil?: { k: string; tip?: string } | null; foto?: string | null; escala?: number; general?: number } | null };
+type Lead = { id: string; email: string; nombre: string; score: number; metrics: { partes?: Parte[]; fuerte?: string; debil?: { k: string; tip?: string } | null; foto?: string | null; escala?: number; general?: number; nota_fotos?: string } | null };
 
 
 // Email tracking: each email gets a row in correos_log (sent, opened, clicked), a 1px open image and
@@ -199,7 +201,7 @@ async function enviar(key: string, l: Lead) {
       from: { name: "Resalta", email: Deno.env.get("SENDER_FROM") ?? "contacto@resalta.co" },
       to: { email: l.email, name: nombre },
       subject: asunto,
-      html: rastrear(correo(nombre, valor, m.partes ?? [], m.fuerte ?? "", m.debil ?? null, site, m.foto ?? null, diez), idc),
+      html: rastrear(correo(nombre, valor, m.partes ?? [], m.fuerte ?? "", m.debil ?? null, site, m.foto ?? null, diez, m.nota_fotos ?? ""), idc),
     }),
   });
   const r = await envio.text();
