@@ -57,6 +57,25 @@ async function eventosDesde(desde: Date, cols = "*") {
   }
   return out;
 }
+
+// Free-rating leads have no account, so their site visits are found through the device id (vid):
+// newer ratings store it in metrics.vid; older ones are matched to the "generate_lead" event the page
+// fires right after the rating is saved (same score, within a few minutes).
+async function vidsDeLeads(leads: Obj[]) {
+  const vids = new Set<string>();
+  for (const l of leads) {
+    if (l.metrics?.vid) { vids.add(String(l.metrics.vid)); continue; }
+    const t = new Date(l.created_at).getTime();
+    const { data } = await admin.from("eventos").select("vid,ts,datos").eq("nombre", "generate_lead")
+      .gte("ts", new Date(t - 2 * 60e3).toISOString()).lte("ts", new Date(t + 5 * 60e3).toISOString()).limit(20);
+    const m = (data ?? []).filter((e: Obj) => e.vid && Number(e.datos?.score) === Number(l.score))
+      .sort((a: Obj, b: Obj) => Math.abs(new Date(a.ts).getTime() - t) - Math.abs(new Date(b.ts).getTime() - t))[0];
+    if (m) vids.add(String(m.vid));
+  }
+  return [...vids].slice(0, 8);
+}
+const EV_COLS = "ts,nombre,path,ref,vid,utm_source,utm_medium,utm_campaign,dispositivo,tz,valor,datos";
+
 const resumenUsuario = (u: Obj) => ({
   id: u.id, email: u.email ?? u.new_email ?? null, nombre: u.user_metadata?.full_name ?? null, creado: u.created_at, ultimo: u.last_sign_in_at,
   proveedor: u.app_metadata?.provider ?? (u.is_anonymous ? "anónimo" : null), anonimo: !!u.is_anonymous, tipo: u.user_metadata?.tipo ?? null,
@@ -388,7 +407,7 @@ Deno.serve(async (req) => {
         todosLosUsuarios(),
         admin.from("orders").select("id,user_id,status,tier,amount_mxn,paid_at,answers->>nombre,answers->>pais,answers->>edad,answers->>sexo").then((r) => r.data ?? []),
         admin.from("suscripciones").select("user_id,estado,periodo_fin,cancela").then((r) => r.data ?? []),
-        admin.from("leads").select("email,nombre,score,created_at").then((r) => r.data ?? []),
+        admin.from("leads").select("email,nombre,score,created_at,metrics->>foto").then((r) => r.data ?? []),
       ]);
       const filas = usuarios.map((u) => {
         const os = ord.filter((o: Obj) => o.user_id === u.id), pag = os.filter((o: Obj) => o.status === "pagado" || o.status === "listo");
@@ -406,8 +425,8 @@ Deno.serve(async (req) => {
         const em = String(l.email ?? "").toLowerCase();
         if (!em || conCuenta.has(em)) continue;
         const x = soloGratis[em];
-        if (!x) soloGratis[em] = { id: null, email: em, nombre: l.nombre ?? null, creado: l.created_at, ultimo: l.created_at, proveedor: "Solo calificación gratis", anonimo: false, solo_lead: true, pedidos: 0, pagados: 0, plan: null, pagado_mxn: 0, suscripcion: null, puntaje_gratis: l.score ?? null, calificaciones: 1 };
-        else { x.calificaciones++; if (l.created_at > x.ultimo) { x.ultimo = l.created_at; x.puntaje_gratis = l.score ?? x.puntaje_gratis; x.nombre = l.nombre ?? x.nombre; } if (l.created_at < x.creado) x.creado = l.created_at; }
+        if (!x) soloGratis[em] = { id: null, email: em, nombre: l.nombre ?? null, creado: l.created_at, ultimo: l.created_at, proveedor: "Solo calificación gratis", anonimo: false, solo_lead: true, pedidos: 0, pagados: 0, plan: null, pagado_mxn: 0, suscripcion: null, puntaje_gratis: l.score ?? null, calificaciones: 1, foto: l.foto ?? null };
+        else { x.calificaciones++; if (l.created_at > x.ultimo) { x.ultimo = l.created_at; x.puntaje_gratis = l.score ?? x.puntaje_gratis; x.nombre = l.nombre ?? x.nombre; x.foto = l.foto ?? x.foto; } if (l.created_at < x.creado) x.creado = l.created_at; }
       }
       const todas = [...filas, ...Object.values(soloGratis)].sort((a: Obj, b2: Obj) => (a.creado < b2.creado ? 1 : -1));
       return json({ ok: true, usuarios: todas });
@@ -432,7 +451,7 @@ Deno.serve(async (req) => {
         listarFotos(id),
       ]);
       // the same visitor before they logged in (same device id)
-      const vids = [...new Set(ev.map((e: Obj) => e.vid).filter(Boolean))].slice(0, 5);
+      const vids = [...new Set([...ev.map((e: Obj) => e.vid).filter(Boolean), ...(await vidsDeLeads(leads))])].slice(0, 8);
       const antes = vids.length ? (await admin.from("eventos").select("ts,nombre,path,ref,utm_source,utm_medium,utm_campaign,dispositivo,tz").in("vid", vids).is("user_id", null).order("ts", { ascending: false }).limit(200)).data ?? [] : [];
       const reportes = rep.map((r: Obj) => {
         const d = r.data ?? {};
@@ -443,6 +462,24 @@ Deno.serve(async (req) => {
       const pedidos = ord.map((o: Obj) => ({ ...o, medidas: o.medidas ? { n: (o.medidas.medidas?.length ?? 0) + (o.medidas.perfil?.medidas?.length ?? 0), resumen: o.medidas.resumen ?? null, avisos: o.medidas.avisos ?? null, ajustado: o.medidas.ajustado ?? null } : null }));
       return json({ ok: true, usuario: { ...resumenUsuario(u), confirmado: u.email_confirmed_at, telefono: u.phone || null, metadata: u.user_metadata },
         pedidos, reportes, suscripcion: sub, fisico: fis, chat, leads, eventos: [...ev, ...antes].sort((a: Obj, b2: Obj) => (a.ts < b2.ts ? 1 : -1)), afiliado: afi, fotos, correos });
+    }
+
+
+    if (accion === "lead") {
+      const em = String(b.email ?? "").trim().toLowerCase().slice(0, 200);
+      if (!em.includes("@")) return json({ error: "correo" }, 400);
+      const [leads, correos, seq, envios, baja, usuarios] = await Promise.all([
+        admin.from("leads").select("*").eq("email", em).order("created_at", { ascending: false }).then((r) => r.data ?? []),
+        admin.from("correos_log").select("*").eq("email", em).order("enviado_at", { ascending: false }).limit(200).then((r) => r.data ?? []),
+        admin.from("lead_secuencia").select("*").eq("email", em).maybeSingle().then((r) => r.data),
+        admin.from("lead_envios").select("paso,ok,enviado_at").eq("email", em).order("paso").then((r) => r.data ?? []),
+        admin.from("bajas").select("email").eq("email", em).maybeSingle().then((r) => r.data),
+        todosLosUsuarios(),
+      ]);
+      const cuenta = usuarios.find((u) => (u.email ?? "").toLowerCase() === em);
+      const vids = await vidsDeLeads(leads);
+      const eventos = vids.length ? (await admin.from("eventos").select(EV_COLS).in("vid", vids).order("ts", { ascending: false }).limit(300)).data ?? [] : [];
+      return json({ ok: true, email: em, cuenta: cuenta?.id ?? null, leads, correos, secuencia: seq, envios, baja: !!baja, eventos });
     }
 
     if (accion === "correos") {
