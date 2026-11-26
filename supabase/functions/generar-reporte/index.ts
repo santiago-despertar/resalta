@@ -195,7 +195,7 @@ async function calificacionIA(db: any, order: Obj, fotos: Obj[], medidasTxt: str
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "content-type": "application/json", "x-api-key": Deno.env.get("ANTHROPIC_API_KEY")!, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model: MODELO_IA, max_tokens: 3000, system: SISTEMA_IA, tools: [TOOL_IA], tool_choice: { type: "auto" }, messages: [{ role: "user", content: [...fotos,
+      body: JSON.stringify({ model: MODELO_IA, max_tokens: 3000, temperature: 0, system: SISTEMA_IA, tools: [TOOL_IA], tool_choice: { type: "auto" }, messages: [{ role: "user", content: [...fotos,
         { type: "text", text: (fotos.length > 1 ? "Son fotos de la misma persona: la primera de frente, la otra de perfil. " : "") + "Califica esta cara. Responde solo llamando a la herramienta calificacion, sin texto aparte." + (medidasTxt ? `\n\nMedidas de su foto de frente fuera del rango de referencia, por zona:\n${medidasTxt}` : "") }] }] }),
     });
     const j = await r.json();
