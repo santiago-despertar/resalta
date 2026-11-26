@@ -834,12 +834,34 @@
         if (error) return msg(m, "No se pudo subir la foto. Revisa tu conexión e inténtalo de nuevo.");
       }
       el.classList.add("done"); uploaded.add(key); check();
+      fotosIA[key] = blob;
       if (key === "frente") medir(blob, m);
       if (key === "perfil_izq" || key === "perfil_der") medirPerfil(key, blob);
     }
 
     // Everything measured so far for this order. Saved whole each time so one photo never erases another.
     const M = { frente: null, perfil: {} };
+    const fotosIA = {};
+
+    // The AI rating (calificar function): the one overall score and zone scores Resalta shows everywhere.
+    // It sees the front and profile photos plus the front measurements that came out of range.
+    const ZONAS_IA = [["proporciones", "Proporciones"], ["ojos", "Ojos"], ["nariz", "Nariz"], ["boca", "Boca y labios"], ["mandibula", "Mandíbula y mentón"], ["simetria", "Simetría"]];
+    async function aJpeg(blob, max = 900) {
+      const b = await createImageBitmap(blob), k = Math.min(1, max / Math.max(b.width, b.height));
+      const c = document.createElement("canvas"); c.width = Math.round(b.width * k); c.height = Math.round(b.height * k);
+      c.getContext("2d").drawImage(b, 0, 0, c.width, c.height);
+      return c.toDataURL("image/jpeg", 0.86);
+    }
+    async function pedirCalificacion() {
+      const fs = [fotosIA.frente, fotosIA.perfil_izq || fotosIA.perfil_der].filter(Boolean);
+      if (!sb || !order || !fs.length) return null;
+      const fuera = crudo ? crudo.medidas.filter(x => x.estado && x.estado !== "dentro") : [];
+      const medidas = ZONAS_IA.map(([id, n]) => {
+        const xs = fuera.filter(x => x.zona === id); if (!xs.length) return "";
+        return `${n}: ` + xs.map(x => `${x.nombre} (${x.valor}${x.unidad || ""}, referencia ${x.rango[0]} a ${x.rango[1]})`).join("; ");
+      }).filter(Boolean).join("\n");
+      return fnCall("calificar", { order_id: order.id, fotos: await Promise.all(fs.map(f => aJpeg(f))), medidas });
+    }
     async function guardarMedidas() {
       if (!M.frente) return;
       const perfil = M.perfil.perfil_izq || M.perfil.perfil_der || null;
@@ -1001,22 +1023,20 @@
     // Before the prices: their real overall score and their three strongest zones in the clear, the other zones
     // blurred, on the same strict /10 scale as the report.
     // Then "¿quieres saber por qué?" leads to the plans.
-    function mostrarPreview() {
+    function mostrarPreview(cal) {
       const st = $("#prevStep"), c = $("#mideCanvas");
-      if (!st || !crudo || !crudo.resumen) return false;
+      if (!st || !crudo || !crudo.resumen || !cal || !cal.ok) return false;
       const esc = v => String(v ?? "").replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
       const a = (order && order.answers) || {}, nombre = String(a.nombre || "").trim().split(/\s+/)[0];
       if (nombre) $("#prevH").textContent = `${nombre}, esta es tu calificación`;
       try { if (c && c.width) $("#prevImg").src = c.toDataURL("image/jpeg", 0.86); else $(".prev-foto").hidden = true; } catch (e) { $(".prev-foto").hidden = true; }
       const n = crudo.medidas.length;
       $("#prevN").textContent = n;
-      // same strict /10 scale as the report, so the preview and the paid result never disagree
-      const diez = v => (10 * Math.pow(Math.max(0, Math.min(100, v)) / 100, 2.2)).toFixed(1);
-      const prom = crudo.medidas.reduce((s, m) => s + (m.puntaje || 0), 0) / Math.max(1, n);
-      const total = diez(prom);
+      // the AI rating, saved with the order: the report shows this same number
+      const total = Number(cal.general).toFixed(1);
       $("#prevScore").textContent = total;
-      const zs = crudo.resumen.zonas.filter(z => z.puntaje != null).sort((x, y) => y.puntaje - x.puntaje);
-      $("#prevRows").innerHTML = zs.map((z, i) => `<div class="report-row"><span>${esc(z.nombre)}</span>${i < 3 ? `<b class="mono">${diez(z.puntaje)}</b>` : `<b class="mono cal-borroso">8.8</b>`}</div>`).join("");
+      const zs = ZONAS_IA.map(([id, nombre]) => ({ nombre, puntaje: Number((cal.zonas || {})[id]) })).filter(z => z.puntaje >= 0).sort((x, y) => y.puntaje - x.puntaje);
+      $("#prevRows").innerHTML = zs.map((z, i) => `<div class="report-row"><span>${esc(z.nombre)}</span>${i < 3 ? `<b class="mono">${z.puntaje.toFixed(1)}</b>` : `<b class="mono cal-borroso">8.8</b>`}</div>`).join("");
       const fuera = crudo.medidas.filter(m => m.estado && m.estado !== "dentro").length;
       $("#prevPq").textContent = `¿Quieres saber por qué sacaste ${total}?`;
       const debil = zs[zs.length - 1];
@@ -1033,12 +1053,23 @@
       const b = $("#toPay"); b.disabled = true;
       if (sb && order) await sb.from("orders").update({ photos_consent_at: new Date().toISOString() }).eq("id", order.id);
       const w0 = sb && order && !(await subEstado).activa ? warmPay() : null; if (w0) w0.catch(() => {}); // Stripe page gets ready while they watch
+      const calP = pedirCalificacion().catch(e => { console.warn("calificar", e && e.message); return null; }); // the AI rates while they watch
       try { await animarMedicion(); } catch (e) { console.warn(e); }
+      const cal = await calP;
       b.disabled = false;
+      // a photo the AI can't rate fairly goes back to the photo step instead of getting a wrong number
+      if (cal && cal.ok === false && cal.motivo) {
+        go(2);
+        const t = { foto_mala: "Tu foto de frente o de perfil no se ve bien, así que tu calificación no saldría justa. Sube fotos nítidas, con buena luz y sin filtros.", sin_cara: "No encontramos bien tu cara en tus fotos. Sube una de frente y una de perfil, con buena luz.", menor: "El análisis es solo para mayores de 18 años." }[cal.motivo];
+        msg($("#photoMsg"), t || "No pudimos calificar tus fotos. Prueba con otras.");
+        if (cal.motivo === "foto_mala" || cal.motivo === "sin_cara") ["frente", "perfil_izq", "perfil_der"].forEach(k => { const sl = document.querySelector(`.slot[data-key="${k}"]`); if (sl) sl.classList.remove("done"); uploaded.delete(k); delete fotosIA[k]; });
+        check();
+        return;
+      }
       try { personalizarOferta(); } catch (e) { console.warn(e); }
       const mensualActivo = await modoMensual();
       let conPreview = false;
-      if (!mensualActivo) { try { conPreview = mostrarPreview(); } catch (e) { console.warn(e); } }
+      if (!mensualActivo) { try { conPreview = mostrarPreview(cal); } catch (e) { console.warn(e); } }
       go(conPreview ? 2.7 : 3);
       if (mensualActivo) return;
       const w = warmPay(); if (w) w.catch(() => {});
@@ -2242,7 +2273,9 @@
       const zonas = Object.fromEntries((o.medidas && o.medidas.resumen ? o.medidas.resumen.zonas : []).map(z => [z.id, z]));
       $("#repZonas").innerHTML = (r.zonas || []).map(z => {
         const s = zonas[z.id];
-        return `<div class="card rep-zona"><div class="rep-zona-top"><b>${esc(s ? s.nombre : z.id)}</b>${s ? `<span class="mono">${s.puntaje}</span>` : ""}</div><p class="hint">${esc(z.lectura)}</p><ul class="rep-list">${li(z.acciones)}</ul></div>`;
+        // zone score: the AI one on the same /10 scale as the overall, or the measured /100 on older reports
+        const ia = r.zonas_ia && typeof r.zonas_ia[z.id] === "number" ? Number(r.zonas_ia[z.id]).toFixed(1) : null;
+        return `<div class="card rep-zona"><div class="rep-zona-top"><b>${esc(s ? s.nombre : z.id)}</b>${ia ? `<span class="mono">${ia}</span>` : s ? `<span class="mono">${s.puntaje}</span>` : ""}</div><p class="hint">${esc(z.lectura)}</p><ul class="rep-list">${li(z.acciones)}</ul></div>`;
       }).join("");
 
       const bloque = (x) => x && x.lectura ? `<p class="hint">${esc(x.lectura)}</p><ul class="rep-list">${li(x.acciones)}</ul>` : "";

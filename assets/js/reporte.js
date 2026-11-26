@@ -73,7 +73,7 @@
     const zs = Object.fromEntries(((M.resumen || {}).zonas || []).map(z => [z.id, z]));
     h += seccion("Zona por zona", (r.zonas || []).map(z => {
       const s = zs[z.id];
-      return `<div class="doc-zona"><div class="doc-zona-t"><b>${esc(s ? s.nombre : z.id)}</b>${s ? `<span>${f1(s.puntaje / 10)}</span>` : ""}</div><p>${esc(z.lectura)}</p><ul>${li(z.acciones)}</ul></div>`;
+      return `<div class="doc-zona"><div class="doc-zona-t"><b>${esc(s ? s.nombre : z.id)}</b>${r.zonas_ia && typeof r.zonas_ia[z.id] === "number" ? `<span>${f1(r.zonas_ia[z.id])}</span>` : s ? `<span>${f1(s.puntaje / 10)}</span>` : ""}</div><p>${esc(z.lectura)}</p><ul>${li(z.acciones)}</ul></div>`;
     }).join(""));
     const extra = [["Perfil", r.perfil], ["Sonrisa", r.sonrisa], ["Tres cuartos", r.tres_cuartos]].filter(x => x[1] && x[1].lectura);
     h += seccion("Otros ángulos", extra.map(([t, x]) => `<div class="doc-zona"><div class="doc-zona-t"><b>${t}</b></div><p>${esc(x.lectura)}</p><ul>${li(x.acciones)}</ul></div>`).join(""));

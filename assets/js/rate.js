@@ -1,4 +1,6 @@
-// Free facial harmony score. The face is measured in the browser; only a small annotated crop is sent, for the result email.
+// Free facial rating. The face is found and measured in the browser (to check the photo and draw the lines for the
+// email), then a face crop goes to the calificar function, where the AI gives the 0-10 rating that Resalta uses
+// everywhere: here, in the onboarding preview and in the report. The photo is not stored.
 import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
 
 const $ = (s) => document.querySelector(s);
@@ -66,10 +68,40 @@ async function getLandmarker() {
   return landmarker;
 }
 
-// Strict scale, like a real rating: 50 is an average face, 70 is clearly attractive, a 90 is model level
-// and 100 does not happen. Proportions from one photo can't see skin, hair or body fat, so this curve
-// alone tops out at 90 even for perfect ratios.
-const estricto = raw => Math.max(15, Math.min(90, Math.round(50 + (raw - 67) * 0.9)));
+// The six zones of the AI rating (same ids as the measurements), with a first tip for the weakest one.
+const ZONAS = [
+  ["proporciones", "Proporciones", "El volumen del cabello y la forma de la barba cambian cómo se perciben las proporciones de tu cara."],
+  ["ojos", "Ojos", "La forma de tus cejas, el descanso y la piel alrededor de los ojos cambian mucho tu mirada."],
+  ["nariz", "Nariz", "El corte, la barba y las cejas pueden equilibrar visualmente la nariz con el resto de la cara."],
+  ["boca", "Boca y labios", "Hidratación, cuidado de los labios y una barba bien recortada mejoran cómo se ve tu boca."],
+  ["mandibula", "Mandíbula y mentón", "Menos grasa facial, postura de cuello y una barba bien definida marcan la mandíbula."],
+  ["simetria", "Simetría", "Pequeñas asimetrías se notan menos con el corte, la barba y la postura correctos."]
+];
+
+// the face, cropped with some margin, without lines: what the AI looks at
+function recorte(L) {
+  const iw = img.width, ih = img.height, xs = L.map(q => q.x * iw), ys = L.map(q => q.y * ih);
+  const bx0 = Math.min(...xs), bx1 = Math.max(...xs), by0 = Math.min(...ys), by1 = Math.max(...ys);
+  const pw = (bx1 - bx0) * 0.6, ph = (by1 - by0) * 0.55;
+  const x0 = Math.max(0, bx0 - pw), x1 = Math.min(iw, bx1 + pw), y0 = Math.max(0, by0 - ph), y1 = Math.min(ih, by1 + ph * 0.6);
+  const k = Math.min(1, 900 / Math.max(x1 - x0, y1 - y0)), W = Math.round((x1 - x0) * k), H = Math.round((y1 - y0) * k);
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  c.getContext("2d").drawImage(img, x0, y0, x1 - x0, y1 - y0, 0, 0, W, H);
+  return c.toDataURL("image/jpeg", 0.88);
+}
+async function calificarIA(L) {
+  const C = window.RESALTA || {};
+  const r = await fetch(`${C.SUPABASE_URL}/functions/v1/calificar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: C.SUPABASE_ANON_KEY, Authorization: `Bearer ${C.SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ fotos: [recorte(L)] }),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (j.limitado) throw new Error("limitado");
+  if (j.motivo) throw new Error(j.motivo);
+  if (!r.ok || !j.ok) throw new Error("ia");
+  return j;
+}
 
 // ---- geometry helpers
 const d = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -124,9 +156,7 @@ function measure(L) {
     { k: "Mandíbula", v: jaw, w: 0.12, tip: "Menos grasa facial, postura de cuello y barba bien definida marcan la mandíbula." },
     { k: "Proporción del rostro", v: fwhr, w: 0.08, tip: "El volumen del cabello arriba o a los lados cambia la proporción de tu cara." }
   ];
-  const raw = parts.reduce((s, p) => s + p.v * p.w, 0);
-  const score = estricto(raw);
-  return { score, parts, yaw };
+  return { parts, yaw }; // only used to check the photo; the rating itself comes from the AI
 }
 
 function draw(L) {
@@ -196,23 +226,29 @@ go.addEventListener("click", async () => {
     const L = faces[0];
     const m = measure(L);
     if (m.yaw > 0.18) throw new Error("turned");
+    const ia = calificarIA(L); ia.catch(() => {});
     await procesar(L);
+    const cal = await ia;
     draw(L);
-    bloquear(m);
+    bloquear(cal);
   } catch (e) {
     ir("foto");
-    const t = { noface: "No encontramos una cara en la foto. Prueba con una foto de frente y buena luz.", many: "Hay más de una cara en la foto. Usa una foto donde solo salgas tú.", turned: "Tu cara está muy girada. Mira directo a la cámara y vuelve a intentar." }[e.message];
+    const t = { noface: "No encontramos una cara en la foto. Prueba con una foto de frente y buena luz.", sin_cara: "No encontramos una cara en la foto. Prueba con una foto de frente y buena luz.", many: "Hay más de una cara en la foto. Usa una foto donde solo salgas tú.", turned: "Tu cara está muy girada. Mira directo a la cámara y vuelve a intentar.",
+      foto_mala: "Tu cara no se ve bien en esta foto, así que la calificación no saldría justa. Usa una foto de frente, nítida, con buena luz y sin filtros.",
+      menor: "La calificación es solo para mayores de 18 años.",
+      limitado: "Hiciste varias calificaciones seguidas. Vuelve a intentarlo en una hora." }[e.message];
     say(t || "No pudimos analizar la foto. Revisa tu conexión e inténtalo de nuevo.");
-  } finally { go.disabled = false; go.textContent = "Calcular mi puntaje"; }
+  } finally { go.disabled = false; go.textContent = "Calcular mi calificación"; }
 });
 
 // the result is shown blurred: the numbers are real but unreadable until they leave their email
 let resultado = null;
-function bloquear(m) {
-  resultado = m;
-  $("#rScore").textContent = String(Math.max(10, m.score)).replace(/\d/g, "8");
-  $("#rRows").innerHTML = m.parts.map(p => `<div class="report-row"><span>${p.k}</span><b class="mono cal-borroso">88</b></div>`).join("");
-  try { if (window.resaltaTrack) window.resaltaTrack("calificacion_resultado", { score: m.score }); } catch (e) {}
+function bloquear(cal) {
+  const parts = ZONAS.map(([id, k, tip]) => ({ id, k, tip, v: Number((cal.zonas || {})[id]) || 0 }));
+  resultado = { id: cal.id, score: Number(cal.general), parts };
+  $("#rScore").textContent = "8.8";
+  $("#rRows").innerHTML = parts.map(p => `<div class="report-row"><span>${p.k}</span><b class="mono cal-borroso">8.8</b></div>`).join("");
+  try { if (window.resaltaTrack) window.resaltaTrack("calificacion_resultado", { score: resultado.score }); } catch (e) {}
   ir("bloqueado");
 }
 
@@ -243,8 +279,8 @@ $("#leadForm").addEventListener("submit", async (ev) => {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: C.SUPABASE_ANON_KEY, Authorization: `Bearer ${C.SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
-        nombre, email, score: m.score,
-        partes: (m.parts || []).map(p => ({ k: p.k, v: Math.round(p.v), tip: p.tip })),
+        nombre, email, score: m.score, cal_id: m.id,
+        partes: (m.parts || []).map(p => ({ k: p.k, v: p.v, tip: p.tip })),
         vid: (() => { try { return (localStorage.getItem("rs_vid") || "").slice(0, 40) || null; } catch (e) { return null; } })(),
         foto: fotoCorreo(), fuerte: sorted[0] && sorted[0].k, debil: sorted.length ? { k: sorted[sorted.length - 1].k, tip: sorted[sorted.length - 1].tip } : null,
       }),
