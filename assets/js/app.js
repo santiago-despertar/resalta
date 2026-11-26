@@ -594,14 +594,11 @@
         n.innerHTML = `<b>${j.descuento}% de descuento</b>${j.nombre ? ` por la invitación de ${j.nombre.replace(/[<>&"]/g, "")}` : " por invitación"}. Se aplica al pagar.`;
         n.hidden = false;
       }).catch(() => {});
-    // The first three are required; the other three are optional and only add precision.
+    // The three photos the analysis uses: front, smiling and profile.
     const SLOTS = [
       ["frente", "Frente", "Cara relajada, boca cerrada"],
       ["sonrisa", "Sonriendo", "Sonrisa natural, de frente"],
       ["perfil_izq", "Perfil", "90°, de cualquier lado"],
-      ["perfil_der", "El otro perfil", "90°, del lado contrario", true],
-      ["tres_cuartos_izq", "Tres cuartos", "Gira la cara 45°", true],
-      ["tres_cuartos_der", "Tres cuartos, otro lado", "Gira la cara 45°", true]
     ];
     const REQUERIDAS = SLOTS.filter(s => !s[3]).map(s => s[0]);
     let user, order;
