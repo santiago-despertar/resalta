@@ -2461,3 +2461,8 @@ body[data-page=index] .notes{padding-bottom:32px}
 .prev-foto img{display:block;width:100%;height:auto}
 .prev-gate{margin-top:14px}
 @media (max-width:560px){.prev-res{grid-template-columns:1fr 1fr;gap:12px}}
+
+/* onboarding photos: only two now, so each slot is bigger */
+#photoGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (min-width:641px){#photoGrid .slot{aspect-ratio:1/1}}
+@media (max-width:640px){#photoGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:none}#photoGrid .slot small{display:block}}
