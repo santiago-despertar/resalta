@@ -27,6 +27,20 @@ function califOnboarding(med: unknown, zonas?: unknown) {
   return { total: diez(ps.reduce((a, b) => a + b, 0) / ps.length),
     zonas: ((zonas as Obj[] | null) ?? []).filter((z: Obj) => z.puntaje != null).map((z: Obj) => ({ nombre: z.nombre, v: diez(z.puntaje) })).sort((a: Obj, b: Obj) => b.v - a.v) };
 }
+// The AI rating (calificaciones table, written by the calificar function) is what the onboarding preview and the
+// report show now. Orders from before it fall back to the old measurement curve above.
+const ZN: Record<string, string> = { proporciones: "Proporciones", ojos: "Ojos", nariz: "Nariz", boca: "Boca y labios", mandibula: "Mandíbula y mentón", simetria: "Simetría" };
+async function calsIA(ids: string[]) {
+  const m = new Map<string, { total: number; zonas: { nombre: string; v: number }[]; razon: string | null; ia: true }>();
+  for (let i = 0; i < ids.length; i += 300) {
+    const { data } = await admin.from("calificaciones").select("order_id,general,zonas,razon,created_at").in("order_id", ids.slice(i, i + 300)).not("general", "is", null).order("created_at", { ascending: false });
+    for (const c of data ?? []) if (!m.has(c.order_id)) m.set(c.order_id, { total: Number(c.general), ia: true, razon: c.razon ?? null,
+      zonas: Object.entries(ZN).filter(([k]) => typeof c.zonas?.[k] === "number").map(([k, nombre]) => ({ nombre, v: Number(c.zonas[k]) })).sort((a, b) => b.v - a.v) });
+  }
+  return m;
+}
+// free rating as shown to the person: AI ratings are /10 (saved x10 in leads.score), tool ratings /100
+const gratisTxt = (l: Obj | undefined) => l?.score == null ? null : (l.escala === "10" || l.metrics?.escala === 10) ? `${(Number(l.score) / 10).toFixed(1)} /10` : `${l.score} /100`;
 const hoy0 = () => { const d = new Date(); d.setUTCHours(6, 0, 0, 0); if (d.getTime() > Date.now()) d.setTime(d.getTime() - DIA); return d; }; // midnight in Mexico City
 const diaMX = (t: string | number | Date) => new Date(new Date(t).getTime() - 6 * 3600e3).toISOString().slice(0, 10);
 const cuenta = <T>(xs: T[], k: (x: T) => string | null | undefined) => {
@@ -417,18 +431,20 @@ Deno.serve(async (req) => {
         todosLosUsuarios(),
         admin.from("orders").select("id,user_id,status,tier,amount_mxn,paid_at,created_at,answers->>nombre,answers->>pais,answers->>edad,answers->>sexo,med:medidas->medidas").then((r) => r.data ?? []),
         admin.from("suscripciones").select("user_id,estado,periodo_fin,cancela").then((r) => r.data ?? []),
-        admin.from("leads").select("email,nombre,score,created_at,metrics->>foto").then((r) => r.data ?? []),
+        admin.from("leads").select("email,nombre,score,created_at,metrics->>foto,metrics->>escala").then((r) => r.data ?? []),
       ]);
+      const ias = await calsIA(ord.map((o: Obj) => o.id));
       const filas = usuarios.map((u) => {
         const os = ord.filter((o: Obj) => o.user_id === u.id), pag = os.filter((o: Obj) => o.status === "pagado" || o.status === "listo");
         const s = subs.find((x: Obj) => x.user_id === u.id), em = (u.email ?? "").toLowerCase();
         const l = leads.filter((x: Obj) => x.email === em).sort((a: Obj, b2: Obj) => a.created_at < b2.created_at ? 1 : -1)[0];
         const o0 = os[0] ?? {};
+        const conIA = os.filter((o: Obj) => ias.has(o.id)).sort((a: Obj, b2: Obj) => (a.created_at < b2.created_at ? 1 : -1))[0];
         const conMed = os.filter((o: Obj) => Array.isArray(o.med) && o.med.length).sort((a: Obj, b2: Obj) => (a.created_at < b2.created_at ? 1 : -1))[0];
-        const cal = conMed ? califOnboarding(conMed.med) : null;
+        const cal = conIA ? ias.get(conIA.id) : conMed ? califOnboarding(conMed.med) : null;
         return { ...resumenUsuario(u), calif_onboarding: cal?.total ?? null, pedidos: os.length, pagados: pag.length, plan: pag.some((o: Obj) => o.tier === "hard") ? "Completo" : pag.length ? "Esencial" : null,
           pagado_mxn: pag.reduce((t: number, o: Obj) => t + (o.amount_mxn ?? 0), 0), suscripcion: s?.estado ?? null,
-          puntaje_gratis: l?.score ?? null, pais: o0.pais ?? null, edad: o0.edad ?? null, sexo: o0.sexo ?? null, nombre_form: o0.nombre ?? null };
+          puntaje_gratis: gratisTxt(l), pais: o0.pais ?? null, edad: o0.edad ?? null, sexo: o0.sexo ?? null, nombre_form: o0.nombre ?? null };
       });
       // people who only did the free rating (no account): one row per email, newest rating
       const conCuenta = new Set(usuarios.map((u) => (u.email ?? "").toLowerCase()));
@@ -437,8 +453,8 @@ Deno.serve(async (req) => {
         const em = String(l.email ?? "").toLowerCase();
         if (!em || conCuenta.has(em)) continue;
         const x = soloGratis[em];
-        if (!x) soloGratis[em] = { id: null, email: em, nombre: l.nombre ?? null, creado: l.created_at, ultimo: l.created_at, proveedor: "Solo calificación gratis", anonimo: false, solo_lead: true, pedidos: 0, pagados: 0, plan: null, pagado_mxn: 0, suscripcion: null, puntaje_gratis: l.score ?? null, calificaciones: 1, foto: l.foto ?? null };
-        else { x.calificaciones++; if (l.created_at > x.ultimo) { x.ultimo = l.created_at; x.puntaje_gratis = l.score ?? x.puntaje_gratis; x.nombre = l.nombre ?? x.nombre; x.foto = l.foto ?? x.foto; } if (l.created_at < x.creado) x.creado = l.created_at; }
+        if (!x) soloGratis[em] = { id: null, email: em, nombre: l.nombre ?? null, creado: l.created_at, ultimo: l.created_at, proveedor: "Solo calificación gratis", anonimo: false, solo_lead: true, pedidos: 0, pagados: 0, plan: null, pagado_mxn: 0, suscripcion: null, puntaje_gratis: gratisTxt(l), calificaciones: 1, foto: l.foto ?? null };
+        else { x.calificaciones++; if (l.created_at > x.ultimo) { x.ultimo = l.created_at; x.puntaje_gratis = gratisTxt(l) ?? x.puntaje_gratis; x.nombre = l.nombre ?? x.nombre; x.foto = l.foto ?? x.foto; } if (l.created_at < x.creado) x.creado = l.created_at; }
       }
       const todas = [...filas, ...Object.values(soloGratis)].sort((a: Obj, b2: Obj) => (a.creado < b2.creado ? 1 : -1));
       return json({ ok: true, usuarios: todas });
@@ -471,7 +487,8 @@ Deno.serve(async (req) => {
           arquetipo: d.arquetipo ?? null, fortalezas: d.fortalezas ?? null, prioridades: d.prioridades ?? null, grupos: (d.grupos ?? []).map((g: Obj) => ({ titulo: g.titulo, puntaje: g.puntaje })),
           longevidad: d.longevidad ?? null, potencial: d.potencial ?? null, motivo: d.motivo ?? null, segundos: d.segundos ?? null, modelo: d.modelo ?? null };
       });
-      const pedidos = ord.map((o: Obj) => ({ ...o, calificacion: califOnboarding(o.medidas?.medidas, o.medidas?.resumen?.zonas), medidas: o.medidas ? { n: (o.medidas.medidas?.length ?? 0) + (o.medidas.perfil?.medidas?.length ?? 0), resumen: o.medidas.resumen ?? null, avisos: o.medidas.avisos ?? null, ajustado: o.medidas.ajustado ?? null } : null }));
+      const ias = await calsIA(ord.map((o: Obj) => o.id));
+      const pedidos = ord.map((o: Obj) => ({ ...o, calificacion: ias.get(o.id) ?? califOnboarding(o.medidas?.medidas, o.medidas?.resumen?.zonas), medidas: o.medidas ? { n: (o.medidas.medidas?.length ?? 0) + (o.medidas.perfil?.medidas?.length ?? 0), resumen: o.medidas.resumen ?? null, avisos: o.medidas.avisos ?? null, ajustado: o.medidas.ajustado ?? null } : null }));
       return json({ ok: true, usuario: { ...resumenUsuario(u), confirmado: u.email_confirmed_at, telefono: u.phone || null, metadata: u.user_metadata },
         pedidos, reportes, suscripcion: sub, fisico: fis, chat, leads, eventos: [...ev, ...antes].sort((a: Obj, b2: Obj) => (a.ts < b2.ts ? 1 : -1)), afiliado: afi, fotos, correos });
     }
@@ -516,7 +533,8 @@ Deno.serve(async (req) => {
         todosLosUsuarios(),
       ]);
       const correo = new Map(usuarios.map((u) => [u.id, u.email]));
-      return json({ ok: true, pedidos: (ord ?? []).map(({ med, ...o }: Obj) => ({ ...o, calificacion: califOnboarding(med)?.total ?? null, email: correo.get(o.user_id) ?? null })) });
+      const ias = await calsIA((ord ?? []).map((o: Obj) => o.id));
+      return json({ ok: true, pedidos: (ord ?? []).map(({ med, ...o }: Obj) => ({ ...o, calificacion: ias.get(o.id)?.total ?? califOnboarding(med)?.total ?? null, email: correo.get(o.user_id) ?? null })) });
     }
 
     if (accion === "afiliados") {
