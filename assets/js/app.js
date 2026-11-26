@@ -1044,7 +1044,7 @@
       // the AI flags photos that make a face look worse than it is; they're told so and can swap them
       let nf = $("#prevFotoNota");
       if (!nf) {
-        $("#prevRows").insertAdjacentHTML("afterend", '<div class="tool-tips" id="prevFotoNota" style="margin-top:16px"></div>'); nf = $("#prevFotoNota");
+        $("#prevRows").insertAdjacentHTML("beforebegin", '<div class="tool-tips" id="prevFotoNota" style="margin:4px 0 16px"></div>'); nf = $("#prevFotoNota");
         nf.addEventListener("click", ev => { if (ev.target.closest("[data-otra-foto]")) go(2); });
       }
       const tn = String(cal.nota_fotos || "").trim().replace(/[.\s]+$/, "");

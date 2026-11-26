@@ -257,7 +257,7 @@ function bloquear(cal) {
   $("#rRows").innerHTML = parts.map(p => `<div class="report-row"><span>${p.k}</span><b class="mono cal-borroso">8.8</b></div>`).join("");
   let nf = $("#rFotoNota");
   if (!nf) {
-    $("#rRows").insertAdjacentHTML("afterend", '<div class="tool-tips" id="rFotoNota" style="margin-top:16px"></div>'); nf = $("#rFotoNota");
+    $("#rRows").insertAdjacentHTML("beforebegin", '<div class="tool-tips" id="rFotoNota" style="margin:4px 0 16px"></div>'); nf = $("#rFotoNota");
     nf.addEventListener("click", ev => { if (ev.target.closest("[data-otra-foto]")) ir("foto"); });
   }
   nf.innerHTML = notaFotosHTML(cal.nota_fotos); nf.hidden = !nf.innerHTML;

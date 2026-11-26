@@ -151,7 +151,7 @@ const RESULTADOS = {
     $("#resVerdict").textContent = nivel(c.general) + (nivel(c.general) === "En el promedio" ? ", donde está la mayoría de la gente." : ". 6 es el promedio.");
     $("#resRows").innerHTML = ZONAS.map(([, k]) => `<div class="report-row"><span>${k}</span><b class="mono cal-borroso">8.8</b></div>`).join("");
     let nf = $("#resFotoNota");
-    if (!nf) { $("#resRows").insertAdjacentHTML("afterend", '<div class="tool-tips" id="resFotoNota" style="margin-top:16px"></div>'); nf = $("#resFotoNota"); }
+    if (!nf) { $("#resRows").insertAdjacentHTML("beforebegin", '<div class="tool-tips" id="resFotoNota" style="margin:4px 0 16px"></div>'); nf = $("#resFotoNota"); }
     nf.innerHTML = notaFotosHTML(c.nota_fotos); nf.hidden = !nf.innerHTML;
     return { evento: { score: c.general } };
   },
