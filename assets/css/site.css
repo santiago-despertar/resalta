@@ -2454,3 +2454,10 @@ body[data-page=index] .notes{padding-bottom:32px}
   .tool-intro h1{font-size:38px;margin:12px 0 12px}
 }
 @media (max-width:560px){.tool-hero>.wrap{padding:0 14px}.tool-big{font-size:40px}.tool-content{padding-top:40px}}
+
+/* onboarding: blurred result before the plans */
+.prev-res{margin:18px 0 10px;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:24px}
+.prev-foto{margin:0}
+.prev-foto img{display:block;width:100%;height:auto}
+.prev-gate{margin-top:14px}
+@media (max-width:560px){.prev-res{grid-template-columns:1fr 1fr;gap:12px}}
