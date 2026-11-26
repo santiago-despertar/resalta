@@ -258,7 +258,6 @@ Deno.serve(async (req) => {
     if (cuenta >= MAX_POR_CORRIDA) break;
     if (compro.has(ins.user_id)) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "compra" }).eq("user_id", ins.user_id); resumen.salieron++; continue; }
     if (bajas.has(ins.email)) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "baja" }).eq("user_id", ins.user_id); continue; }
-    if (sinInteres(ins.email)) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "no_abre" }).eq("user_id", ins.user_id); resumen.salieron++; continue; }
     const pasos = porSec[ins.secuencia] ?? [];
     const sig = pasos.find((c) => !enviados.has(`${ins.user_id}|${ins.secuencia}|${c.paso}`));
     if (!sig) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "terminó" }).eq("user_id", ins.user_id); continue; }
@@ -267,8 +266,14 @@ Deno.serve(async (req) => {
     if (hoy.has(String(ins.email).toLowerCase())) continue;
 
     // if they filled the form more than once, the emails use their newest answers
-    const { data: os } = await admin.from("orders").select("id,answers,foto_correo").eq("user_id", ins.user_id).not("answers", "is", null).order("created_at", { ascending: false }).limit(1);
-    const o = os?.[0] ?? (await admin.from("orders").select("id,answers,foto_correo").eq("id", ins.order_id).maybeSingle()).data;
+    const { data: os } = await admin.from("orders").select("id,answers,foto_correo,nivel_precio").eq("user_id", ins.user_id).not("answers", "is", null).order("created_at", { ascending: false }).limit(1);
+    const o = os?.[0] ?? (await admin.from("orders").select("id,answers,foto_correo,nivel_precio").eq("id", ins.order_id).maybeSingle()).data;
+    // People who got as far as the payment page (create-checkout saves their price level) get the whole sequence,
+    // opens or not: they were one step from buying. Everyone else follows the engagement rule.
+    // Orders from before 26-nov have no level saved, so the site's begin_checkout event counts too.
+    const { count: alPago } = await admin.from("orders").select("id", { count: "exact", head: true }).eq("user_id", ins.user_id).not("nivel_precio", "is", null);
+    const { count: abrioPago } = alPago ? { count: 0 } : await admin.from("eventos").select("id", { count: "exact", head: true }).eq("user_id", ins.user_id).eq("nombre", "begin_checkout");
+    if (!(alPago ?? 0) && !(abrioPago ?? 0) && sinInteres(ins.email)) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "no_abre" }).eq("user_id", ins.user_id); resumen.salieron++; continue; }
     const { data: ud } = await admin.auth.admin.getUserById(ins.user_id);
     if (!ud?.user) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "sin_cuenta" }).eq("user_id", ins.user_id); continue; }
     const a = o?.answers ?? {}, nombre = nombreDe(a, ud.user);
