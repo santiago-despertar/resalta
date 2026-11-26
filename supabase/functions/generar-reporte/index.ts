@@ -136,6 +136,64 @@ const okZonas = (r: Obj) => hay(r.zonas) && r.perfil?.lectura;
 const okEstilo = (r: Obj) => r.piel?.lectura && hay(r.piel.acciones) && r.color?.lectura && hay(r.color.paleta) && hay(r.cabello_barba?.cortes);
 
 const dec = (v: number) => Math.round(v * 10) / 10;
+
+// The overall rating is the AI one from the calificar function (Sonnet), saved when the person saw their preview.
+// The report uses that same number, so what they saw before paying and what they get never disagree.
+// Orders without one (older orders) get rated here once, with the same prompt as the calificar function.
+const MODELO_IA = "claude-sonnet-5-5";
+const ZONAS_IA: [string, string][] = [
+  ["proporciones", "Proporciones"], ["ojos", "Ojos"], ["nariz", "Nariz"],
+  ["boca", "Boca y labios"], ["mandibula", "Mandíbula y mentón"], ["simetria", "Simetría"],
+];
+const SISTEMA_IA = `Eres el evaluador de atractivo facial de Resalta. Calificas qué tan atractiva se percibe una cara.
+Escala absoluta de 0 a 10 con un decimal, igual para hombres y mujeres, contra la población general de su edad y sexo:
+- 5.0 es una persona promedio, la que te cruzas en la calle. La mitad de la gente está entre 4.3 y 5.7.
+- 6 es arriba del promedio (1 de cada 5 personas).
+- 7 es claramente atractivo, llama la atención (1 de cada 20).
+- 8 es muy atractivo, nivel actor o modelo comercial (1 de cada 200).
+- Entre 8.8 y 9.4 están los modelos más cotizados del mundo, las caras de las grandes campañas de moda. Si una cara es de ese nivel, ponle ese número; no la bajes a 8 por prudencia.
+- 10 no existe.
+Usa toda la escala. Una cara poco agraciada saca 3 o 4 y está bien decirlo. Sé honesto y realista, sin regalar puntos y sin crueldad.
+Califica solo lo que ves: no intentes reconocer a la persona ni uses su fama.
+Cuenta todo lo que pesa en la percepción: estructura ósea, proporciones, ojos y cejas, nariz, labios, mandíbula, piel, cabello y armonía del conjunto.
+La foto: la luz, el ángulo o el lente pueden mover a lo mucho 0.3. Si la cara no se ve bien (borrosa, muy oscura, muy lejos, tapada, muy girada o con filtro fuerte) marca calidad "mala".
+Si te dan medidas de la cara, úsalas solo como apoyo: si una zona tiene medidas fuera de rango y también se nota en la foto, refléjalo; si en la foto no se nota, manda lo que ves.
+Por zona califica en la misma escala de 0 a 10. Las zonas deben ser coherentes con la calificación general: su promedio queda cerca del general.`;
+const TOOL_IA = {
+  name: "calificacion", description: "Entrega la calificación.",
+  input_schema: {
+    type: "object", required: ["es_cara", "parece_menor", "calidad", "general", "zonas", "razon"],
+    properties: {
+      es_cara: { type: "boolean", description: "Hay una cara humana real y visible." },
+      parece_menor: { type: "boolean", description: "La persona parece menor de 18 años." },
+      calidad: { type: "string", enum: ["buena", "regular", "mala"] },
+      general: { type: "number", minimum: 0, maximum: 10 },
+      zonas: { type: "object", required: ZONAS_IA.map((z) => z[0]), properties: Object.fromEntries(ZONAS_IA.map(([k]) => [k, { type: "number", minimum: 0, maximum: 10 }])) },
+      razon: { type: "string", description: "Una frase en español, en segunda persona: qué sube y qué baja la calificación." },
+    },
+  },
+};
+// deno-lint-ignore no-explicit-any
+async function calificacionIA(db: any, order: Obj, fotos: Obj[], medidasTxt: string): Promise<{ general: number; zonas: Obj } | null> {
+  const { data: hecha } = await db.from("calificaciones").select("general,zonas").eq("order_id", order.id).not("general", "is", null).order("created_at", { ascending: false }).limit(1).maybeSingle();
+  if (hecha) return { general: Number(hecha.general), zonas: hecha.zonas ?? {} };
+  if (!fotos.length) return null;
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": Deno.env.get("ANTHROPIC_API_KEY")!, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({ model: MODELO_IA, max_tokens: 3000, system: SISTEMA_IA, tools: [TOOL_IA], tool_choice: { type: "auto" }, messages: [{ role: "user", content: [...fotos,
+        { type: "text", text: (fotos.length > 1 ? "Son fotos de la misma persona: la primera de frente, la otra de perfil. " : "") + "Califica esta cara. Responde solo llamando a la herramienta calificacion, sin texto aparte." + (medidasTxt ? `\n\nMedidas de su foto de frente fuera del rango de referencia, por zona:\n${medidasTxt}` : "") }] }] }),
+    });
+    const j = await r.json();
+    const x = (j.content ?? []).find((c: Obj) => c.type === "tool_use")?.input;
+    if (!r.ok || !x || typeof x.general !== "number") { console.error("calificacion ia", r.status, JSON.stringify(j).slice(0, 300)); return null; }
+    const zonas = Object.fromEntries(ZONAS_IA.map(([k]) => [k, dec(Math.max(0, Math.min(10, Number(x.zonas?.[k]) || 0)))]));
+    const general = dec(Math.max(0, Math.min(9.6, x.general)));
+    await db.from("calificaciones").insert({ hash: "reporte:" + order.id, modelo: MODELO_IA, origen: "reporte", general, zonas, razon: String(x.razon ?? "").slice(0, 400), calidad: x.calidad ?? null, order_id: order.id, user_id: order.user_id, uso: j.usage });
+    return { general, zonas };
+  } catch (e) { console.error("calificacion ia", e); return null; }
+}
 const prom = (a: number[]) => a.length ? a.reduce((s, x) => s + x, 0) / a.length : null;
 // Proportion alone says little about how a face is perceived, so the curve is strict: an ordinary set of ratios lands near 5.5.
 const armonia = (m: Obj) => {
@@ -281,7 +339,8 @@ Deno.serve(async (req) => {
       nuevas.ajustado = ahora;
       await admin.from("orders").update({ medidas: nuevas }).eq("id", order.id);
       const { data: rp } = await admin.from("reports").select("data").eq("order_id", order.id).maybeSingle();
-      if (rp?.data?.puntajes) {
+      // with the AI rating the overall score doesn't depend on the landmarks, so moving them changes nothing here
+      if (rp?.data?.puntajes && !rp.data.zonas_ia) {
         const pz: Obj = { ...rp.data.puntajes, armonia: armonia(nuevas) };
         const vals = ["armonia", "angularidad", "dimorfismo", "rasgos"].map((k) => pz[k]).filter((x) => typeof x === "number" && x > 0) as number[];
         pz.general = vals.length ? dec(Math.pow(vals.reduce((s2, x) => s2 * x, 1), 1 / vals.length)) : pz.general;
@@ -354,13 +413,21 @@ Deno.serve(async (req) => {
         const angulos = ["perfil", ...(conSonrisa ? ["sonrisa"] : []), ...(conTq ? ["tres cuartos"] : [])];
 
         const m = order.medidas;
+        const fueraTxt = ZONAS_IA.map(([id, n]) => {
+          const xs = (m.medidas ?? []).filter((x: Obj) => x.zona === id && x.estado && x.estado !== "dentro"); if (!xs.length) return "";
+          return `${n}: ` + xs.map((x: Obj) => `${x.nombre} (${x.valor}${x.unidad ?? ""}, referencia ${x.rango[0]} a ${x.rango[1]})`).join("; ");
+        }).filter(Boolean).join("\n");
+        const fotosIA = [imagenes[0], imagenes[2] ?? imagenes[3]].filter(Boolean) as Obj[];
+        const cal = await calificacionIA(admin, order, fotosIA, fueraTxt);
         const fila = (x: Obj) => `${x.nombre} (${x.zona}): ${x.valor}${x.unidad ?? ""} | referencia ${x.rango[0]} a ${x.rango[1]} | ${x.estado} | ${dec(x.puntaje / 10)}/10`;
         const datos = `Fotos, en este orden: ${nombres.join("; ")}.
 
 Medidas de frente:
 ${m.medidas.map(fila).join("\n")}
 ${m.perfil?.medidas?.length ? `\nMedidas de perfil (tomadas de la silueta; los milímetros son aproximados):\n${m.perfil.medidas.map(fila).join("\n")}` : "\nNo hay medidas de perfil para este pedido."}
-${m.avisos?.length ? `\nAvisos de calidad de la foto de frente: ${m.avisos.join(" ")}` : ""}`;
+${m.avisos?.length ? `\nAvisos de calidad de la foto de frente: ${m.avisos.join(" ")}` : ""}
+${cal ? `\nCalificación de Resalta, ya fijada y que el cliente ya vio: ${cal.general.toFixed(1)}/10 en general (5 es el promedio). Por zona: ${ZONAS_IA.map(([k, n]) => `${n} ${Number(cal.zonas[k]).toFixed(1)}`).join(", ")}.
+Todo lo que escribas y califiques tiene que ser coherente con esa calificación: tus puntajes por rasgo deben promediar cerca de ${cal.general.toFixed(1)}, las zonas más bajas son las que más le restan y el potencial parte de ese número. No des otra calificación general distinta. Las medidas son estimaciones de una foto de celular: si una medida sale fuera de rango pero en la foto no se nota, dale más peso a lo que se ve.` : ""}`;
 
         const sistema = estilo(order.tier, order.answers ?? {});
         const inicio = Date.now();
@@ -412,13 +479,14 @@ En dimorfismo, califica qué tanto ese rasgo se acerca a lo que se percibe como 
           return { id, titulo: g.titulo, pilar: g.pilar, puntaje: items.length ? dec(prom(items.map((x) => x.puntaje)) as number) : null, items };
         }).filter((g) => g.items.length);
         const pilar = (p: string) => { const xs = grupos.filter((g) => g.pilar === p).flatMap((g) => g.items.map((x) => x.puntaje)); return xs.length ? dec(prom(xs) as number) : null; };
-        const puntajes: Obj = { armonia: armonia(m), angularidad: pilar("angularidad"), dimorfismo: pilar("dimorfismo"), rasgos: pilar("rasgos") };
+        const zIA = cal ? ZONAS_IA.map(([k]) => Number(cal.zonas[k])).filter((x) => x > 0) : [];
+        const puntajes: Obj = { armonia: zIA.length ? dec(prom(zIA) as number) : armonia(m), angularidad: pilar("angularidad"), dimorfismo: pilar("dimorfismo"), rasgos: pilar("rasgos") };
         const vals = Object.values(puntajes).filter((x) => typeof x === "number" && x > 0) as number[];
-        // close to a geometric mean: the weakest pillar pulls the total down
-        puntajes.general = vals.length ? dec(Math.pow(vals.reduce((s, x) => s * x, 1), 1 / vals.length)) : null;
+        // the overall is the AI rating they already saw; without it, close to a geometric mean of the pillars
+        puntajes.general = cal ? cal.general : vals.length ? dec(Math.pow(vals.reduce((s, x) => s * x, 1), 1 / vals.length)) : null;
         const nMedidas = (m.medidas?.length ?? 0) + (m.perfil?.medidas?.length ?? 0);
 
-        const data: Obj = { ...pr.input, ...(zo?.input ?? {}), ...(es?.input ?? {}), grupos, puntajes, evaluaciones: nMedidas + Object.keys(porId).length,
+        const data: Obj = { ...pr.input, ...(zo?.input ?? {}), ...(es?.input ?? {}), grupos, puntajes, ...(cal ? { zonas_ia: cal.zonas } : {}), evaluaciones: nMedidas + Object.keys(porId).length,
           v: VERSION, tier: order.tier, modelo: MODELO, generado: new Date().toISOString(), uso: [ev?.usage, pr.usage, zo?.usage, es?.usage], segundos: Math.round((Date.now() - inicio) / 1000) };
         if (order.tier !== "hard") { delete data.avanzado; if (data.potencial) delete data.potencial.general_hard; }
         await admin.from("reports").update({ data }).eq("order_id", order.id);
