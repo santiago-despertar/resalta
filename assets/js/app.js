@@ -999,7 +999,8 @@
       }
     }
 
-    // Before the prices: their real result, nothing blurred, on the same strict /10 scale as the report.
+    // Before the prices: their real overall score, their strongest and weakest zone in the clear and the zones
+    // in between blurred, on the same strict /10 scale as the report.
     // Then "¿quieres saber por qué?" leads to the plans.
     function mostrarPreview() {
       const st = $("#prevStep"), c = $("#mideCanvas");
@@ -1016,7 +1017,7 @@
       const total = diez(prom);
       $("#prevScore").textContent = total;
       const zs = crudo.resumen.zonas.filter(z => z.puntaje != null).sort((x, y) => y.puntaje - x.puntaje);
-      $("#prevRows").innerHTML = zs.map((z, i) => `<div class="report-row"><span>${esc(z.nombre)}</span><b class="mono">${diez(z.puntaje)}</b></div>`).join("");
+      $("#prevRows").innerHTML = zs.map((z, i) => `<div class="report-row"><span>${esc(z.nombre)}</span>${i === 0 || i === zs.length - 1 ? `<b class="mono">${diez(z.puntaje)}</b>` : `<b class="mono cal-borroso">8.8</b>`}</div>`).join("");
       const fuera = crudo.medidas.filter(m => m.estado && m.estado !== "dentro").length;
       $("#prevPq").textContent = `¿Quieres saber por qué sacaste ${total}?`;
       const debil = zs[zs.length - 1];
