@@ -17,7 +17,7 @@ const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE
 const MODELO = "claude-sonnet-5-5";
 const POR_HORA = 12, POR_DIA = 30;
 // bump when the rating prompt changes, so cached results from the old prompt are not reused
-const RUBRICA = "v5";
+const RUBRICA = "v6";
 
 export const ZONAS: [string, string][] = [
   ["proporciones", "Proporciones"], ["ojos", "Ojos"], ["nariz", "Nariz"],
@@ -43,10 +43,9 @@ Por zona califica en la misma escala de 0 a 10. Las zonas deben ser coherentes c
 const TOOL = {
   name: "calificacion", description: "Entrega la calificación.",
   input_schema: {
-    type: "object", required: ["es_cara", "parece_menor", "calidad", "general", "zonas", "razon"],
+    type: "object", required: ["es_cara", "calidad", "general", "zonas", "razon"],
     properties: {
       es_cara: { type: "boolean", description: "Hay una cara humana real y visible." },
-      parece_menor: { type: "boolean", description: "La persona parece menor de 18 años." },
       calidad: { type: "string", enum: ["buena", "regular", "mala"] },
       general: { type: "number", minimum: 0, maximum: 10 },
       zonas: { type: "object", required: ZONAS.map((z) => z[0]), properties: Object.fromEntries(ZONAS.map(([k]) => [k, { type: "number", minimum: 0, maximum: 10 }])) },
@@ -92,7 +91,7 @@ export async function calificarFotos(fotos: string[], medidas: string) {
   const x = t.input;
   const zonas = Object.fromEntries(ZONAS.map(([k]) => [k, dec(curva(Math.max(0, Math.min(10, Number(x.zonas?.[k]) || 0))))]));
   return {
-    es_cara: x.es_cara !== false, parece_menor: !!x.parece_menor, calidad: ["buena", "regular", "mala"].includes(x.calidad) ? x.calidad : "regular",
+    es_cara: x.es_cara !== false, calidad: ["buena", "regular", "mala"].includes(x.calidad) ? x.calidad : "regular",
     general: dec(curva(Math.max(0, Math.min(10, Number(x.general) || 0)))), zonas, razon: String(x.razon ?? "").slice(0, 400),
     nota_fotos: x.calidad === "regular" ? String(x.nota_fotos ?? "").trim().slice(0, 240) || null : null, uso: j.usage,
   };
@@ -145,7 +144,8 @@ Deno.serve(async (req) => {
 
     const c = await calificarFotos(fotos, medidas);
     // unusable photos are saved too (without a score), so retrying the same photo is free and still counts toward the cap
-    const motivo = !c.es_cara ? "sin_cara" : c.parece_menor ? "menor" : c.calidad === "mala" ? "foto_mala" : null;
+    // Age is never judged from the photo: the person states it (and confirms 18+) before rating.
+    const motivo = !c.es_cara ? "sin_cara" : c.calidad === "mala" ? "foto_mala" : null;
     const { data: fila, error } = await admin.from("calificaciones").insert({
       hash, modelo: MODELO, origen, general: motivo ? null : c.general, zonas: motivo ? null : c.zonas, razon: c.razon,
       calidad: motivo === "foto_mala" ? "mala" : motivo ?? c.calidad, nota_fotos: motivo ? null : c.nota_fotos, order_id: orderId, user_id: userId, ip, uso: c.uso,
