@@ -143,7 +143,7 @@ const RESULTADOS = {
     const m = puntaje();
     dibujarPuntaje($("#resCanvas"));
     $("#resScore").textContent = m.score;
-    $("#resVerdict").textContent = m.score >= 80 ? "Muy armónica" : m.score >= 70 ? "Armónica" : m.score >= 60 ? "Equilibrada, con detalles por resaltar" : "Con varios rasgos por resaltar";
+    $("#resVerdict").textContent = m.score >= 75 ? "Muy armónica" : m.score >= 62 ? "Armónica" : m.score >= 48 ? "Equilibrada, con detalles por resaltar" : "Con varios rasgos por resaltar";
     $("#resRows").innerHTML = m.parts.map(p => `<div class="report-row"><span>${p.k}</span><b class="mono cal-borroso">88</b></div>`).join("");
     return { evento: { score: m.score } };
   },
@@ -268,6 +268,10 @@ const cl = (v) => Math.max(0, Math.min(100, v));
 const near = (v, ideal, tol) => cl(100 * (1 - Math.abs(v - ideal) / tol));
 function reflect(p, a, b) { const dx = b.x - a.x, dy = b.y - a.y, t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / (dx * dx + dy * dy); const fx = a.x + t * dx, fy = a.y + t * dy; return { x: 2 * fx - p.x, y: 2 * fy - p.y }; }
 let _puntaje = null;
+// Strict scale, like a real rating: 50 is an average face, 70 is clearly attractive, a 90 is model level
+// and 100 does not happen. Proportions from one photo can't see skin, hair or body fat, so this curve
+// alone tops out at 90 even for perfect ratios.
+const estricto = raw => Math.max(15, Math.min(90, Math.round(50 + (raw - 67) * 0.9)));
 function puntaje() {
   if (_puntaje) return _puntaje;
   const Q = (i) => L[i], faceW = dn(Q(234), Q(454));
@@ -295,7 +299,7 @@ function puntaje() {
     { k: "Proporción del rostro", v: fwhr, w: 0.08, tip: "El volumen del cabello arriba o a los lados cambia la proporción de tu cara." }
   ];
   const raw = parts.reduce((s, p) => s + p.v * p.w, 0);
-  _puntaje = { score: Math.round(35 + raw * 0.6), parts };
+  _puntaje = { score: estricto(raw), parts };
   return _puntaje;
 }
 function dibujarPuntaje(canvas) { D.dibujarBelleza(canvas, img, P, { disp: 260 }); }
@@ -332,9 +336,15 @@ async function enviarLead(ev) {
       body: JSON.stringify({
         nombre, email, score: m.score,
         partes: m.parts.map(p => ({ k: p.k, v: Math.round(p.v), tip: p.tip })),
+        vid: (() => { try { return (localStorage.getItem("rs_vid") || "").slice(0, 40) || null; } catch (e) { return null; } })(),
         foto: fotoCorreo(), fuerte: sorted[0].k, debil: { k: sorted[sorted.length - 1].k, tip: sorted[sorted.length - 1].tip },
       }),
     });
+    const j = await r.json().catch(() => ({}));
+    if (j.limitado) {
+      m2.textContent = `Ya te mandamos ${j.max || 3} resultados a este correo hoy. Revisa tu bandeja (y spam) o vuelve a intentarlo mañana.`;
+      m2.className = "msg show err"; return;
+    }
     if (!r.ok) throw new Error(String(r.status));
     const metodo = "herramienta_" + TOOL;
     try { if (window.resaltaTrack) window.resaltaTrack("generate_lead", { method: metodo, score: m.score }); } catch (e) {}

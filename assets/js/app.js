@@ -609,7 +609,7 @@
 
     // each step and question is logged once per visit, so the admin panel shows where people leave the onboarding
     const unaVez = (nombre, paso) => { try { const k = "rs_ob_" + nombre + "_" + paso; if (sessionStorage.getItem(k)) return; sessionStorage.setItem(k, "1"); } catch (e) {} registrar(nombre, { paso }); };
-    const PASOS = { 1: "preguntas", 2: "fotos", 2.5: "midiendo", 3: "oferta" };
+    const PASOS = { 1: "preguntas", 2: "fotos", 2.5: "midiendo", 2.7: "preview", 3: "oferta" };
     function go(n) {
       if (PASOS[n]) unaVez("onboarding_paso", PASOS[n]);
       $$(".wstep").forEach(s => s.classList.toggle("active", s.dataset.step == n));
@@ -1002,6 +1002,32 @@
       }
     }
 
+    // Before the prices: their result, like the free rating. The overall score and most zones are blurred,
+    // the strongest zone is shown for real, so it is clear the measuring happened and the result is theirs.
+    function mostrarPreview() {
+      const st = $("#prevStep"), c = $("#mideCanvas");
+      if (!st || !crudo || !crudo.resumen) return false;
+      const esc = v => String(v ?? "").replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+      const a = (order && order.answers) || {}, nombre = String(a.nombre || "").trim().split(/\s+/)[0];
+      if (nombre) $("#prevH").textContent = `${nombre}, ya tenemos tu calificación`;
+      try { if (c && c.width) $("#prevImg").src = c.toDataURL("image/jpeg", 0.86); else $(".prev-foto").hidden = true; } catch (e) { $(".prev-foto").hidden = true; }
+      const n = crudo.medidas.length;
+      $("#prevN").textContent = n;
+      // same strict /10 scale as the report, so the preview and the paid result never disagree
+      const diez = v => (10 * Math.pow(Math.max(0, Math.min(100, v)) / 100, 2.2)).toFixed(1);
+      $("#prevScore").textContent = "8.8";
+      const zs = crudo.resumen.zonas.filter(z => z.puntaje != null).sort((x, y) => y.puntaje - x.puntaje);
+      $("#prevRows").innerHTML = zs.map((z, i) => `<div class="report-row"><span>${esc(z.nombre)}</span><b class="mono${i ? " cal-borroso" : ""}">${i ? "8.8" : diez(z.puntaje)}</b></div>`).join("");
+      const fuera = crudo.medidas.filter(m => m.estado && m.estado !== "dentro").length;
+      $("#prevNota").textContent = (zs[0] ? `Tu zona más fuerte es ${zs[0].nombre.toLowerCase()}. ` : "") +
+        (fuera ? `${fuera} de tus ${n} medidas están fuera del rango de referencia. ` : "") + "Ve tu puntaje, cada zona de tu cara y qué hacer primero para subirlo.";
+      const t = $("#tuyo"); if (t) t.hidden = true; // the plans page doesn't repeat the photo
+      const back = $("#payBack"); if (back) back.dataset.back = "2.7";
+      return true;
+    }
+    const prevGo = $("#prevGo");
+    if (prevGo) prevGo.addEventListener("click", () => go(3));
+
     $("#toPay").addEventListener("click", async () => {
       const b = $("#toPay"); b.disabled = true;
       if (sb && order) await sb.from("orders").update({ photos_consent_at: new Date().toISOString() }).eq("id", order.id);
@@ -1009,8 +1035,11 @@
       try { await animarMedicion(); } catch (e) { console.warn(e); }
       b.disabled = false;
       try { personalizarOferta(); } catch (e) { console.warn(e); }
-      go(3);
-      if (await modoMensual()) return;
+      const mensualActivo = await modoMensual();
+      let conPreview = false;
+      if (!mensualActivo) { try { conPreview = mostrarPreview(); } catch (e) { console.warn(e); } }
+      go(conPreview ? 2.7 : 3);
+      if (mensualActivo) return;
       const w = warmPay(); if (w) w.catch(() => {});
     });
 

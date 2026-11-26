@@ -66,6 +66,11 @@ async function getLandmarker() {
   return landmarker;
 }
 
+// Strict scale, like a real rating: 50 is an average face, 70 is clearly attractive, a 90 is model level
+// and 100 does not happen. Proportions from one photo can't see skin, hair or body fat, so this curve
+// alone tops out at 90 even for perfect ratios.
+const estricto = raw => Math.max(15, Math.min(90, Math.round(50 + (raw - 67) * 0.9)));
+
 // ---- geometry helpers
 const d = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const clamp = (v) => Math.max(0, Math.min(100, v));
@@ -120,8 +125,7 @@ function measure(L) {
     { k: "Proporción del rostro", v: fwhr, w: 0.08, tip: "El volumen del cabello arriba o a los lados cambia la proporción de tu cara." }
   ];
   const raw = parts.reduce((s, p) => s + p.v * p.w, 0);
-  // compress into a realistic 35-95 band so scores read like a rating, not a test grade
-  const score = Math.round(35 + raw * 0.6);
+  const score = estricto(raw);
   return { score, parts, yaw };
 }
 
@@ -241,9 +245,15 @@ $("#leadForm").addEventListener("submit", async (ev) => {
       body: JSON.stringify({
         nombre, email, score: m.score,
         partes: (m.parts || []).map(p => ({ k: p.k, v: Math.round(p.v), tip: p.tip })),
+        vid: (() => { try { return (localStorage.getItem("rs_vid") || "").slice(0, 40) || null; } catch (e) { return null; } })(),
         foto: fotoCorreo(), fuerte: sorted[0] && sorted[0].k, debil: sorted.length ? { k: sorted[sorted.length - 1].k, tip: sorted[sorted.length - 1].tip } : null,
       }),
     });
+    const j = await r.json().catch(() => ({}));
+    if (j.limitado) {
+      m2.textContent = `Ya te mandamos ${j.max || 3} resultados a este correo hoy. Revisa tu bandeja (y spam) o vuelve a intentarlo mañana.`;
+      m2.className = "msg show err"; return;
+    }
     if (!r.ok) throw new Error(String(r.status));
     try { if (window.resaltaTrack) window.resaltaTrack("generate_lead", { method: "calificacion_gratis", score: m.score }); } catch (e) {}
     try { if (window.gtag) window.gtag("event", "generate_lead", { method: "calificacion_gratis" }); } catch (e) {}
