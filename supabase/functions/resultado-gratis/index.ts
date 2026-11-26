@@ -26,7 +26,7 @@ const MAX_DIA = 3;
 // shrinks on phones, and solid bgcolor fallbacks where rgba is ignored (Outlook desktop).
 function correo(nombre: string, score: number, partes: Parte[], fuerte: string, debil: { k: string; tip?: string } | null, site: string, foto: string | null, diez = false, notaFotos = "") {
   const nivel = diez
-    ? (score >= 7.4 ? "Estás claramente arriba del promedio. Tu margen está en los detalles finos." : score >= 6.6 ? "Estás arriba del promedio y tienes mejoras claras a tu alcance." : score >= 5.2 ? "Estás en el promedio. Los cambios correctos se van a notar bastante." : "Tienes mucho margen para subir, y los cambios correctos se van a notar bastante.")
+    ? (score >= 7 ? "Estás claramente arriba del promedio. Tu margen está en los detalles finos." : score >= 5.5 ? "Estás arriba del promedio y tienes mejoras claras a tu alcance." : score >= 4.5 ? "Estás en el promedio. Los cambios correctos se van a notar bastante." : "Tienes mucho margen para subir, y los cambios correctos se van a notar bastante.")
     : (score >= 72 ? "Tienes una cara muy armónica. Tu margen está en los detalles finos." : score >= 55 ? "Tienes una buena base y varias mejoras claras a tu alcance." : "Tienes mucho potencial. Los cambios correctos se van a notar bastante.");
   const nf = String(notaFotos || "").trim().replace(/[.\s]+$/, "");
   const tope = diez ? 10 : 100, txt = (v: number) => diez ? v.toFixed(1) : String(Math.round(v));
@@ -79,7 +79,7 @@ function correo(nombre: string, score: number, partes: Parte[], fuerte: string, 
       ${fuerte ? `<div style="margin-top:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,.22);font-family:${sans};font-size:16px;line-height:25px;color:${W}">Tu punto más fuerte es <b style="color:#FFFFFF;font-weight:600">${esc(fuerte.toLowerCase())}</b>.${debil && debil.k && debil.k !== fuerte ? ` Lo que más te baja el puntaje es <b style="color:#FFFFFF;font-weight:600">${esc(debil.k.toLowerCase())}</b>.` : ""}</div>` : ""}`) : ""}
     ${card(`<div style="text-align:center">
       <div style="font-family:${sans};font-size:24px;line-height:31px;font-weight:300;letter-spacing:-.01em;color:#FFFFFF">¿Quieres saber por qué te dimos ${s}?</div>
-      <div style="margin:14px auto 26px;max-width:430px;font-family:${sans};font-size:16px;line-height:25px;color:${W}">${diez ? "Esta calificación ve tu cara de frente en una escala real donde 6 es el promedio." : "Este puntaje mide unas cuantas proporciones de tu cara de frente."} El análisis completo revisa más de 110 rasgos con tus fotos de frente y de perfil, y te dice qué cambiar primero, qué no vale la pena y cómo te verías con tu plan.</div>
+      <div style="margin:14px auto 26px;max-width:430px;font-family:${sans};font-size:16px;line-height:25px;color:${W}">${diez ? "Esta calificación ve tu cara de frente en una escala real donde 5 es el promedio." : "Este puntaje mide unas cuantas proporciones de tu cara de frente."} El análisis completo revisa más de 110 rasgos con tus fotos de frente y de perfil, y te dice qué cambiar primero, qué no vale la pena y cómo te verías con tu plan.</div>
       <a href="${url}" style="display:inline-block;background:#FFFFFF;color:#16191D;text-decoration:none;padding:17px 34px;border-radius:999px;font-family:${sans};font-size:16px;font-weight:600">Ver mi análisis completo</a></div>`, "34px 24px 34px")}
   </table>
 </td></tr></table>
