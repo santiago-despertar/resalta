@@ -42,7 +42,7 @@ function initFoto() {
   adult.addEventListener("change", ready);
 
   async function usar(f) {
-    img = await createImageBitmap(f); _cal = null;
+    img = await createImageBitmap(f); _cal = null; fotoId = await idFoto(f);
     const slot = $("#toolDrop");
     let p = slot.querySelector(":scope > img"); if (!p) { p = document.createElement("img"); slot.prepend(p); }
     p.src = URL.createObjectURL(f); slot.classList.add("done");
@@ -291,14 +291,20 @@ function recorte() {
   c.getContext("2d").drawImage(img, x0, y0, x1 - x0, y1 - y0, 0, 0, W, Hh);
   return c.toDataURL("image/jpeg", 0.88);
 }
-let _cal = null;
+// SHA-256 of the original photo file: the rating is stored per photo, so the same picture gets the same number
+// in the free rating, the beauty test and the onboarding.
+async function idFoto(f) {
+  try { const b = await crypto.subtle.digest("SHA-256", await f.arrayBuffer()); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join(""); }
+  catch (e) { return null; }
+}
+let _cal = null, fotoId = null;
 async function calificarIA() {
   if (_cal) return _cal;
   const C = window.RESALTA || {};
   const r = await fetch(`${C.SUPABASE_URL}/functions/v1/calificar`, {
     method: "POST",
     headers: { "Content-Type": "application/json", apikey: C.SUPABASE_ANON_KEY, Authorization: `Bearer ${C.SUPABASE_ANON_KEY}` },
-    body: JSON.stringify({ fotos: [recorte()] }),
+    body: JSON.stringify({ fotos: [recorte()], foto_id: fotoId }),
   });
   const j = await r.json().catch(() => ({}));
   if (j.limitado) throw new Error("limitado");

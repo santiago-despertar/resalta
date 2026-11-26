@@ -857,13 +857,33 @@
       }
       el.classList.add("done"); uploaded.add(key); check();
       fotosIA[key] = blob;
-      if (key === "frente") medir(blob, m);
+      if (key === "frente") { fotoIdFrente = await idFoto(file); medir(blob, m); }
       if (key === "perfil_izq" || key === "perfil_der") medirPerfil(key, blob);
     }
 
     // Everything measured so far for this order. Saved whole each time so one photo never erases another.
     const M = { frente: null, perfil: {} };
     const fotosIA = {};
+    let fotoIdFrente = null;
+    // SHA-256 of the original photo file: the rating is stored per photo, so the same picture gets the same number
+    // here as in the free rating and the beauty test.
+    async function idFoto(f) {
+      try { const b = await crypto.subtle.digest("SHA-256", await f.arrayBuffer()); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join(""); }
+      catch (e) { return null; }
+    }
+    // The face crop the free rating and the beauty test send (same margins, size and quality), so all three flows
+    // show the AI the same picture.
+    function recorteCara() {
+      if (!crudo || !crudo.bmp || !crudo.puntos) return null;
+      const img = crudo.bmp, xs = crudo.puntos.map(q => q.x), ys = crudo.puntos.map(q => q.y);
+      const bx0 = Math.min(...xs), bx1 = Math.max(...xs), by0 = Math.min(...ys), by1 = Math.max(...ys);
+      const pw = (bx1 - bx0) * 0.6, ph = (by1 - by0) * 0.55;
+      const x0 = Math.max(0, bx0 - pw), x1 = Math.min(img.width, bx1 + pw), y0 = Math.max(0, by0 - ph), y1 = Math.min(img.height, by1 + ph * 0.6);
+      const k = Math.min(1, 900 / Math.max(x1 - x0, y1 - y0)), W = Math.round((x1 - x0) * k), H = Math.round((y1 - y0) * k);
+      const c = document.createElement("canvas"); c.width = W; c.height = H;
+      c.getContext("2d").drawImage(img, x0, y0, x1 - x0, y1 - y0, 0, 0, W, H);
+      return c.toDataURL("image/jpeg", 0.88);
+    }
 
     // The AI rating (calificar function): the one overall score and zone scores Resalta shows everywhere.
     // It sees the front and profile photos plus the front measurements that came out of range.
@@ -874,15 +894,11 @@
       c.getContext("2d").drawImage(b, 0, 0, c.width, c.height);
       return c.toDataURL("image/jpeg", 0.86);
     }
+    // Rated from the front photo only, cropped like the free rating, so the same photo gets the same number in both.
     async function pedirCalificacion() {
-      const fs = [fotosIA.frente, fotosIA.perfil_izq || fotosIA.perfil_der].filter(Boolean);
-      if (!sb || !order || !fs.length) return null;
-      const fuera = crudo ? crudo.medidas.filter(x => x.estado && x.estado !== "dentro") : [];
-      const medidas = ZONAS_IA.map(([id, n]) => {
-        const xs = fuera.filter(x => x.zona === id); if (!xs.length) return "";
-        return `${n}: ` + xs.map(x => `${x.nombre} (${x.valor}${x.unidad || ""}, referencia ${x.rango[0]} a ${x.rango[1]})`).join("; ");
-      }).filter(Boolean).join("\n");
-      return fnCall("calificar", { order_id: order.id, fotos: await Promise.all(fs.map(f => aJpeg(f))), medidas });
+      if (!sb || !order || !fotosIA.frente) return null;
+      const foto = recorteCara() || await aJpeg(fotosIA.frente);
+      return fnCall("calificar", { order_id: order.id, fotos: [foto], foto_id: fotoIdFrente });
     }
     async function guardarMedidas() {
       if (!M.frente) return;

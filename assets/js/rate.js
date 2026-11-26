@@ -11,8 +11,15 @@ function say(t, type = "err") { msg.textContent = t; msg.className = "msg show "
 function ready() { go.disabled = !(img && adult.checked); }
 adult.addEventListener("change", ready);
 
+// SHA-256 of the original photo file: the rating is stored per photo, so the same picture gets the same number
+// in the free rating, the beauty test and the onboarding.
+async function idFoto(f) {
+  try { const b = await crypto.subtle.digest("SHA-256", await f.arrayBuffer()); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join(""); }
+  catch (e) { return null; }
+}
+let fotoId = null;
 async function usar(f) {
-  img = await createImageBitmap(f);
+  img = await createImageBitmap(f); fotoId = await idFoto(f);
   const slot = $("#rateDrop");
   let p = slot.querySelector(":scope > img"); if (!p) { p = document.createElement("img"); slot.prepend(p); }
   p.src = URL.createObjectURL(f); slot.classList.add("done");
@@ -94,7 +101,7 @@ async function calificarIA(L) {
   const r = await fetch(`${C.SUPABASE_URL}/functions/v1/calificar`, {
     method: "POST",
     headers: { "Content-Type": "application/json", apikey: C.SUPABASE_ANON_KEY, Authorization: `Bearer ${C.SUPABASE_ANON_KEY}` },
-    body: JSON.stringify({ fotos: [recorte(L)] }),
+    body: JSON.stringify({ fotos: [recorte(L)], foto_id: fotoId }),
   });
   const j = await r.json().catch(() => ({}));
   if (j.limitado) throw new Error("limitado");
