@@ -241,6 +241,13 @@ go.addEventListener("click", async () => {
   } finally { go.disabled = false; go.textContent = "Calcular mi calificación"; }
 });
 
+function notaFotosHTML(nota) {
+  // the AI flags photos that make a face look worse than it is; the person is told so, with how to take a better one
+  const t = String(nota || "").trim().replace(/[.\s]+$/, "");
+  if (!t) return "";
+  const e = s => s.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+  return `<div><b>Un comentario sobre tu foto</b><p>${e(t)}. Eso suele bajar la calificación unas décimas. Para la más justa, toma otra con luz de frente, el celular a la altura de tus ojos y a un brazo de distancia o más, y la cara relajada.</p><button type="button" class="tool-otra" data-otra-foto style="text-align:left;margin-top:8px">Probar con otra foto</button></div>`;
+}
 // the result is shown blurred: the numbers are real but unreadable until they leave their email
 let resultado = null;
 function bloquear(cal) {
@@ -248,6 +255,12 @@ function bloquear(cal) {
   resultado = { id: cal.id, score: Number(cal.general), parts };
   $("#rScore").textContent = "8.8";
   $("#rRows").innerHTML = parts.map(p => `<div class="report-row"><span>${p.k}</span><b class="mono cal-borroso">8.8</b></div>`).join("");
+  let nf = $("#rFotoNota");
+  if (!nf) {
+    $("#rRows").insertAdjacentHTML("afterend", '<div class="tool-tips" id="rFotoNota" style="margin-top:16px"></div>'); nf = $("#rFotoNota");
+    nf.addEventListener("click", ev => { if (ev.target.closest("[data-otra-foto]")) ir("foto"); });
+  }
+  nf.innerHTML = notaFotosHTML(cal.nota_fotos); nf.hidden = !nf.innerHTML;
   try { if (window.resaltaTrack) window.resaltaTrack("calificacion_resultado", { score: resultado.score }); } catch (e) {}
   ir("bloqueado");
 }

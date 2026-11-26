@@ -8,7 +8,7 @@
   const fecha = d => new Date(d).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" });
   const NIVEL = { alto: "Impacto alto", medio: "Impacto medio", bajo: "Impacto bajo" };
   const ESF = { bajo: "poco esfuerzo", medio: "esfuerzo medio", alto: "mucho esfuerzo" };
-  const nivel = v => v == null ? "" : v < 4.5 ? "Por debajo del promedio" : v < 5.5 ? "En el promedio" : v < 6.5 ? "Arriba del promedio" : v < 7.5 ? "Atractivo" : v < 8.5 ? "Muy atractivo" : "Excepcional";
+  const nivel = v => v == null ? "" : v < 5.2 ? "Por debajo del promedio" : v < 6.6 ? "En el promedio" : v < 7.4 ? "Arriba del promedio" : v < 8.2 ? "Atractivo" : v < 8.9 ? "Muy atractivo" : "Excepcional";
   function parsear(v) {
     if (typeof v !== "string") return v;
     const t = v.trim(); try { return JSON.parse(t); } catch (e) { return v; }
@@ -52,7 +52,7 @@
         <div>
           <p class="label">Calificación general</p>
           <p class="doc-score">${f1(P.general)}<span> / 10</span></p>
-          <p class="doc-nivel">${esc(nivel(P.general))}. 5 es el promedio de la población.</p>
+          <p class="doc-nivel">${esc(nivel(P.general))}. 6 es el promedio de la población.</p>
           <div class="doc-pils">${pil.map(([k, n]) => `<div><span>${n}</span>${barra(P[k])}<b>${f1(P[k])}</b></div>`).join("")}</div>
           ${r.arquetipo && r.arquetipo.nombre ? `<p class="label" style="margin-top:22px">Tu tipo de cara</p><p class="doc-arq"><b>${esc(r.arquetipo.nombre.charAt(0).toUpperCase() + r.arquetipo.nombre.slice(1))}.</b> ${esc(r.arquetipo.texto)}</p>` : ""}
         </div>
@@ -90,7 +90,7 @@
     h += seccion("Rasgos evaluados", Object.keys(TIT).map(k => {
       const gs = (r.grupos || []).filter(g => g.pilar === k); if (!gs.length) return "";
       return `<h3>${TIT[k]} <span>${f1(P[k])} / 10</span></h3>${gs.map(g => `<div class="doc-grupo"><div class="doc-zona-t"><b>${esc(g.titulo)}</b><span>${f1(g.puntaje)}</span></div>${(g.items || []).map(x => `<div class="doc-row"><div class="doc-row-t"><span>${esc(x.nombre)}</span>${barra(x.puntaje)}<b>${f1(x.puntaje)}</b></div><p>${esc(x.nota)}</p></div>`).join("")}</div>`).join("")}`;
-    }).join(""), "Cada rasgo calificado de 0 a 10, donde 5 es el promedio.", true);
+    }).join(""), "Cada rasgo calificado de 0 a 10, donde 6 es el promedio.", true);
 
     // ---- measurements
     // measurements against their reference range: in, near or outside (the only score in the report is the overall rating)

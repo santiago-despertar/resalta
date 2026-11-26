@@ -148,8 +148,11 @@ const RESULTADOS = {
     const c = await pre;
     dibujarPuntaje($("#resCanvas"));
     $("#resScore").textContent = c.general.toFixed(1);
-    $("#resVerdict").textContent = nivel(c.general) + (nivel(c.general) === "En el promedio" ? ", donde está la mayoría de la gente." : ". 5 es el promedio.");
+    $("#resVerdict").textContent = nivel(c.general) + (nivel(c.general) === "En el promedio" ? ", donde está la mayoría de la gente." : ". 6 es el promedio.");
     $("#resRows").innerHTML = ZONAS.map(([, k]) => `<div class="report-row"><span>${k}</span><b class="mono cal-borroso">8.8</b></div>`).join("");
+    let nf = $("#resFotoNota");
+    if (!nf) { $("#resRows").insertAdjacentHTML("afterend", '<div class="tool-tips" id="resFotoNota" style="margin-top:16px"></div>'); nf = $("#resFotoNota"); }
+    nf.innerHTML = notaFotosHTML(c.nota_fotos); nf.hidden = !nf.innerHTML;
     return { evento: { score: c.general } };
   },
 
@@ -276,7 +279,7 @@ const ZONAS = [
   ["mandibula", "Mandíbula y mentón", "Menos grasa facial, postura de cuello y una barba bien definida marcan la mandíbula."],
   ["simetria", "Simetría", "Pequeñas asimetrías se notan menos con el corte, la barba y la postura correctos."]
 ];
-const nivel = v => v < 4.5 ? "Por debajo del promedio" : v < 5.5 ? "En el promedio" : v < 6.5 ? "Arriba del promedio" : v < 7.5 ? "Atractivo" : v < 8.5 ? "Muy atractivo" : "Excepcional";
+const nivel = v => v < 5.2 ? "Por debajo del promedio" : v < 6.6 ? "En el promedio" : v < 7.4 ? "Arriba del promedio" : v < 8.2 ? "Atractivo" : v < 8.9 ? "Muy atractivo" : "Excepcional";
 // the face with some margin, without lines: what the AI looks at
 function recorte() {
   const xs = P.map(q => q.x), ys = P.map(q => q.y);
@@ -302,6 +305,13 @@ async function calificarIA() {
   if (j.motivo) throw new Error(j.motivo);
   if (!r.ok || !j.ok) throw new Error("ia");
   _cal = j; return j;
+}
+function notaFotosHTML(nota) {
+  // the AI flags photos that make a face look worse than it is; the person is told so, with how to take a better one
+  const t = String(nota || "").trim().replace(/[.\s]+$/, "");
+  if (!t) return "";
+  const e = s => s.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+  return `<div><b>Un comentario sobre tu foto</b><p>${e(t)}. Eso suele bajar la calificación unas décimas. Para la más justa, toma otra con luz de frente, el celular a la altura de tus ojos y a un brazo de distancia o más, y la cara relajada.</p></div>`;
 }
 function dibujarPuntaje(canvas) { D.dibujarBelleza(canvas, img, P, { disp: 260 }); }
 function nota(t) {
