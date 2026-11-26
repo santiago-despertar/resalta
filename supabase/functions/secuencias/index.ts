@@ -210,18 +210,20 @@ Deno.serve(async (req) => {
   // Engagement: no point sending sales emails nobody opens. The first email of a sequence always goes. Someone
   // who has never opened or clicked anything from us gets one more chance (many land in Promotions) and then
   // leaves the sequence. Someone who has opened before keeps getting them until they skip two in a row.
-  // Opens and clicks come from the tracking pixel and links in correos_log; the free-rating result email counts.
+  // People who reached the payment page get more room: three more chances if they never opened, and they
+  // leave only after skipping four in a row. Opens and clicks come from the tracking pixel and links in
+  // correos_log; the free-rating result email counts.
   const { data: logs } = await admin.from("correos_log").select("email,tipo,enviado_at,abierto_at,clic_at").not("ok", "is", false)
     .gt("enviado_at", new Date(ahora - 60 * 864e5).toISOString()).order("enviado_at");
   const historial: Record<string, Obj[]> = {};
   for (const l of logs ?? []) (historial[String(l.email).toLowerCase()] ??= []).push(l);
   const visto = (x: Obj) => !!(x.abierto_at || x.clic_at);
-  const sinInteres = (email: string) => {
+  const sinInteres = (email: string, pago = false) => {
     const h = historial[email.toLowerCase()] ?? [], seq = h.filter((x) => x.tipo === "secuencia");
     if (!seq.length) return false;
-    if (!h.some(visto)) return seq.length >= 2;
-    const ult = seq.slice(-2);
-    return ult.length === 2 && !ult.some(visto);
+    if (!h.some(visto)) return seq.length >= (pago ? 4 : 2);
+    const n = pago ? 4 : 2, ult = seq.slice(-n);
+    return ult.length === n && !ult.some(visto);
   };
   const porSec: Record<string, Obj[]> = {};
   for (const c of correos ?? []) (porSec[c.secuencia] ??= []).push(c);
@@ -273,7 +275,7 @@ Deno.serve(async (req) => {
     // Orders from before 26-nov have no level saved, so the site's begin_checkout event counts too.
     const { count: alPago } = await admin.from("orders").select("id", { count: "exact", head: true }).eq("user_id", ins.user_id).not("nivel_precio", "is", null);
     const { count: abrioPago } = alPago ? { count: 0 } : await admin.from("eventos").select("id", { count: "exact", head: true }).eq("user_id", ins.user_id).eq("nombre", "begin_checkout");
-    if (!(alPago ?? 0) && !(abrioPago ?? 0) && sinInteres(ins.email)) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "no_abre" }).eq("user_id", ins.user_id); resumen.salieron++; continue; }
+    if (sinInteres(ins.email, !!(alPago ?? 0) || !!(abrioPago ?? 0))) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "no_abre" }).eq("user_id", ins.user_id); resumen.salieron++; continue; }
     const { data: ud } = await admin.auth.admin.getUserById(ins.user_id);
     if (!ud?.user) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "sin_cuenta" }).eq("user_id", ins.user_id); continue; }
     const a = o?.answers ?? {}, nombre = nombreDe(a, ud.user);
