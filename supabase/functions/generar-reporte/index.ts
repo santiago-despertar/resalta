@@ -142,9 +142,9 @@ const dec = (v: number) => Math.round(v * 10) / 10;
 // Orders without one (older orders) get rated here once, with the same prompt as the calificar function.
 const MODELO_IA = "claude-sonnet-5-5";
 // Calibration measured on test faces: the model puts ordinary faces at about 4.6, faces a bit above average at 6.4
-// and top models at 8.4 to 8.9. Resalta's published scale puts the average at 6 and top models at about 9,
-// so this curve moves an ordinary face to about 6.0 and a top model to about 9.0. 10 stays out of reach.
-// The prompt keeps the model's own 5-centered scale on purpose: that is what the test faces were measured against.
+// and top models at 8.4 to 8.9. The site still says 5 is the average, but the score is deliberately generous:
+// this curve moves an ordinary face to about 6.0 (reads as a bit above average) and a top model to about 9.0.
+// 10 stays out of reach. The prompt keeps the model's own 5-centered scale: the test faces were measured against it.
 const CURVA: [number, number][] = [[0, 0], [2.5, 3.0], [3.6, 4.6], [4.6, 5.9], [6.4, 7.3], [8.4, 9.0], [9, 9.3], [10, 9.7]];
 const curva = (x: number) => {
   for (let i = 1; i < CURVA.length; i++) {
@@ -440,7 +440,7 @@ Medidas de frente:
 ${m.medidas.map(fila).join("\n")}
 ${m.perfil?.medidas?.length ? `\nMedidas de perfil (tomadas de la silueta; los milímetros son aproximados):\n${m.perfil.medidas.map(fila).join("\n")}` : "\nNo hay medidas de perfil para este pedido."}
 ${m.avisos?.length ? `\nAvisos de calidad de la foto de frente: ${m.avisos.join(" ")}` : ""}
-${cal ? `\nCalificación de Resalta, ya fijada y que el cliente ya vio: ${cal.general.toFixed(1)}/10 en general (6 es el promedio). Por zona: ${ZONAS_IA.map(([k, n]) => `${n} ${Number(cal.zonas[k]).toFixed(1)}`).join(", ")}.
+${cal ? `\nCalificación de Resalta, ya fijada y que el cliente ya vio: ${cal.general.toFixed(1)}/10 en general (en la escala que ve el cliente, 5 es el promedio, así que un 6 se lee como un poco arriba del promedio). Por zona: ${ZONAS_IA.map(([k, n]) => `${n} ${Number(cal.zonas[k]).toFixed(1)}`).join(", ")}.
 Todo lo que escribas y califiques tiene que ser coherente con esa calificación: tus puntajes por rasgo deben promediar cerca de ${cal.general.toFixed(1)}, las zonas más bajas son las que más le restan y el potencial parte de ese número. No des otra calificación general distinta. Las medidas son estimaciones de una foto de celular: si una medida sale fuera de rango pero en la foto no se nota, dale más peso a lo que se ve.` : ""}`;
 
         const sistema = estilo(order.tier, order.answers ?? {});
@@ -475,13 +475,13 @@ Todo lo que escribas y califiques tiene que ser coherente con esa calificación:
           pedir(tEval, `Califica de 0 a 10 cada uno de estos rasgos a partir de las fotos, uno por cada id, sin saltarte ninguno:
 ${Object.values(CAT).map((g) => `${g.titulo}: ${Object.entries(g.items).map(([id, n]) => `${id} (${n})`).join(", ")}`).join("\n")}
 
-Escala: 6 es una persona promedio de su edad y sexo. La mayoría de la gente queda entre 5 y 7. Un 7.5 ya es claramente por encima del promedio, un 8.5 es poco común y un 9 es nivel de modelo profesional. Sé estricto y usa decimales; no regales puntos. Más alto siempre es mejor (por ejemplo, en acné un 9 es piel limpia).
+Escala: la misma de la calificación de Resalta, que es generosa. Una persona común de su edad y sexo saca alrededor de 6 y la mayoría de la gente queda entre 5 y 7. Un 7.5 ya destaca, un 8.5 es poco común y un 9 es nivel de modelo profesional. Al cliente se le dice que 5 es el promedio, así que a un 6 nunca le digas promedio: es un poco arriba del promedio. Sé estricto y usa decimales; no regales puntos. Más alto siempre es mejor (por ejemplo, en acné un 9 es piel limpia).
 En dimorfismo, califica qué tanto ese rasgo se acerca a lo que se percibe como atractivo para su sexo. Si un rasgo no aplica o no se alcanza a ver (por ejemplo vello facial en una mujer, o cabello tapado), pon 6 y dilo en la nota.`, (r: Obj) => hay(r.evaluaciones) && r.evaluaciones.length >= ids.length * 0.8, 12000),
           pedir(T_PRINCIPAL, `Escribe la parte principal del reporte: resumen, arquetipo, fortalezas, prioridades y plan por fases.${order.tier === "hard"
             ? " Incluye también avanzado: procedimientos estéticos que se suelen considerar para un rostro con estas proporciones, qué hace cada uno y qué pensar antes. Preséntalo como información general que debe evaluar un médico certificado, no como una recomendación tuya, y di cuando algo no parece indicado."
             : " No llenes avanzado, este cliente tiene el plan esencial."}`, okPrincipal, 12000),
           pedir(tZonas, `Escribe la lectura zona por zona y las de ${angulos.join(", ").replace(/, ([^,]*)$/, " y $1")}.${conSonrisa ? "" : " No hay foto sonriendo: no opines sobre dientes ni sonrisa."}`, okZonas, 12000),
-          pedir(T_ESTILO, `Escribe piel, color personal y cabello, barba, cejas y lentes. Además: longevidad (edad visual contra su edad real de ${(order.answers ?? {}).edad || "?"} años, y la que podría aparentar con su plan) y potencial (calificación realista que podría alcanzar en general y en cada grupo, en la misma escala donde 6 es el promedio; el potencial casi nunca sube más de 1.5 puntos sin procedimientos).${order.tier === "hard" ? " Incluye general_hard." : " No llenes general_hard."}`, okEstilo, 12000),
+          pedir(T_ESTILO, `Escribe piel, color personal y cabello, barba, cejas y lentes. Además: longevidad (edad visual contra su edad real de ${(order.answers ?? {}).edad || "?"} años, y la que podría aparentar con su plan) y potencial (calificación realista que podría alcanzar en general y en cada grupo, en la misma escala de su calificación; el potencial casi nunca sube más de 1.5 puntos sin procedimientos).${order.tier === "hard" ? " Incluye general_hard." : " No llenes general_hard."}`, okEstilo, 12000),
         ]);
         if (!pr) { await fallar("modelo"); return; }
 
