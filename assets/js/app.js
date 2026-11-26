@@ -450,7 +450,7 @@
     box.innerHTML = `<span class="label">Guarda tu acceso</span>
       <h2>Crea tu contraseña</h2>
       <p class="hint">Así entras a tu reporte desde cualquier celular o computadora con <b>${String(u.email || "tu correo").replace(/[<>&"]/g, "")}</b>.</p>
-      <form class="acceso-f" novalidate><input type="password" name="clave" autocomplete="new-password" minlength="8" placeholder="Contraseña (mínimo 8 caracteres)" required><button class="btn btn-primary" type="submit">Guardar</button></form>
+      <form class="acceso-f" novalidate><input type="password" name="clave" autocomplete="new-password" minlength="8" placeholder="Contraseña, mínimo 8" aria-label="Contraseña, mínimo 8 caracteres" required><button class="btn btn-primary" type="submit">Guardar</button></form>
       <div class="msg"></div>
       <button class="btn btn-google btn-block" type="button"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.2l7.9 6.2C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.7 6c4.5-4.2 6.9-10.3 6.9-17.7z"/><path fill="#FBBC05" d="M10.6 28.6A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6l-7.9-6.2A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l8-6.2z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.7-6c-2.1 1.4-4.9 2.3-8.2 2.3-6.2 0-11.5-4.1-13.4-9.9l-8 6.2C6.6 42.6 14.6 48 24 48z"/></svg> O conecta tu Google</button>`;
     const f = box.querySelector("form"), m = box.querySelector(".msg");
@@ -742,6 +742,14 @@
       const fn = $("#aboutForm").nombre;
       if (fn && !fn.value && user.user_metadata && user.user_metadata.full_name) fn.value = user.user_metadata.full_name;
       if (quiz) quiz.refrescar(true, order && order.answers); // we already know their name from sign-up: start at the next question
+      // Someone coming back (from their account or an email) who already answered everything and sent their photos
+      // goes straight to the plans instead of clicking through every question and uploading the photos again.
+      if (order && order.answers && order.answers.objetivo && order.photos_consent_at && location.hash !== "#editar" && !(await subEstado).activa) {
+        if (quiz) quiz.alFinal();
+        const back = $("#payBack"); if (back) back.dataset.back = "2";
+        go(3);
+        const w = warmPay(); if (w) w.catch(() => {});
+      }
     })();
 
     $("#aboutForm").addEventListener("submit", async (ev) => {
@@ -772,8 +780,9 @@
       msg(m, text);
     }
 
-    import("/assets/js/medidas.js?v=20").then(m => m.precargar()).catch(() => {});
-    import("/assets/js/perfil.js?v=20").then(m => m.precargarPerfil()).catch(() => {});
+    // One after the other: both models need the same 2 MB engine file, and loading them at the same time downloads it twice.
+    import("/assets/js/medidas.js?v=20").then(m => m.precargar()).catch(() => {})
+      .then(() => import("/assets/js/perfil.js?v=20")).then(m => m.precargarPerfil()).catch(() => {});
 
     const grid = $("#photoGrid"), gridOpc = $("#photoGridOpc") || grid;
     SLOTS.forEach(([key, title, sub, opcional]) => {
