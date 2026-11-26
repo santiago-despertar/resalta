@@ -1072,6 +1072,14 @@
       const a = (order && order.answers) || {}, nombre = String(a.nombre || "").trim().split(/\s+/)[0];
       if (nombre) $("#prevH").textContent = `${nombre}, esta es tu calificación`;
       try { if (c && c.width) $("#prevImg").src = c.toDataURL("image/jpeg", 0.86); else $(".prev-foto").hidden = true; } catch (e) { $(".prev-foto").hidden = true; }
+      // the same picture goes in their first follow-up email, next to their rating (sent smaller)
+      try {
+        if (c && c.width && order) {
+          const W = Math.min(600, c.width), H = Math.round(c.height * W / c.width), o2 = document.createElement("canvas");
+          o2.width = W; o2.height = H; o2.getContext("2d").drawImage(c, 0, 0, W, H);
+          fnCall("calificar", { accion: "foto_correo", order_id: order.id, foto: o2.toDataURL("image/jpeg", 0.82) }).catch(() => {});
+        }
+      } catch (e) {}
       const n = crudo.medidas.length;
       $("#prevN").textContent = n;
       // the AI rating, saved with the order: the report shows this same number
