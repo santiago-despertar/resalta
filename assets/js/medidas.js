@@ -14,7 +14,7 @@ async function getLandmarker() {
 }
 
 // Starts loading the model ahead of time so the first measurement is not the one that waits for it.
-export function precargar() { getLandmarker().catch(() => {}); }
+export function precargar() { return getLandmarker().catch(() => {}); }
 
 // ---- geometry (all points are in image pixels)
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
