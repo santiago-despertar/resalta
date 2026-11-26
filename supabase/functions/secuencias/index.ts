@@ -119,7 +119,7 @@ export function esMujer(nombre: string) {
 const CON_ARTICULO: Record<string, string> = { "simetría": "tu simetría", "tercios faciales": "tus tercios faciales", "tercio inferior": "tu tercio inferior", "ojos": "tus ojos", "inclinación de ojos": "la inclinación de tus ojos", "mandíbula": "tu mandíbula", "proporción del rostro": "la proporción de tu rostro" };
 const conArticulo = (k: string) => { const x = (k || "").trim().toLowerCase(); return x ? (CON_ARTICULO[x] ?? x) : ""; };
 const LANZAMIENTO_GRATIS = "2026-11-15T23:59:00Z"; // only people who did the free rating from here on
-const PUNTAJE_ALTO = 80;
+const PUNTAJE_ALTO = 70;
 
 const nombreDe = (a: Obj, u: Obj) => String(a?.nombre || u?.user_metadata?.full_name || "").trim().split(/\s+/)[0] || "Hola";
 const objetivoTexto = (o: string) => (o || "").split(", ").filter(Boolean).map((x) => x.toLowerCase()).join(" y ") || "tu imagen";
@@ -182,6 +182,11 @@ Deno.serve(async (req) => {
     admin.from("bajas").select("email"),
   ]);
   const compro = new Set((pagos ?? []).map((o: Obj) => o.user_id));
+  // Across every sequence, an address gets at most one sales email every 20 hours. The free-rating result,
+  // the "analysis ready" email and account emails are not counted: the person asked for those.
+  const { data: recientes } = await admin.from("correos_log").select("email").eq("tipo", "secuencia").not("ok", "is", false)
+    .gt("enviado_at", new Date(ahora - 20 * 3600e3).toISOString());
+  const hoy = new Set((recientes ?? []).map((x: Obj) => String(x.email).toLowerCase()));
   const bajas = new Set((bajasL ?? []).map((b: Obj) => b.email));
   const porSec: Record<string, Obj[]> = {};
   for (const c of correos ?? []) (porSec[c.secuencia] ??= []).push(c);
@@ -190,18 +195,19 @@ Deno.serve(async (req) => {
   const limite = new Date(ahora - ESPERA_MIN * 60e3).toISOString(), mes = new Date(ahora - 30 * 864e5).toISOString();
   const { data: borradores } = await admin.from("orders").select("id,user_id,answers,created_at").eq("status", "borrador")
     .not("answers", "is", null).lt("created_at", limite).gt("created_at", mes).order("created_at", { ascending: false }).limit(500);
-  const { data: ya } = await admin.from("secuencia_inscritos").select("user_id");
+  const { data: ya } = await admin.from("secuencia_inscritos").select("user_id,email");
   const inscritos = new Set((ya ?? []).map((x: Obj) => x.user_id));
+  const inscritosEmail = new Set((ya ?? []).map((x: Obj) => String(x.email ?? "").toLowerCase()));
   for (const o of borradores ?? []) {
     if (inscritos.has(o.user_id) || compro.has(o.user_id) || !o.answers?.objetivo) continue;
     const { data: ud } = await admin.auth.admin.getUserById(o.user_id);
     const email = (ud?.user?.email ?? "").toLowerCase();
-    if (!email || bajas.has(email)) continue;
+    if (!email || bajas.has(email) || inscritosEmail.has(email)) continue;
     const sec = elegir(o.answers.objetivo);
     if (!porSec[sec]?.length) continue;
     const { error } = await admin.from("secuencia_inscritos").insert({ user_id: o.user_id, email, secuencia: sec, order_id: o.id });
     if (error) continue;
-    inscritos.add(o.user_id); resumen.inscritos++;
+    inscritos.add(o.user_id); inscritosEmail.add(email); resumen.inscritos++;
     // out of the free-rating sequence: this one is about what they told us
     await fetch(`https://api.sender.net/v2/subscribers/groups/${GRUPO_LEADS}`, { method: "DELETE",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", Accept: "application/json" },
@@ -222,10 +228,11 @@ Deno.serve(async (req) => {
     if (!sig) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "terminó" }).eq("user_id", ins.user_id); continue; }
     if (ahora + 120000 < new Date(ins.desde).getTime() + Number(sig.dias) * 864e5) continue;
     // never two emails on the same day
-    const { data: ult } = await admin.from("secuencia_envios").select("enviado_at").eq("user_id", ins.user_id).eq("ok", true).order("enviado_at", { ascending: false }).limit(1);
-    if (ult?.[0] && ahora - new Date(ult[0].enviado_at).getTime() < 20 * 3600e3) continue;
+    if (hoy.has(String(ins.email).toLowerCase())) continue;
 
-    const { data: o } = await admin.from("orders").select("answers").eq("id", ins.order_id).maybeSingle();
+    // if they filled the form more than once, the emails use their newest answers
+    const { data: os } = await admin.from("orders").select("answers").eq("user_id", ins.user_id).not("answers", "is", null).order("created_at", { ascending: false }).limit(1);
+    const o = os?.[0] ?? (await admin.from("orders").select("answers").eq("id", ins.order_id).maybeSingle()).data;
     const { data: ud } = await admin.auth.admin.getUserById(ins.user_id);
     if (!ud?.user) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "sin_cuenta" }).eq("user_id", ins.user_id); continue; }
     const a = o?.answers ?? {}, nombre = nombreDe(a, ud.user);
@@ -237,6 +244,7 @@ Deno.serve(async (req) => {
     const ok = await enviar(key, ins.email, asunto, rastrear(plantilla(render(sig.cuerpo, vars, banderas(a), enlace), baja), idc), nombre);
     await cerrarCorreo(admin, idc, ok);
     await admin.from("secuencia_envios").upsert({ user_id: ins.user_id, email: ins.email, secuencia: ins.secuencia, paso: sig.paso, ok, enviado_at: new Date().toISOString() }, { onConflict: "user_id,secuencia,paso" });
+    if (ok) hoy.add(String(ins.email).toLowerCase());
     cuenta++; ok ? resumen.enviados++ : resumen.fallidos++;
     if (!ok) break; // Sender is refusing (limit or account issue): try again next hour
   }
@@ -269,7 +277,7 @@ Deno.serve(async (req) => {
       const sig = gratis.find((c) => !hechoL.has(`${ins.email}|${c.paso}`));
       if (!sig) { await sale("terminó"); continue; }
       if (ahora + 120000 < new Date(ins.desde).getTime() + Number(sig.dias) * 864e5) continue;
-      if (ahora - (ultimoL[ins.email] ?? 0) < 20 * 3600e3) continue;
+      if (ahora - (ultimoL[ins.email] ?? 0) < 20 * 3600e3 || hoy.has(String(ins.email).toLowerCase())) continue;
       // their most recent rating: if they repeated it, the emails talk about the newest number
       const { data: ls } = await admin.from("leads").select("nombre,score,metrics").eq("email", ins.email).eq("source", "calificacion").order("created_at", { ascending: false }).limit(1);
       const l = ls?.[0] ?? {};
@@ -285,6 +293,7 @@ Deno.serve(async (req) => {
       const ok = await enviar(key, ins.email, asunto, rastrear(plantilla(render(sig.cuerpo, vars, flags, enlace), baja, "hiciste tu calificación gratis"), idc), nombre);
       await cerrarCorreo(admin, idc, ok);
       await admin.from("lead_envios").upsert({ email: ins.email, paso: sig.paso, ok, enviado_at: new Date().toISOString() }, { onConflict: "email,paso" });
+      if (ok) hoy.add(String(ins.email).toLowerCase());
       cuenta++; ok ? resumen.enviados++ : resumen.fallidos++;
       if (!ok) break;
     }
@@ -343,7 +352,7 @@ Deno.serve(async (req) => {
       if (sx && ["active", "trialing", "past_due"].includes(sx.estado)) continue;
       const { data: ud } = await admin.auth.admin.getUserById(o.user_id);
       const email = (ud?.user?.email ?? "").toLowerCase();
-      if (!email || bajas.has(email) || await yaMandado(email, "segundo_escaneo")) continue;
+      if (!email || bajas.has(email) || hoy.has(email) || await yaMandado(email, "segundo_escaneo")) continue;
       const { count: hard } = await admin.from("orders").select("id", { count: "exact", head: true }).eq("user_id", o.user_id).eq("tier", "hard").in("status", ["pagado", "listo"]).or("origen.is.null,origen.neq.suscripcion");
       const gratis = (hard ?? 0) > 0 && !sx?.stripe_subscription;
       const nombre = nombreDe({}, ud?.user ?? {});
