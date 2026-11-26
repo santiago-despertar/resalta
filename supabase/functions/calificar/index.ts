@@ -17,7 +17,7 @@ const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE
 const MODELO = "claude-sonnet-5-5";
 const POR_HORA = 12, POR_DIA = 30;
 // bump when the rating prompt changes, so cached results from the old prompt are not reused
-const RUBRICA = "v4";
+const RUBRICA = "v5";
 
 export const ZONAS: [string, string][] = [
   ["proporciones", "Proporciones"], ["ojos", "Ojos"], ["nariz", "Nariz"],
@@ -37,6 +37,7 @@ Usa toda la escala. Una cara poco agraciada saca 3 o 4 y está bien decirlo. Sé
 Califica solo lo que ves: no intentes reconocer a la persona ni uses su fama.
 Cuenta todo lo que pesa en la percepción: estructura ósea, proporciones, ojos y cejas, nariz, labios, mandíbula, piel, cabello y armonía del conjunto.
 La foto: la luz, el ángulo o el lente pueden mover a lo mucho 0.3. Si la cara no se ve bien (borrosa, muy oscura, muy lejos, tapada, muy girada o con filtro fuerte) marca calidad "mala".
+Si la cara sí se ve pero la foto la hace ver peor de lo que es (selfie con el brazo o lente muy cerca que agranda la nariz, cámara desde abajo, luz dura o desde arriba que marca ojeras, contraluz, cara tensa o gesto raro, baja resolución), marca calidad "regular" y en nota_fotos di en una frase, en segunda persona, qué tiene la foto. Si la foto está bien, calidad "buena" y nota_fotos vacío. No inventes problemas: la mayoría de las fotos normales de frente están bien.
 Por zona califica en la misma escala de 0 a 10. Las zonas deben ser coherentes con la calificación general: su promedio queda cerca del general.`;
 
 const TOOL = {
@@ -50,20 +51,23 @@ const TOOL = {
       general: { type: "number", minimum: 0, maximum: 10 },
       zonas: { type: "object", required: ZONAS.map((z) => z[0]), properties: Object.fromEntries(ZONAS.map(([k]) => [k, { type: "number", minimum: 0, maximum: 10 }])) },
       razon: { type: "string", description: "Una frase en español, en segunda persona: qué sube y qué baja la calificación." },
+      nota_fotos: { type: "string", description: "Solo si calidad es regular: qué de la foto puede estar bajando la calificación, en una frase en segunda persona. Vacío si la foto está bien." },
     },
   },
 };
 
 const dec = (x: number) => Math.round(x * 10) / 10;
-// Calibration measured on test faces: the model puts ordinary faces at about 4.7 and models at 8.7 to 9.0.
-// This curve moves an ordinary face to 5.0 (the scale's average) and barely touches the ends.
-const CURVA: [number, number][] = [[0, 0], [2.5, 2.6], [4.7, 5.0], [6.5, 6.7], [8, 8.1], [9, 9.1], [10, 9.6]];
+// Calibration measured on test faces: the model puts ordinary faces at about 4.6, faces a bit above average at 6.4
+// and top models at 8.4 to 8.9. Resalta's published scale puts the average at 6 and top models at about 9,
+// so this curve moves an ordinary face to about 6.0 and a top model to about 9.0. 10 stays out of reach.
+// The prompt keeps the model's own 5-centered scale on purpose: that is what the test faces were measured against.
+const CURVA: [number, number][] = [[0, 0], [2.5, 3.0], [3.6, 4.6], [4.6, 5.9], [6.4, 7.3], [8.4, 9.0], [9, 9.3], [10, 9.7]];
 const curva = (x: number) => {
   for (let i = 1; i < CURVA.length; i++) {
     const [x0, y0] = CURVA[i - 1], [x1, y1] = CURVA[i];
     if (x <= x1) return y0 + (Math.max(x, x0) - x0) * (y1 - y0) / (x1 - x0);
   }
-  return 9.6;
+  return 9.7;
 };
 async function sha(s: string) {
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
@@ -89,7 +93,8 @@ export async function calificarFotos(fotos: string[], medidas: string) {
   const zonas = Object.fromEntries(ZONAS.map(([k]) => [k, dec(curva(Math.max(0, Math.min(10, Number(x.zonas?.[k]) || 0))))]));
   return {
     es_cara: x.es_cara !== false, parece_menor: !!x.parece_menor, calidad: ["buena", "regular", "mala"].includes(x.calidad) ? x.calidad : "regular",
-    general: dec(curva(Math.max(0, Math.min(10, Number(x.general) || 0)))), zonas, razon: String(x.razon ?? "").slice(0, 400), uso: j.usage,
+    general: dec(curva(Math.max(0, Math.min(10, Number(x.general) || 0)))), zonas, razon: String(x.razon ?? "").slice(0, 400),
+    nota_fotos: x.calidad === "regular" ? String(x.nota_fotos ?? "").trim().slice(0, 240) || null : null, uso: j.usage,
   };
 }
 
@@ -117,14 +122,14 @@ Deno.serve(async (req) => {
 
     // same photos, same result, no new charge
     const hash = await sha(RUBRICA + "|" + fotos.join("|"));
-    const { data: hecho } = await admin.from("calificaciones").select("id,general,zonas,razon,calidad,order_id").eq("hash", hash).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const { data: hecho } = await admin.from("calificaciones").select("id,general,zonas,razon,calidad,nota_fotos,order_id").eq("hash", hash).order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (hecho && hecho.general == null) return json({ ok: false, motivo: hecho.calidad === "mala" ? "foto_mala" : hecho.calidad });
     if (hecho) {
       if (orderId && hecho.order_id !== orderId) {
-        const { data: copia } = await admin.from("calificaciones").insert({ hash, modelo: MODELO, origen, general: hecho.general, zonas: hecho.zonas, razon: hecho.razon, calidad: hecho.calidad, order_id: orderId, user_id: userId }).select("id").single();
-        return json({ ok: true, id: copia?.id ?? hecho.id, general: Number(hecho.general), zonas: hecho.zonas, razon: hecho.razon, calidad: hecho.calidad });
+        const { data: copia } = await admin.from("calificaciones").insert({ hash, modelo: MODELO, origen, general: hecho.general, zonas: hecho.zonas, razon: hecho.razon, calidad: hecho.calidad, nota_fotos: hecho.nota_fotos, order_id: orderId, user_id: userId }).select("id").single();
+        return json({ ok: true, id: copia?.id ?? hecho.id, general: Number(hecho.general), zonas: hecho.zonas, razon: hecho.razon, calidad: hecho.calidad, nota_fotos: hecho.nota_fotos ?? null });
       }
-      return json({ ok: true, id: hecho.id, general: Number(hecho.general), zonas: hecho.zonas, razon: hecho.razon, calidad: hecho.calidad });
+      return json({ ok: true, id: hecho.id, general: Number(hecho.general), zonas: hecho.zonas, razon: hecho.razon, calidad: hecho.calidad, nota_fotos: hecho.nota_fotos ?? null });
     }
 
     const ipRaw = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "?";
@@ -143,11 +148,11 @@ Deno.serve(async (req) => {
     const motivo = !c.es_cara ? "sin_cara" : c.parece_menor ? "menor" : c.calidad === "mala" ? "foto_mala" : null;
     const { data: fila, error } = await admin.from("calificaciones").insert({
       hash, modelo: MODELO, origen, general: motivo ? null : c.general, zonas: motivo ? null : c.zonas, razon: c.razon,
-      calidad: motivo === "foto_mala" ? "mala" : motivo ?? c.calidad, order_id: orderId, user_id: userId, ip, uso: c.uso,
+      calidad: motivo === "foto_mala" ? "mala" : motivo ?? c.calidad, nota_fotos: motivo ? null : c.nota_fotos, order_id: orderId, user_id: userId, ip, uso: c.uso,
     }).select("id").single();
     if (error) console.error(error.message);
     if (motivo) return json({ ok: false, motivo });
-    return json({ ok: true, id: fila?.id ?? null, general: c.general, zonas: c.zonas, razon: c.razon, calidad: c.calidad });
+    return json({ ok: true, id: fila?.id ?? null, general: c.general, zonas: c.zonas, razon: c.razon, calidad: c.calidad, nota_fotos: c.nota_fotos });
   } catch (e) {
     console.error(e);
     return json({ error: "No pudimos calificar la foto" }, 500);
