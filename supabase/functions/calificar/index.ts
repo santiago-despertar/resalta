@@ -82,7 +82,7 @@ export async function calificarFotos(fotos: string[], medidas: string) {
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "content-type": "application/json", "x-api-key": Deno.env.get("ANTHROPIC_API_KEY")!, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({ model: MODELO, max_tokens: 3000, temperature: 0, system: SISTEMA, tools: [TOOL], tool_choice: { type: "auto" }, messages: [{ role: "user", content }] }),
+    body: JSON.stringify({ model: MODELO, max_tokens: 3000, system: SISTEMA, tools: [TOOL], tool_choice: { type: "auto" }, messages: [{ role: "user", content }] }),
   });
   const j = await r.json();
   if (!r.ok) throw new Error("anthropic " + JSON.stringify(j).slice(0, 300));
