@@ -121,6 +121,24 @@ const conArticulo = (k: string) => { const x = (k || "").trim().toLowerCase(); r
 const LANZAMIENTO_GRATIS = "2026-11-15T23:59:00Z"; // only people who did the free rating from here on
 const PUNTAJE_ALTO = 70;
 
+// The onboarding rating, as the first follow-up email shows it: their photo with the measurement lines, the
+// number on the site's scale (5 is the average) and their strongest and weakest zone.
+const ZONAS_N: Record<string, string> = { proporciones: "Proporciones", ojos: "Ojos", nariz: "Nariz", boca: "Boca y labios", mandibula: "Mandíbula", simetria: "Simetría" };
+function bloqueResultado(general: number, zs: [string, number][], foto: string | null) {
+  const nivel = general >= 7 ? "Estás claramente arriba del promedio. Tu margen está en los detalles finos."
+    : general >= 5.5 ? "Estás arriba del promedio y tienes mejoras claras a tu alcance."
+    : general >= 4.5 ? "Estás en el promedio. Los cambios correctos se van a notar bastante."
+    : "Tienes mucho margen para subir, y los cambios correctos se van a notar bastante.";
+  const fila = ([n, v]: [string, number]) => `<tr><td style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,.18);font-family:${EM_SANS};font-size:15px;color:${EM_SUAVE}">${esc(n)}</td><td align="right" style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,.18);font-family:${EM_MONO};font-size:15px;color:#FFFFFF">${v.toFixed(1)}</td></tr>`;
+  const fuerte = zs[0], debil = zs.length > 1 ? zs[zs.length - 1] : null;
+  return (foto ? emCaja(`<img src="${esc(foto)}" width="100%" class="fi" alt="Tu foto con tus medidas" style="display:block;width:100%;max-width:510px;height:auto;margin:0 auto;border:0;border-radius:14px">`, "9px") : "")
+    + emCaja(`<div style="text-align:center"><div style="font-family:${EM_MONO};font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)">Tu calificación facial</div>
+      <div class="sc" style="margin-top:10px;font-family:${EM_SANS};font-size:84px;line-height:1;font-weight:300;letter-spacing:-.045em;color:#FFFFFF">${general.toFixed(1)}<span style="font-size:22px;letter-spacing:0;color:${EM_SUAVE}">&nbsp;/ 10</span></div>
+      <div style="margin:14px auto 0;max-width:400px;font-family:${EM_SANS};font-size:16px;line-height:25px;color:${EM_SUAVE}">${esc(nivel)}</div></div>`, "30px 24px 28px")
+    + (zs.length ? emCaja(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${zs.map(fila).join("")}</table>`
+      + (fuerte ? `<div style="margin-top:18px;font-family:${EM_SANS};font-size:16px;line-height:25px;color:${EM_SUAVE}">Tu punto más fuerte es <b style="color:#FFFFFF">${esc(fuerte[0].toLowerCase())}</b>.${debil ? ` Lo que más te baja la calificación es <b style="color:#FFFFFF">${esc(debil[0].toLowerCase())}</b>.` : ""}</div>` : "")) : "");
+}
+
 const nombreDe = (a: Obj, u: Obj) => String(a?.nombre || u?.user_metadata?.full_name || "").trim().split(/\s+/)[0] || "Hola";
 const objetivoTexto = (o: string) => (o || "").split(", ").filter(Boolean).map((x) => x.toLowerCase()).join(" y ") || "tu imagen";
 
@@ -188,6 +206,23 @@ Deno.serve(async (req) => {
     .gt("enviado_at", new Date(ahora - 20 * 3600e3).toISOString());
   const hoy = new Set((recientes ?? []).map((x: Obj) => String(x.email).toLowerCase()));
   const bajas = new Set((bajasL ?? []).map((b: Obj) => b.email));
+
+  // Engagement: no point sending sales emails nobody opens. The first email of a sequence always goes. Someone
+  // who has never opened or clicked anything from us gets one more chance (many land in Promotions) and then
+  // leaves the sequence. Someone who has opened before keeps getting them until they skip two in a row.
+  // Opens and clicks come from the tracking pixel and links in correos_log; the free-rating result email counts.
+  const { data: logs } = await admin.from("correos_log").select("email,tipo,enviado_at,abierto_at,clic_at").not("ok", "is", false)
+    .gt("enviado_at", new Date(ahora - 60 * 864e5).toISOString()).order("enviado_at");
+  const historial: Record<string, Obj[]> = {};
+  for (const l of logs ?? []) (historial[String(l.email).toLowerCase()] ??= []).push(l);
+  const visto = (x: Obj) => !!(x.abierto_at || x.clic_at);
+  const sinInteres = (email: string) => {
+    const h = historial[email.toLowerCase()] ?? [], seq = h.filter((x) => x.tipo === "secuencia");
+    if (!seq.length) return false;
+    if (!h.some(visto)) return seq.length >= 2;
+    const ult = seq.slice(-2);
+    return ult.length === 2 && !ult.some(visto);
+  };
   const porSec: Record<string, Obj[]> = {};
   for (const c of correos ?? []) (porSec[c.secuencia] ??= []).push(c);
 
@@ -223,6 +258,7 @@ Deno.serve(async (req) => {
     if (cuenta >= MAX_POR_CORRIDA) break;
     if (compro.has(ins.user_id)) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "compra" }).eq("user_id", ins.user_id); resumen.salieron++; continue; }
     if (bajas.has(ins.email)) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "baja" }).eq("user_id", ins.user_id); continue; }
+    if (sinInteres(ins.email)) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "no_abre" }).eq("user_id", ins.user_id); resumen.salieron++; continue; }
     const pasos = porSec[ins.secuencia] ?? [];
     const sig = pasos.find((c) => !enviados.has(`${ins.user_id}|${ins.secuencia}|${c.paso}`));
     if (!sig) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "terminó" }).eq("user_id", ins.user_id); continue; }
@@ -231,17 +267,24 @@ Deno.serve(async (req) => {
     if (hoy.has(String(ins.email).toLowerCase())) continue;
 
     // if they filled the form more than once, the emails use their newest answers
-    const { data: os } = await admin.from("orders").select("answers").eq("user_id", ins.user_id).not("answers", "is", null).order("created_at", { ascending: false }).limit(1);
-    const o = os?.[0] ?? (await admin.from("orders").select("answers").eq("id", ins.order_id).maybeSingle()).data;
+    const { data: os } = await admin.from("orders").select("id,answers,foto_correo").eq("user_id", ins.user_id).not("answers", "is", null).order("created_at", { ascending: false }).limit(1);
+    const o = os?.[0] ?? (await admin.from("orders").select("id,answers,foto_correo").eq("id", ins.order_id).maybeSingle()).data;
     const { data: ud } = await admin.auth.admin.getUserById(ins.user_id);
     if (!ud?.user) { await admin.from("secuencia_inscritos").update({ salio_at: new Date().toISOString(), motivo: "sin_cuenta" }).eq("user_id", ins.user_id); continue; }
     const a = o?.answers ?? {}, nombre = nombreDe(a, ud.user);
-    const vars = { nombre, objetivo: objetivoTexto(a.objetivo) };
+    // the AI rating they saw in the onboarding preview: the first email opens with it, like the free-rating email
+    const { data: cs } = await admin.from("calificaciones").select("general,zonas").in("order_id", [o?.id, ins.order_id].filter(Boolean))
+      .not("general", "is", null).order("created_at", { ascending: false }).limit(1);
+    const cal = cs?.[0];
+    const zs = cal ? Object.entries(ZONAS_N).map(([k, n]) => [n, Number(cal.zonas?.[k])] as [string, number]).filter(([, v]) => v > 0).sort((x, y) => y[1] - x[1]) : [];
+    const vars = { nombre, objetivo: objetivoTexto(a.objetivo), puntaje: cal ? `${Number(cal.general).toFixed(1)} de 10` : "",
+      fuerte: conArticulo(zs[0]?.[0] ?? ""), debil: conArticulo(zs[zs.length - 1]?.[0] ?? "") };
+    const resultado = cal && sig.paso === pasos[0].paso ? bloqueResultado(Number(cal.general), zs, o?.foto_correo ?? null) : "";
     const enlace = `${SITE}/analisis?utm_source=email&utm_medium=abandono&utm_campaign=${ins.secuencia}-${sig.paso}`;
     const baja = `${Deno.env.get("SUPABASE_URL")}/functions/v1/secuencias?baja=${encodeURIComponent(ins.email)}&t=${await firma(ins.email)}`;
     const asunto = String(sig.asunto).replace(/\{(nombre|objetivo)\}/g, (_: string, k: string) => String((vars as Obj)[k] ?? ""));
     const idc = await registrarCorreo(admin, { email: ins.email, tipo: "secuencia", secuencia: ins.secuencia, paso: sig.paso, asunto });
-    const ok = await enviar(key, ins.email, asunto, rastrear(plantilla(render(sig.cuerpo, vars, banderas(a), enlace), baja), idc), nombre);
+    const ok = await enviar(key, ins.email, asunto, rastrear(plantilla(resultado + render(sig.cuerpo, vars, banderas(a), enlace), baja), idc), nombre);
     await cerrarCorreo(admin, idc, ok);
     await admin.from("secuencia_envios").upsert({ user_id: ins.user_id, email: ins.email, secuencia: ins.secuencia, paso: sig.paso, ok, enviado_at: new Date().toISOString() }, { onConflict: "user_id,secuencia,paso" });
     if (ok) hoy.add(String(ins.email).toLowerCase());
@@ -272,6 +315,7 @@ Deno.serve(async (req) => {
       if (cuenta >= MAX_POR_CORRIDA) break;
       const sale = (motivo: string) => admin.from("lead_secuencia").update({ salio_at: new Date().toISOString(), motivo }).eq("email", ins.email);
       if (bajas.has(ins.email)) { await sale("baja"); continue; }
+      if (sinInteres(ins.email)) { await sale("no_abre"); resumen.salieron++; continue; }
       const { data: estado } = await admin.rpc("lead_estado", { e: ins.email });
       if (estado) { await sale(String(estado)); resumen.salieron++; continue; }
       const sig = gratis.find((c) => !hechoL.has(`${ins.email}|${c.paso}`));
