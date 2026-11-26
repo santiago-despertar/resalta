@@ -999,25 +999,29 @@
       }
     }
 
-    // Before the prices: their result, like the free rating. The overall score and most zones are blurred,
-    // the strongest zone is shown for real, so it is clear the measuring happened and the result is theirs.
+    // Before the prices: their real result, nothing blurred, on the same strict /10 scale as the report.
+    // Then "¿quieres saber por qué?" leads to the plans.
     function mostrarPreview() {
       const st = $("#prevStep"), c = $("#mideCanvas");
       if (!st || !crudo || !crudo.resumen) return false;
       const esc = v => String(v ?? "").replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
       const a = (order && order.answers) || {}, nombre = String(a.nombre || "").trim().split(/\s+/)[0];
-      if (nombre) $("#prevH").textContent = `${nombre}, ya tenemos tu calificación`;
+      if (nombre) $("#prevH").textContent = `${nombre}, esta es tu calificación`;
       try { if (c && c.width) $("#prevImg").src = c.toDataURL("image/jpeg", 0.86); else $(".prev-foto").hidden = true; } catch (e) { $(".prev-foto").hidden = true; }
       const n = crudo.medidas.length;
       $("#prevN").textContent = n;
       // same strict /10 scale as the report, so the preview and the paid result never disagree
       const diez = v => (10 * Math.pow(Math.max(0, Math.min(100, v)) / 100, 2.2)).toFixed(1);
-      $("#prevScore").textContent = "8.8";
+      const prom = crudo.medidas.reduce((s, m) => s + (m.puntaje || 0), 0) / Math.max(1, n);
+      const total = diez(prom);
+      $("#prevScore").textContent = total;
       const zs = crudo.resumen.zonas.filter(z => z.puntaje != null).sort((x, y) => y.puntaje - x.puntaje);
-      $("#prevRows").innerHTML = zs.map((z, i) => `<div class="report-row"><span>${esc(z.nombre)}</span><b class="mono${i ? " cal-borroso" : ""}">${i ? "8.8" : diez(z.puntaje)}</b></div>`).join("");
+      $("#prevRows").innerHTML = zs.map((z, i) => `<div class="report-row"><span>${esc(z.nombre)}</span><b class="mono">${diez(z.puntaje)}</b></div>`).join("");
       const fuera = crudo.medidas.filter(m => m.estado && m.estado !== "dentro").length;
-      $("#prevNota").textContent = (zs[0] ? `Tu zona más fuerte es ${zs[0].nombre.toLowerCase()}. ` : "") +
-        (fuera ? `${fuera} de tus ${n} medidas están fuera del rango de referencia. ` : "") + "Ve tu puntaje, cada zona de tu cara y qué hacer primero para subirlo.";
+      $("#prevPq").textContent = `¿Quieres saber por qué sacaste ${total}?`;
+      const debil = zs[zs.length - 1];
+      $("#prevNota").textContent = (fuera ? `${fuera} de tus ${n} medidas están fuera del rango de referencia` : "Tus medidas tienen detalles") +
+        (debil ? ` y lo que más te baja es ${debil.nombre.toLowerCase()}. ` : ". ") + "Tu análisis completo te dice cuáles, qué cambiar primero y hasta dónde puedes subir.";
       const t = $("#tuyo"); if (t) t.hidden = true; // the plans page doesn't repeat the photo
       const back = $("#payBack"); if (back) back.dataset.back = "2.7";
       return true;
