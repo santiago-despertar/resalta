@@ -17,6 +17,16 @@ const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE
 type Obj = Record<string, any>; // deno-lint-ignore no-explicit-any
 
 const DIA = 864e5;
+// The score the onboarding shows before the prices: average of the front measurements on the same strict
+// /10 curve as the report (10 * (avg/100)^2.2). Recomputed from the stored measurements, so it matches
+// what the person saw, older orders included.
+const diez = (v: number) => Math.round(10 * Math.pow(Math.max(0, Math.min(100, v)) / 100, 2.2) * 10) / 10;
+function califOnboarding(med: unknown, zonas?: unknown) {
+  const ps = ((med as Obj[] | null) ?? []).map((m: Obj) => m.puntaje).filter((x: unknown) => typeof x === "number") as number[];
+  if (!ps.length) return null;
+  return { total: diez(ps.reduce((a, b) => a + b, 0) / ps.length),
+    zonas: ((zonas as Obj[] | null) ?? []).filter((z: Obj) => z.puntaje != null).map((z: Obj) => ({ nombre: z.nombre, v: diez(z.puntaje) })).sort((a: Obj, b: Obj) => b.v - a.v) };
+}
 const hoy0 = () => { const d = new Date(); d.setUTCHours(6, 0, 0, 0); if (d.getTime() > Date.now()) d.setTime(d.getTime() - DIA); return d; }; // midnight in Mexico City
 const diaMX = (t: string | number | Date) => new Date(new Date(t).getTime() - 6 * 3600e3).toISOString().slice(0, 10);
 const cuenta = <T>(xs: T[], k: (x: T) => string | null | undefined) => {
@@ -405,7 +415,7 @@ Deno.serve(async (req) => {
     if (accion === "usuarios") {
       const [usuarios, ord, subs, leads] = await Promise.all([
         todosLosUsuarios(),
-        admin.from("orders").select("id,user_id,status,tier,amount_mxn,paid_at,answers->>nombre,answers->>pais,answers->>edad,answers->>sexo").then((r) => r.data ?? []),
+        admin.from("orders").select("id,user_id,status,tier,amount_mxn,paid_at,created_at,answers->>nombre,answers->>pais,answers->>edad,answers->>sexo,med:medidas->medidas").then((r) => r.data ?? []),
         admin.from("suscripciones").select("user_id,estado,periodo_fin,cancela").then((r) => r.data ?? []),
         admin.from("leads").select("email,nombre,score,created_at,metrics->>foto").then((r) => r.data ?? []),
       ]);
@@ -414,7 +424,9 @@ Deno.serve(async (req) => {
         const s = subs.find((x: Obj) => x.user_id === u.id), em = (u.email ?? "").toLowerCase();
         const l = leads.filter((x: Obj) => x.email === em).sort((a: Obj, b2: Obj) => a.created_at < b2.created_at ? 1 : -1)[0];
         const o0 = os[0] ?? {};
-        return { ...resumenUsuario(u), pedidos: os.length, pagados: pag.length, plan: pag.some((o: Obj) => o.tier === "hard") ? "Completo" : pag.length ? "Esencial" : null,
+        const conMed = os.filter((o: Obj) => Array.isArray(o.med) && o.med.length).sort((a: Obj, b2: Obj) => (a.created_at < b2.created_at ? 1 : -1))[0];
+        const cal = conMed ? califOnboarding(conMed.med) : null;
+        return { ...resumenUsuario(u), calif_onboarding: cal?.total ?? null, pedidos: os.length, pagados: pag.length, plan: pag.some((o: Obj) => o.tier === "hard") ? "Completo" : pag.length ? "Esencial" : null,
           pagado_mxn: pag.reduce((t: number, o: Obj) => t + (o.amount_mxn ?? 0), 0), suscripcion: s?.estado ?? null,
           puntaje_gratis: l?.score ?? null, pais: o0.pais ?? null, edad: o0.edad ?? null, sexo: o0.sexo ?? null, nombre_form: o0.nombre ?? null };
       });
@@ -459,7 +471,7 @@ Deno.serve(async (req) => {
           arquetipo: d.arquetipo ?? null, fortalezas: d.fortalezas ?? null, prioridades: d.prioridades ?? null, grupos: (d.grupos ?? []).map((g: Obj) => ({ titulo: g.titulo, puntaje: g.puntaje })),
           longevidad: d.longevidad ?? null, potencial: d.potencial ?? null, motivo: d.motivo ?? null, segundos: d.segundos ?? null, modelo: d.modelo ?? null };
       });
-      const pedidos = ord.map((o: Obj) => ({ ...o, medidas: o.medidas ? { n: (o.medidas.medidas?.length ?? 0) + (o.medidas.perfil?.medidas?.length ?? 0), resumen: o.medidas.resumen ?? null, avisos: o.medidas.avisos ?? null, ajustado: o.medidas.ajustado ?? null } : null }));
+      const pedidos = ord.map((o: Obj) => ({ ...o, calificacion: califOnboarding(o.medidas?.medidas, o.medidas?.resumen?.zonas), medidas: o.medidas ? { n: (o.medidas.medidas?.length ?? 0) + (o.medidas.perfil?.medidas?.length ?? 0), resumen: o.medidas.resumen ?? null, avisos: o.medidas.avisos ?? null, ajustado: o.medidas.ajustado ?? null } : null }));
       return json({ ok: true, usuario: { ...resumenUsuario(u), confirmado: u.email_confirmed_at, telefono: u.phone || null, metadata: u.user_metadata },
         pedidos, reportes, suscripcion: sub, fisico: fis, chat, leads, eventos: [...ev, ...antes].sort((a: Obj, b2: Obj) => (a.ts < b2.ts ? 1 : -1)), afiliado: afi, fotos, correos });
     }
@@ -500,11 +512,11 @@ Deno.serve(async (req) => {
 
     if (accion === "pedidos") {
       const [{ data: ord }, usuarios] = await Promise.all([
-        admin.from("orders").select("id,user_id,status,tier,amount_mxn,paid_at,delivered_at,created_at,origen,afiliado_id,stripe_session_id,answers->>nombre").order("created_at", { ascending: false }).limit(2000),
+        admin.from("orders").select("id,user_id,status,tier,amount_mxn,paid_at,delivered_at,created_at,origen,afiliado_id,stripe_session_id,answers->>nombre,med:medidas->medidas").order("created_at", { ascending: false }).limit(2000),
         todosLosUsuarios(),
       ]);
       const correo = new Map(usuarios.map((u) => [u.id, u.email]));
-      return json({ ok: true, pedidos: (ord ?? []).map((o: Obj) => ({ ...o, email: correo.get(o.user_id) ?? null })) });
+      return json({ ok: true, pedidos: (ord ?? []).map(({ med, ...o }: Obj) => ({ ...o, calificacion: califOnboarding(med)?.total ?? null, email: correo.get(o.user_id) ?? null })) });
     }
 
     if (accion === "afiliados") {
