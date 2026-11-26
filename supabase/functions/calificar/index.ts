@@ -1,0 +1,142 @@
+// AI face rating: the one number Resalta gives a face. Claude Sonnet looks at the photo(s) and returns an
+// overall score on a strict 0-10 scale (5 = average person) plus a score for each of the six zones the
+// measurements use. The same saved result is shown in the free rating, the onboarding preview and the report,
+// so a person never sees two different numbers.
+// Each photo is hashed: the same photo always gets the same result and is only paid for once.
+// Calls from one IP are capped so the free rating can't be used to run up the bill.
+// Secrets: ANTHROPIC_API_KEY. Table: calificaciones (service role only).
+import { createClient } from "npm:@supabase/supabase-js@2.45.4";
+
+const cors = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
+const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+const MODELO = "claude-sonnet-5-5";
+const POR_HORA = 12, POR_DIA = 30;
+
+export const ZONAS: [string, string][] = [
+  ["proporciones", "Proporciones"], ["ojos", "Ojos"], ["nariz", "Nariz"],
+  ["boca", "Boca y labios"], ["mandibula", "Mandíbula y mentón"], ["simetria", "Simetría"],
+];
+
+const SISTEMA = `Eres el evaluador de atractivo facial de Resalta. Calificas qué tan atractiva se percibe una cara.
+Escala absoluta de 0 a 10 con un decimal, igual para hombres y mujeres, contra la población general de su edad y sexo:
+- 5.0 es una persona promedio, la que te cruzas en la calle. La mitad de la gente está entre 4.3 y 5.7.
+- 6 es arriba del promedio (1 de cada 5 personas).
+- 7 es claramente atractivo, llama la atención (1 de cada 20).
+- 8 es muy atractivo, nivel actor o modelo comercial (1 de cada 200).
+- Entre 8.8 y 9.4 están los modelos más cotizados del mundo, las caras de las grandes campañas de moda. Si una cara es de ese nivel, ponle ese número; no la bajes a 8 por prudencia.
+- 10 no existe.
+Usa toda la escala. Una cara poco agraciada saca 3 o 4 y está bien decirlo. Sé honesto y realista, sin regalar puntos y sin crueldad.
+Califica solo lo que ves: no intentes reconocer a la persona ni uses su fama.
+Cuenta todo lo que pesa en la percepción: estructura ósea, proporciones, ojos y cejas, nariz, labios, mandíbula, piel, cabello y armonía del conjunto.
+La foto: la luz, el ángulo o el lente pueden mover a lo mucho 0.3. Si la cara no se ve bien (borrosa, muy oscura, muy lejos, tapada, muy girada o con filtro fuerte) marca calidad "mala".
+Si te dan medidas de la cara, úsalas solo como apoyo: si una zona tiene medidas fuera de rango y también se nota en la foto, refléjalo; si en la foto no se nota, manda lo que ves.
+Por zona califica en la misma escala de 0 a 10. Las zonas deben ser coherentes con la calificación general: su promedio queda cerca del general.`;
+
+const TOOL = {
+  name: "calificacion", description: "Entrega la calificación.",
+  input_schema: {
+    type: "object", required: ["es_cara", "parece_menor", "calidad", "general", "zonas", "razon"],
+    properties: {
+      es_cara: { type: "boolean", description: "Hay una cara humana real y visible." },
+      parece_menor: { type: "boolean", description: "La persona parece menor de 18 años." },
+      calidad: { type: "string", enum: ["buena", "regular", "mala"] },
+      general: { type: "number", minimum: 0, maximum: 10 },
+      zonas: { type: "object", required: ZONAS.map((z) => z[0]), properties: Object.fromEntries(ZONAS.map(([k]) => [k, { type: "number", minimum: 0, maximum: 10 }])) },
+      razon: { type: "string", description: "Una frase en español, en segunda persona: qué sube y qué baja la calificación." },
+    },
+  },
+};
+
+const dec = (x: number) => Math.round(x * 10) / 10;
+async function sha(s: string) {
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
+}
+
+export async function calificarFotos(fotos: string[], medidas: string) {
+  const content = [
+    ...fotos.map((d) => ({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: d } })),
+    { type: "text", text: (fotos.length > 1 ? "Son fotos de la misma persona: la primera de frente, la otra de perfil. " : "") +
+      "Califica esta cara. Responde solo llamando a la herramienta calificacion, sin texto aparte." + (medidas ? `\n\nMedidas de su foto de frente fuera del rango de referencia, por zona:\n${medidas}` : "") },
+  ];
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": Deno.env.get("ANTHROPIC_API_KEY")!, "anthropic-version": "2023-06-01" },
+    body: JSON.stringify({ model: MODELO, max_tokens: 3000, system: SISTEMA, tools: [TOOL], tool_choice: { type: "auto" }, messages: [{ role: "user", content }] }),
+  });
+  const j = await r.json();
+  if (!r.ok) throw new Error("anthropic " + JSON.stringify(j).slice(0, 300));
+  const t = (j.content ?? []).find((c: { type: string }) => c.type === "tool_use");
+  if (!t) throw new Error("sin respuesta");
+  const x = t.input;
+  const zonas = Object.fromEntries(ZONAS.map(([k]) => [k, dec(Math.max(0, Math.min(10, Number(x.zonas?.[k]) || 0)))]));
+  return {
+    es_cara: x.es_cara !== false, parece_menor: !!x.parece_menor, calidad: ["buena", "regular", "mala"].includes(x.calidad) ? x.calidad : "regular",
+    general: dec(Math.max(0, Math.min(9.6, Number(x.general) || 0))), zonas, razon: String(x.razon ?? "").slice(0, 400), uso: j.usage,
+  };
+}
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  try {
+    const b = await req.json().catch(() => ({}));
+    const fotos = (Array.isArray(b.fotos) ? b.fotos : []).slice(0, 2).map((f: unknown) => String(f ?? "").replace(/^data:image\/jpeg;base64,/, ""))
+      .filter((f: string) => /^[A-Za-z0-9+/=]+$/.test(f) && f.length > 2000 && f.length < 1_500_000);
+    if (!fotos.length) return json({ error: "Falta la foto" }, 400);
+    const origen = b.order_id ? "onboarding" : "gratis";
+    const medidas = String(b.medidas ?? "").slice(0, 3000);
+
+    // onboarding: the order has to belong to whoever is calling
+    let orderId: string | null = null, userId: string | null = null;
+    if (b.order_id) {
+      const auth = req.headers.get("Authorization") ?? "";
+      const u = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: auth } } });
+      const { data: ud } = await u.auth.getUser();
+      const { data: o } = await u.from("orders").select("id,user_id").eq("id", String(b.order_id)).maybeSingle();
+      if (!o || !ud?.user || o.user_id !== ud.user.id) return json({ error: "Pedido no encontrado" }, 403);
+      orderId = o.id; userId = ud.user.id;
+    }
+
+    // same photos, same result, no new charge
+    const hash = await sha(fotos.join("|"));
+    const { data: hecho } = await admin.from("calificaciones").select("id,general,zonas,razon,calidad,order_id").eq("hash", hash).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    if (hecho && hecho.general == null) return json({ ok: false, motivo: hecho.calidad === "mala" ? "foto_mala" : hecho.calidad });
+    if (hecho) {
+      if (orderId && hecho.order_id !== orderId) {
+        const { data: copia } = await admin.from("calificaciones").insert({ hash, modelo: MODELO, origen, general: hecho.general, zonas: hecho.zonas, razon: hecho.razon, calidad: hecho.calidad, order_id: orderId, user_id: userId }).select("id").single();
+        return json({ ok: true, id: copia?.id ?? hecho.id, general: Number(hecho.general), zonas: hecho.zonas, razon: hecho.razon, calidad: hecho.calidad });
+      }
+      return json({ ok: true, id: hecho.id, general: Number(hecho.general), zonas: hecho.zonas, razon: hecho.razon, calidad: hecho.calidad });
+    }
+
+    const ipRaw = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "?";
+    const ip = (await sha("resalta:" + ipRaw)).slice(0, 24);
+    if (!orderId) {
+      const hora = new Date(Date.now() - 3600e3).toISOString(), dia = new Date(Date.now() - 864e5).toISOString();
+      const [{ count: h }, { count: d }] = await Promise.all([
+        admin.from("calificaciones").select("id", { count: "exact", head: true }).eq("ip", ip).gte("created_at", hora),
+        admin.from("calificaciones").select("id", { count: "exact", head: true }).eq("ip", ip).gte("created_at", dia),
+      ]);
+      if ((h ?? 0) >= POR_HORA || (d ?? 0) >= POR_DIA) return json({ ok: false, limitado: true });
+    }
+
+    const c = await calificarFotos(fotos, medidas);
+    // unusable photos are saved too (without a score), so retrying the same photo is free and still counts toward the cap
+    const motivo = !c.es_cara ? "sin_cara" : c.parece_menor ? "menor" : c.calidad === "mala" ? "foto_mala" : null;
+    const { data: fila, error } = await admin.from("calificaciones").insert({
+      hash, modelo: MODELO, origen, general: motivo ? null : c.general, zonas: motivo ? null : c.zonas, razon: c.razon,
+      calidad: motivo === "foto_mala" ? "mala" : motivo ?? c.calidad, order_id: orderId, user_id: userId, ip, uso: c.uso,
+    }).select("id").single();
+    if (error) console.error(error.message);
+    if (motivo) return json({ ok: false, motivo });
+    return json({ ok: true, id: fila?.id ?? null, general: c.general, zonas: c.zonas, razon: c.razon, calidad: c.calidad });
+  } catch (e) {
+    console.error(e);
+    return json({ error: "No pudimos calificar la foto" }, 500);
+  }
+});
