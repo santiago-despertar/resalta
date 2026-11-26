@@ -122,7 +122,7 @@ PAGES = [
     ("gracias.html", "Pago recibido · Resalta", "Recibimos tu pago.", ""),
     ("privacidad.html", "Aviso de privacidad · Resalta", "Aviso de privacidad integral de Resalta.", ""),
     ("terminos.html", "Términos y condiciones · Resalta", "Términos y condiciones de Resalta.", ""),
-    ("calificacion.html", "Calificación facial gratis · Resalta", "Descubre tu puntaje de armonía facial del 0 al 100, gratis. Tu foto se analiza en tu dispositivo.", ""),
+    ("calificacion.html", "Calificación facial gratis · Resalta", "Descubre qué tan atractiva es tu cara, del 1 al 10 y en una escala real donde 5 es el promedio. Gratis y en 30 segundos.", ""),
     ("reporte.html", "Tu reporte · Resalta", "Tu análisis facial para leer y descargar.", '<script src="/assets/js/reporte.js?v=__V__"></script>'),
     ("plan.html", "Tu plan del mes · Resalta", "Tu plan de nutrición y ejercicio para leer y descargar.", '<script src="/assets/js/plan.js?v=__V__"></script>'),
     ("visor.html", "Tu cara, medida · Resalta", "Vista previa del visor de medidas de Resalta.", ""),
