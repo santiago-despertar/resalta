@@ -16,6 +16,8 @@ const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: 
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 const MODELO = "claude-sonnet-5-5";
 const POR_HORA = 12, POR_DIA = 30;
+// bump when the rating prompt changes, so cached results from the old prompt are not reused
+const RUBRICA = "v3";
 
 export const ZONAS: [string, string][] = [
   ["proporciones", "Proporciones"], ["ojos", "Ojos"], ["nariz", "Nariz"],
@@ -30,6 +32,7 @@ Escala absoluta de 0 a 10 con un decimal, igual para hombres y mujeres, contra l
 - 8 es muy atractivo, nivel actor o modelo comercial (1 de cada 200).
 - Entre 8.8 y 9.4 están los modelos más cotizados del mundo, las caras de las grandes campañas de moda. Si una cara es de ese nivel, ponle ese número; no la bajes a 8 por prudencia.
 - 10 no existe.
+Una persona promedio se ve como cualquier persona normal en una foto de celular: piel con poros y alguna marca, cabello sin arreglo de salón, cara seria, sin maquillaje ni pose. Eso es lo normal y queda en 5, no abajo. Solo baja de 5 por rasgos que de verdad restan, por ejemplo mentón muy retraído, mucha grasa en la cara, asimetría que se nota o acné activo.
 Usa toda la escala. Una cara poco agraciada saca 3 o 4 y está bien decirlo. Sé honesto y realista, sin regalar puntos y sin crueldad.
 Califica solo lo que ves: no intentes reconocer a la persona ni uses su fama.
 Cuenta todo lo que pesa en la percepción: estructura ósea, proporciones, ojos y cejas, nariz, labios, mandíbula, piel, cabello y armonía del conjunto.
@@ -53,6 +56,16 @@ const TOOL = {
 };
 
 const dec = (x: number) => Math.round(x * 10) / 10;
+// Calibration measured on test faces: the model puts ordinary faces at about 4.7 and models at 8.7 to 9.0.
+// This curve moves an ordinary face to 5.0 (the scale's average) and barely touches the ends.
+const CURVA: [number, number][] = [[0, 0], [2.5, 2.6], [4.7, 5.0], [6.5, 6.7], [8, 8.1], [9, 9.1], [10, 9.6]];
+const curva = (x: number) => {
+  for (let i = 1; i < CURVA.length; i++) {
+    const [x0, y0] = CURVA[i - 1], [x1, y1] = CURVA[i];
+    if (x <= x1) return y0 + (Math.max(x, x0) - x0) * (y1 - y0) / (x1 - x0);
+  }
+  return 9.6;
+};
 async function sha(s: string) {
   const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
@@ -74,10 +87,10 @@ export async function calificarFotos(fotos: string[], medidas: string) {
   const t = (j.content ?? []).find((c: { type: string }) => c.type === "tool_use");
   if (!t) throw new Error("sin respuesta");
   const x = t.input;
-  const zonas = Object.fromEntries(ZONAS.map(([k]) => [k, dec(Math.max(0, Math.min(10, Number(x.zonas?.[k]) || 0)))]));
+  const zonas = Object.fromEntries(ZONAS.map(([k]) => [k, dec(curva(Math.max(0, Math.min(10, Number(x.zonas?.[k]) || 0))))]));
   return {
     es_cara: x.es_cara !== false, parece_menor: !!x.parece_menor, calidad: ["buena", "regular", "mala"].includes(x.calidad) ? x.calidad : "regular",
-    general: dec(Math.max(0, Math.min(9.6, Number(x.general) || 0))), zonas, razon: String(x.razon ?? "").slice(0, 400), uso: j.usage,
+    general: dec(curva(Math.max(0, Math.min(10, Number(x.general) || 0)))), zonas, razon: String(x.razon ?? "").slice(0, 400), uso: j.usage,
   };
 }
 
@@ -103,7 +116,7 @@ Deno.serve(async (req) => {
     }
 
     // same photos, same result, no new charge
-    const hash = await sha(fotos.join("|"));
+    const hash = await sha(RUBRICA + "|" + fotos.join("|"));
     const { data: hecho } = await admin.from("calificaciones").select("id,general,zonas,razon,calidad,order_id").eq("hash", hash).order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (hecho && hecho.general == null) return json({ ok: false, motivo: hecho.calidad === "mala" ? "foto_mala" : hecho.calidad });
     if (hecho) {
