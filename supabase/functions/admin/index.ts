@@ -121,6 +121,22 @@ async function listarFotos(uid: string) {
   return (data ?? []).map((x, i) => ({ ruta: rutas[i], url: x.signedUrl }));
 }
 
+// Price level of an order from its onboarding answers. Same rules as nivelPrecio() in create-checkout and config.js.
+// deno-lint-ignore no-explicit-any
+function nivelPrecio(a: any): string {
+  a = a ?? {};
+  const p = String(a.presupuesto ?? "").trim(), pp = String(a.presupuesto_procedimientos ?? "").trim(), edad = Number(a.edad) || 0;
+  const DIA2 = ["$500 a $2,000 MXN", "$500 a $2,000", "US$25 a US$100", "25 € a 100 €", "$100.000 a $400.000 COP", "$25.000 a $100.000 CLP", "S/ 100 a S/ 350"];
+  const PROC3 = ["$30,000 a $80,000 MXN", "$30,000 a $80,000", "US$1,500 a US$4,000", "1.500 € a 4.000 €", "$6.000.000 a $15.000.000 COP", "$1.500.000 a $4.000.000 CLP", "S/ 5,000 a S/ 15,000"];
+  if ((edad >= 18 && edad <= 21) || /^menos/i.test(p)) return "bajo";
+  if (/^m[aá]s/i.test(p) || /^m[aá]s/i.test(pp) || PROC3.includes(pp)) return "alto";
+  if (DIA2.includes(p)) return "medio";
+  return "normal";
+}
+// Prices by level went live on this date; earlier orders all saw the regular price.
+const NIVELES_DESDE = "2026-11-26T21:45:00Z";
+const NIVELES_MXN: Obj = { bajo: "$199 / $399", medio: "$699 / $1,299", normal: "$1,499 / $2,999", alto: "$2,499 / $4,999" };
+
 Deno.serve(async (req) => {
   const cors = corsDe(req);
   const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
@@ -144,7 +160,7 @@ Deno.serve(async (req) => {
       const desde = new Date(hoy0().getTime() - (dias - 1) * DIA);
       const [usuarios, ord, subs, leads, rep, ev, com, afi, fis] = await Promise.all([
         todosLosUsuarios(),
-        admin.from("orders").select("id,user_id,status,tier,amount_mxn,paid_at,created_at,origen,afiliado_id").then((r) => r.data ?? []),
+        admin.from("orders").select("id,user_id,status,tier,amount_mxn,paid_at,created_at,origen,afiliado_id,photos_consent_at,nivel_precio,answers").then((r) => r.data ?? []),
         admin.from("suscripciones").select("user_id,estado,periodo_fin,cancela,actualizado").then((r) => r.data ?? []),
         admin.from("leads").select("id,email,score,source,created_at,enviado_at").then((r) => r.data ?? []),
         admin.from("reports").select("order_id,data->>estado,data->>generado").then((r) => r.data ?? []),
@@ -177,8 +193,19 @@ Deno.serve(async (req) => {
       const compradoresVid = new Set(ev.filter((e) => e.nombre === "purchase").map((e) => e.vid));
       const fuentes = cuenta(entradas, fuente).slice(0, 15).map(([k, n]) => ({ fuente: k, visitantes: n, compras: entradas.filter((e) => (fuente(e) || "(directo)") === k && compradoresVid.has(e.vid)).length }));
 
+      // Conversion by price level, only for orders started since prices by level went live (and inside the period).
+      const desdeNiv = new Date(Math.max(desde.getTime(), new Date(NIVELES_DESDE).getTime()));
+      const conNivel = ord.filter((o: Obj) => o.answers && new Date(o.created_at) >= desdeNiv);
+      const niveles = ["bajo", "medio", "normal", "alto"].map((nv) => {
+        const os = conNivel.filter((o: Obj) => (o.nivel_precio || nivelPrecio(o.answers)) === nv);
+        const pag = os.filter((o: Obj) => o.status === "pagado" || o.status === "listo");
+        const ing = pag.reduce((x: number, o: Obj) => x + (o.amount_mxn ?? 0), 0);
+        return { nivel: nv, precios: NIVELES_MXN[nv], onboarding: os.length, vieron_precio: os.filter((o: Obj) => o.photos_consent_at).length,
+          iniciaron_pago: os.filter((o: Obj) => o.nivel_precio).length, pagaron: pag.length, completo: pag.filter((o: Obj) => o.tier === "hard").length, ingresos_mxn: ing };
+      });
+
       return json({
-        ok: true, dias, desde: desde.toISOString(),
+        ok: true, dias, desde: desde.toISOString(), niveles, niveles_desde: desdeNiv.toISOString(),
         kpis: {
           usuarios: reales.length, usuarios_rango: reales.filter((u) => enRango(u.created_at)).length, anonimos: usuarios.length - reales.length,
           leads: leads.length, leads_rango: leads.filter((l: Obj) => enRango(l.created_at)).length,
@@ -529,12 +556,13 @@ Deno.serve(async (req) => {
 
     if (accion === "pedidos") {
       const [{ data: ord }, usuarios] = await Promise.all([
-        admin.from("orders").select("id,user_id,status,tier,amount_mxn,paid_at,delivered_at,created_at,origen,afiliado_id,stripe_session_id,answers->>nombre,med:medidas->medidas").order("created_at", { ascending: false }).limit(2000),
+        admin.from("orders").select("id,user_id,status,tier,amount_mxn,paid_at,delivered_at,created_at,origen,afiliado_id,stripe_session_id,nivel_precio,answers,med:medidas->medidas").order("created_at", { ascending: false }).limit(2000),
         todosLosUsuarios(),
       ]);
       const correo = new Map(usuarios.map((u) => [u.id, u.email]));
       const ias = await calsIA((ord ?? []).map((o: Obj) => o.id));
-      return json({ ok: true, pedidos: (ord ?? []).map(({ med, ...o }: Obj) => ({ ...o, calificacion: ias.get(o.id)?.total ?? califOnboarding(med)?.total ?? null, email: correo.get(o.user_id) ?? null })) });
+      return json({ ok: true, pedidos: (ord ?? []).map(({ med, answers, ...o }: Obj) => ({ ...o, nombre: answers?.nombre ?? null, edad: answers?.edad ?? null,
+        nivel: o.nivel_precio || (answers ? nivelPrecio(answers) : null), calificacion: ias.get(o.id)?.total ?? califOnboarding(med)?.total ?? null, email: correo.get(o.user_id) ?? null })) });
     }
 
     if (accion === "afiliados") {
