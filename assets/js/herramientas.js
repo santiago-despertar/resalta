@@ -1,5 +1,7 @@
 // Free tools (/herramientas/*). One controller for every tool: the page says which one with <main data-tool="...">.
-// The photo never leaves the device. After the free result, the same photo gives the full harmony score by email.
+// Each tool measures its own thing in the browser (face shape, symmetry, colors, visual age). The beauty test and the
+// "send it to my email" step of every tool use the same AI rating as /calificacion (calificar function, 0-10, where 5 is
+// the average): only then a face crop is sent, and it is not stored.
 import * as H from "./herr-core.js";
 import * as D from "./herr-dibujo.js";
 
@@ -40,7 +42,7 @@ function initFoto() {
   adult.addEventListener("change", ready);
 
   async function usar(f) {
-    img = await createImageBitmap(f);
+    img = await createImageBitmap(f); _cal = null;
     const slot = $("#toolDrop");
     let p = slot.querySelector(":scope > img"); if (!p) { p = document.createElement("img"); slot.prepend(p); }
     p.src = URL.createObjectURL(f); slot.classList.add("done");
@@ -90,14 +92,16 @@ function initFoto() {
       if (faces.length > 1) throw new Error("many");
       L = faces[0]; P = H.toPx(L, img.width, img.height);
       if (H.giro(P) > 0.16) throw new Error("turned");
-      const pre = TOOL === "edad" ? edadPrep() : null; // the age model runs while the scan plays
+      // the age model, or the AI rating for the beauty test, runs while the scan plays
+      const pre = TOOL === "edad" ? edadPrep() : TOOL === "belleza" ? calificarIA() : null;
+      if (pre) pre.catch(() => {});
       await procesar();
       const res = await RESULTADOS[TOOL](pre);
       track("herramienta_resultado", res && res.evento);
       ir("resultado");
     } catch (e) {
       ir("foto");
-      const t = { noface: "No encontramos una cara en la foto. Prueba con una foto de frente y buena luz.", many: "Hay más de una cara en la foto. Usa una foto donde solo salgas tú.", turned: "Tu cara está muy girada. Mira directo a la cámara y vuelve a intentar.", gris: "La foto parece en blanco y negro o con filtro. Usa una foto a color, sin filtros.", edad: "No pudimos calcular tu edad visual con esta foto. Prueba con otra de frente y con buena luz." }[e.message];
+      const t = { foto_mala: "Tu cara no se ve bien en esta foto, así que la calificación no saldría justa. Usa una foto de frente, nítida, con buena luz y sin filtros.", sin_cara: "No encontramos una cara en la foto. Prueba con una foto de frente y buena luz.", menor: "Esta herramienta es solo para mayores de 18 años.", limitado: "Hiciste varias calificaciones seguidas. Vuelve a intentarlo en una hora.", noface: "No encontramos una cara en la foto. Prueba con una foto de frente y buena luz.", many: "Hay más de una cara en la foto. Usa una foto donde solo salgas tú.", turned: "Tu cara está muy girada. Mira directo a la cámara y vuelve a intentar.", gris: "La foto parece en blanco y negro o con filtro. Usa una foto a color, sin filtros.", edad: "No pudimos calcular tu edad visual con esta foto. Prueba con otra de frente y con buena luz." }[e.message];
       say(t || "No pudimos analizar la foto. Revisa tu conexión e inténtalo de nuevo.");
     } finally { go.disabled = false; go.textContent = t0; }
   });
@@ -139,13 +143,14 @@ async function procesar() {
 // Results, one per tool
 // =====================================================================
 const RESULTADOS = {
-  belleza: async () => {
-    const m = puntaje();
+  // the same AI rating as /calificacion: the overall number is shown, the zones go by email
+  belleza: async (pre) => {
+    const c = await pre;
     dibujarPuntaje($("#resCanvas"));
-    $("#resScore").textContent = m.score;
-    $("#resVerdict").textContent = m.score >= 75 ? "Muy armónica" : m.score >= 62 ? "Armónica" : m.score >= 48 ? "Equilibrada, con detalles por resaltar" : "Con varios rasgos por resaltar";
-    $("#resRows").innerHTML = m.parts.map(p => `<div class="report-row"><span>${p.k}</span><b class="mono cal-borroso">88</b></div>`).join("");
-    return { evento: { score: m.score } };
+    $("#resScore").textContent = c.general.toFixed(1);
+    $("#resVerdict").textContent = nivel(c.general) + ". 5 es el promedio.";
+    $("#resRows").innerHTML = ZONAS.map(([, k]) => `<div class="report-row"><span>${k}</span><b class="mono cal-borroso">8.8</b></div>`).join("");
+    return { evento: { score: c.general } };
   },
 
   forma: async () => {
@@ -262,45 +267,41 @@ async function edadPrep() {
   } catch (e) { return null; }
 }
 
-// ---------- the free harmony score (same formula as /calificacion), used for the email
-const dn = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-const cl = (v) => Math.max(0, Math.min(100, v));
-const near = (v, ideal, tol) => cl(100 * (1 - Math.abs(v - ideal) / tol));
-function reflect(p, a, b) { const dx = b.x - a.x, dy = b.y - a.y, t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / (dx * dx + dy * dy); const fx = a.x + t * dx, fy = a.y + t * dy; return { x: 2 * fx - p.x, y: 2 * fy - p.y }; }
-let _puntaje = null;
-// Strict scale, like a real rating: 50 is an average face, 70 is clearly attractive, a 90 is model level
-// and 100 does not happen. Proportions from one photo can't see skin, hair or body fat, so this curve
-// alone tops out at 90 even for perfect ratios.
-const estricto = raw => Math.max(15, Math.min(90, Math.round(50 + (raw - 67) * 0.9)));
-function puntaje() {
-  if (_puntaje) return _puntaje;
-  const Q = (i) => L[i], faceW = dn(Q(234), Q(454));
-  const pairs = [[33, 263], [133, 362], [61, 291], [234, 454], [172, 397], [70, 300], [105, 334], [50, 280], [58, 288], [127, 356]];
-  const a = Q(168), b = Q(152);
-  const dev = pairs.reduce((s, [l, r]) => s + dn(Q(l), reflect(Q(r), a, b)), 0) / pairs.length / faceW;
-  const symmetry = cl(100 * (1 - dev / 0.09));
-  const thirds = near(dn(Q(2), Q(152)) / dn(Q(9), Q(2)), 1.0, 0.45);
-  const lowerThird = near(dn(Q(13), Q(152)) / dn(Q(2), Q(13)), 2.0, 1.1);
-  const eyeW = (dn(Q(33), Q(133)) + dn(Q(362), Q(263))) / 2;
-  const eyes = near(dn(Q(133), Q(362)) / eyeW, 1.0, 0.5);
-  const ux0 = Q(263).x - Q(33).x, uy0 = Q(263).y - Q(33).y, un = Math.hypot(ux0, uy0);
-  const u = { x: ux0 / un, y: uy0 / un }, nrm = { x: -u.y, y: u.x };
-  const eyeTilt = (outer, inner, dir) => { const v = { x: Q(outer).x - Q(inner).x, y: Q(outer).y - Q(inner).y }; const along = (v.x * u.x + v.y * u.y) * dir, up = -(v.x * nrm.x + v.y * nrm.y); return Math.atan2(up, along) * 180 / Math.PI; };
-  const tilt = near((eyeTilt(33, 133, -1) + eyeTilt(263, 362, 1)) / 2, 5, 10);
-  const jaw = near(dn(Q(172), Q(397)) / faceW, 0.86, 0.22);
-  const fwhr = near(faceW / dn(Q(168), Q(0)), 1.95, 0.6);
-  const parts = [
-    { k: "Simetría", v: symmetry, w: 0.24, tip: "Pequeñas asimetrías se notan menos con el corte, la barba y la postura correctos." },
-    { k: "Tercios faciales", v: thirds, w: 0.18, tip: "El equilibrio entre la parte media y baja de tu cara se puede compensar con cabello y barba." },
-    { k: "Tercio inferior", v: lowerThird, w: 0.14, tip: "La proporción entre labio y mentón se puede equilibrar visualmente con la barba." },
-    { k: "Ojos", v: eyes, w: 0.14, tip: "La forma de tus cejas cambia mucho cómo se perciben tus ojos." },
-    { k: "Inclinación de ojos", v: tilt, w: 0.1, tip: "Cejas, descanso y piel de la zona de los ojos cambian tu mirada." },
-    { k: "Mandíbula", v: jaw, w: 0.12, tip: "Menos grasa facial, postura de cuello y barba bien definida marcan la mandíbula." },
-    { k: "Proporción del rostro", v: fwhr, w: 0.08, tip: "El volumen del cabello arriba o a los lados cambia la proporción de tu cara." }
-  ];
-  const raw = parts.reduce((s, p) => s + p.v * p.w, 0);
-  _puntaje = { score: estricto(raw), parts };
-  return _puntaje;
+// ---------- the AI rating (same as /calificacion), for the beauty test and for the email
+const ZONAS = [
+  ["proporciones", "Proporciones", "El volumen del cabello y la forma de la barba cambian cómo se perciben las proporciones de tu cara."],
+  ["ojos", "Ojos", "La forma de tus cejas, el descanso y la piel alrededor de los ojos cambian mucho tu mirada."],
+  ["nariz", "Nariz", "El corte, la barba y las cejas pueden equilibrar visualmente la nariz con el resto de la cara."],
+  ["boca", "Boca y labios", "Hidratación, cuidado de los labios y una barba bien recortada mejoran cómo se ve tu boca."],
+  ["mandibula", "Mandíbula y mentón", "Menos grasa facial, postura de cuello y una barba bien definida marcan la mandíbula."],
+  ["simetria", "Simetría", "Pequeñas asimetrías se notan menos con el corte, la barba y la postura correctos."]
+];
+const nivel = v => v < 4.5 ? "Por debajo del promedio" : v < 5.5 ? "En el promedio" : v < 6.5 ? "Arriba del promedio" : v < 7.5 ? "Atractivo" : v < 8.5 ? "Muy atractivo" : "Excepcional";
+// the face with some margin, without lines: what the AI looks at
+function recorte() {
+  const xs = P.map(q => q.x), ys = P.map(q => q.y);
+  const bx0 = Math.min(...xs), bx1 = Math.max(...xs), by0 = Math.min(...ys), by1 = Math.max(...ys);
+  const pw = (bx1 - bx0) * 0.6, ph = (by1 - by0) * 0.55;
+  const x0 = Math.max(0, bx0 - pw), x1 = Math.min(img.width, bx1 + pw), y0 = Math.max(0, by0 - ph), y1 = Math.min(img.height, by1 + ph * 0.6);
+  const k = Math.min(1, 900 / Math.max(x1 - x0, y1 - y0)), W = Math.round((x1 - x0) * k), Hh = Math.round((y1 - y0) * k);
+  const c = document.createElement("canvas"); c.width = W; c.height = Hh;
+  c.getContext("2d").drawImage(img, x0, y0, x1 - x0, y1 - y0, 0, 0, W, Hh);
+  return c.toDataURL("image/jpeg", 0.88);
+}
+let _cal = null;
+async function calificarIA() {
+  if (_cal) return _cal;
+  const C = window.RESALTA || {};
+  const r = await fetch(`${C.SUPABASE_URL}/functions/v1/calificar`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: C.SUPABASE_ANON_KEY, Authorization: `Bearer ${C.SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ fotos: [recorte()] }),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (j.limitado) throw new Error("limitado");
+  if (j.motivo) throw new Error(j.motivo);
+  if (!r.ok || !j.ok) throw new Error("ia");
+  _cal = j; return j;
 }
 function dibujarPuntaje(canvas) { D.dibujarBelleza(canvas, img, P, { disp: 260 }); }
 function nota(t) {
@@ -328,16 +329,16 @@ async function enviarLead(ev) {
   const C = window.RESALTA || {};
   b.disabled = true; const t0 = b.textContent; b.textContent = "Enviando…";
   try {
-    const m = puntaje();
-    const sorted = [...m.parts].sort((a, c) => c.v - a.v);
+    const cal = await calificarIA();
+    const parts = ZONAS.map(([id, k, tip]) => ({ k, tip, v: Number((cal.zonas || {})[id]) || 0 }));
     const r = await fetch(`${C.SUPABASE_URL}/functions/v1/resultado-gratis`, {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: C.SUPABASE_ANON_KEY, Authorization: `Bearer ${C.SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
-        nombre, email, score: m.score,
-        partes: m.parts.map(p => ({ k: p.k, v: Math.round(p.v), tip: p.tip })),
+        nombre, email, score: cal.general, cal_id: cal.id,
+        partes: parts.map(p => ({ k: p.k, v: p.v, tip: p.tip })),
         vid: (() => { try { return (localStorage.getItem("rs_vid") || "").slice(0, 40) || null; } catch (e) { return null; } })(),
-        foto: fotoCorreo(), fuerte: sorted[0].k, debil: { k: sorted[sorted.length - 1].k, tip: sorted[sorted.length - 1].tip },
+        foto: fotoCorreo(),
       }),
     });
     const j = await r.json().catch(() => ({}));
@@ -347,7 +348,7 @@ async function enviarLead(ev) {
     }
     if (!r.ok) throw new Error(String(r.status));
     const metodo = "herramienta_" + TOOL;
-    try { if (window.resaltaTrack) window.resaltaTrack("generate_lead", { method: metodo, score: m.score }); } catch (e) {}
+    try { if (window.resaltaTrack) window.resaltaTrack("generate_lead", { method: metodo, score: cal.general }); } catch (e) {}
     try { if (window.gtag) window.gtag("event", "generate_lead", { method: metodo }); } catch (e) {}
     try { if (window.fbq) window.fbq("track", "Lead", { content_name: metodo }); } catch (e) {}
     try { sessionStorage.setItem("resalta_lead", JSON.stringify({ nombre, email })); } catch (e) {}
@@ -355,7 +356,8 @@ async function enviarLead(ev) {
     document.querySelectorAll("[data-cal-email]").forEach(e => { e.textContent = email; });
     ir("gracias");
   } catch (e) {
-    m2.textContent = "No pudimos enviarlo. Revisa tu correo e inténtalo de nuevo."; m2.className = "msg show err";
+    const t = { foto_mala: "Tu cara no se ve bien en esta foto, así que la calificación no saldría justa. Prueba con otra foto de frente, nítida y con buena luz.", sin_cara: "No encontramos bien tu cara en esta foto. Prueba con otra de frente.", menor: "La calificación es solo para mayores de 18 años.", limitado: "Hiciste varias calificaciones seguidas. Vuelve a intentarlo en una hora." }[e.message];
+    m2.textContent = t || "No pudimos enviarlo. Revisa tu correo e inténtalo de nuevo."; m2.className = "msg show err";
   } finally { b.disabled = false; b.textContent = t0; }
 }
 
