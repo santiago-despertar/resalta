@@ -283,7 +283,9 @@ Deno.serve(async (req) => {
       const l = ls?.[0] ?? {};
       const nombre = String(l.nombre || "").trim().split(/\s+/)[0] || "Hola";
       const m = l.metrics ?? {};
-      const vars = { nombre, puntaje: String(l.score ?? ""), fuerte: conArticulo(m.fuerte) || "algunos rasgos", debil: conArticulo(m.debil?.k) || "algunos detalles" };
+      // AI ratings (/calificacion) are /10 and saved x10; the /herramientas ones are /100
+      const puntaje = l.score == null ? "" : m.escala === 10 ? `${(Number(l.score) / 10).toFixed(1)} de 10` : `${l.score} de 100`;
+      const vars = { nombre, puntaje, fuerte: conArticulo(m.fuerte) || "algunos rasgos", debil: conArticulo(m.debil?.k) || "algunos detalles" };
       const mujer = esMujer(nombre);
       const flags = { mujer, hombre: !mujer, alto: Number(l.score) >= PUNTAJE_ALTO, bajo: !(Number(l.score) >= PUNTAJE_ALTO) };
       const enlace = `${SITE}/analisis?utm_source=email&utm_medium=calificacion&utm_campaign=gratis-${sig.paso}`;
