@@ -93,9 +93,12 @@
     }).join(""), "Cada rasgo calificado de 0 a 10, donde 5 es el promedio.", true);
 
     // ---- measurements
+    // measurements against their reference range: in, near or outside (the only score in the report is the overall rating)
+    const EST = { dentro: "En rango", cerca: "Cerca del rango", fuera: "Fuera del rango" };
     const tabla = (lista, zonas) => (zonas || []).map(z => {
       const ms = (lista || []).filter(m => m.zona === z.id); if (!ms.length) return "";
-      return `<h3>${esc(z.nombre)} <span>${f1(z.puntaje / 10)} / 10</span></h3><table class="doc-t"><thead><tr><th>Medida</th><th>Tu valor</th><th>Rango ideal</th><th>Puntaje</th></tr></thead><tbody>${ms.map(m => `<tr><td>${esc(m.nombre)}</td><td>${esc(m.valor)}${esc(m.unidad || "")}</td><td>${Array.isArray(m.rango) ? esc(m.rango.join(" a ")) + esc(m.unidad || "") : ""}</td><td>${f1(m.puntaje / 10)}</td></tr>`).join("")}</tbody></table>`;
+      const dentro = ms.filter(m => m.estado === "dentro").length;
+      return `<h3>${esc(z.nombre)} <span>${dentro} de ${ms.length} en rango</span></h3><table class="doc-t"><thead><tr><th>Medida</th><th>Tu valor</th><th>Rango ideal</th><th>Estado</th></tr></thead><tbody>${ms.map(m => `<tr><td>${esc(m.nombre)}</td><td>${esc(m.valor)}${esc(m.unidad || "")}</td><td>${Array.isArray(m.rango) ? esc(m.rango.join(" a ")) + esc(m.unidad || "") : ""}</td><td>${esc(EST[m.estado] || "")}</td></tr>`).join("")}</tbody></table>`;
     }).join("");
     const nMed = (M.medidas || []).length + (pf ? (pf.medidas || []).length : 0);
     h += seccion("Tus medidas de frente", tabla(M.medidas, (M.resumen || {}).zonas), `${nMed} medidas tomadas de tus fotos. Son estimaciones a partir de fotos de celular.`, true);

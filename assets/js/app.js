@@ -985,7 +985,7 @@
       "Ojos y mirada": "Cómo enmarcar tu mirada: cejas, ojeras y párpados",
       "Salir mejor en fotos": "Tu lado bueno y el ángulo que más te favorece en fotos"
     };
-    function personalizarOferta() {
+    function personalizarOferta(cal) {
       const esc = v => String(v ?? "").replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
       const a = (order && order.answers) || {};
       const nombre = String(a.nombre || "").trim().split(/\s+/)[0];
@@ -995,10 +995,14 @@
       if (crudo && crudo.resumen && c && c.width && box) {
         try { $("#tuyoImg").src = c.toDataURL("image/jpeg", 0.86); } catch (e) {}
         $("#tuyoN").textContent = crudo.medidas.length;
-        const zs = crudo.resumen.zonas.filter(z => z.puntaje != null).sort((x, y) => y.puntaje - x.puntaje);
+        // zone scores are the AI ones (same as the preview and the report); without them, how many measurements are in range
+        const zs = cal && cal.ok
+          ? ZONAS_IA.map(([id, nombre]) => ({ nombre, v: Number((cal.zonas || {})[id]) })).filter(z => z.v >= 0).sort((x, y) => y.v - x.v).map(z => ({ nombre: z.nombre, txt: z.v.toFixed(1) + "/10", lock: "8.8/10" }))
+          : crudo.resumen.zonas.map(z => { const ms = crudo.medidas.filter(m => m.zona === z.id); return { nombre: z.nombre, n: ms.length, d: ms.filter(m => m.estado === "dentro").length }; })
+            .filter(z => z.n).sort((x, y) => y.d / y.n - x.d / x.n).map(z => ({ nombre: z.nombre, txt: `${z.d} de ${z.n} en rango`, lock: "8 de 8 en rango" }));
         const abiertas = zs.slice(0, 2), cerradas = zs.slice(2);
-        $("#tuyoZonas").innerHTML = abiertas.map(z => `<div><span>${esc(z.nombre)}</span><b>${z.puntaje}/100</b></div>`).join("") +
-          cerradas.map(z => `<div><span>${esc(z.nombre)}</span><b class="lock" aria-label="Bloqueado"><i>88/100</i></b></div>`).join("");
+        $("#tuyoZonas").innerHTML = abiertas.map(z => `<div><span>${esc(z.nombre)}</span><b>${esc(z.txt)}</b></div>`).join("") +
+          cerradas.map(z => `<div><span>${esc(z.nombre)}</span><b class="lock" aria-label="Bloqueado"><i>${esc(z.lock)}</i></b></div>`).join("");
         const fuera = crudo.medidas.filter(m => m.estado && m.estado !== "dentro").length;
         $("#tuyoNota").textContent = `Tu zona más fuerte es ${abiertas[0] ? abiertas[0].nombre.toLowerCase() : "tu cara"}. ` +
           (fuera ? `${fuera} de tus ${crudo.medidas.length} medidas están fuera del rango de referencia. Tu reporte te dice cuáles, qué significan y qué hacer primero.` : "Tu reporte te dice qué significa cada medida y qué hacer primero.");
@@ -1066,7 +1070,7 @@
         check();
         return;
       }
-      try { personalizarOferta(); } catch (e) { console.warn(e); }
+      try { personalizarOferta(cal); } catch (e) { console.warn(e); }
       const mensualActivo = await modoMensual();
       let conPreview = false;
       if (!mensualActivo) { try { conPreview = mostrarPreview(cal); } catch (e) { console.warn(e); } }
@@ -2206,12 +2210,13 @@
       if (o.medidas && o.medidas.medidas) {
         const firmar = k => sb.storage.from("fotos").createSignedUrl(`${user.id}/${o.id}/${k}.jpg`, 3600).then(x => x.data ? x.data.signedUrl : "").catch(() => "");
         const pf = o.medidas.perfil;
-        const [{ montarAnalisis }, foto, fotoP] = await Promise.all([import("/assets/js/analisis-ui.js?v=3"), firmar("frente"), pf ? firmar(pf.foto || "perfil_izq") : ""]);
-        const pun = (r.puntajes || {}).armonia;
+        const [{ montarAnalisis }, foto, fotoP] = await Promise.all([import("/assets/js/analisis-ui.js?v=4"), firmar("frente"), pf ? firmar(pf.foto || "perfil_izq") : ""]);
+        // the same overall rating as the start of the report; the measurements are shown against their ranges
+        const gen = (r.puntajes || {}).general;
         montarAnalisis($("#fqRoot"), {
           frente: { data: o.medidas, src: foto }, perfil: pf ? { data: pf, src: fotoP } : null,
-          armonia: typeof pun === "number" ? pun : null,
-          nivel: v => v < 4.5 ? "Por debajo del promedio" : v < 5.5 ? "En el promedio" : v < 6.5 ? "Arriba del promedio" : v < 7.5 ? "Muy buena armonía" : v < 8.5 ? "Excelente armonía" : "Excepcional"
+          general: typeof gen === "number" ? gen : null,
+          nivel: v => v < 4.5 ? "Por debajo del promedio" : v < 5.5 ? "En el promedio" : v < 6.5 ? "Arriba del promedio" : v < 7.5 ? "Atractivo" : v < 8.5 ? "Muy atractivo" : "Excepcional"
         });
         const peB = $("#peBtns");
         if (peB) {
