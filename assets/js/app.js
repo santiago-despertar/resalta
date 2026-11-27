@@ -290,6 +290,13 @@
       }
     } catch (e) {}
   };
+  // Google sign-ins come back from Google already logged in: count them once, as a new account or a login.
+  if (sb) sb.auth.getUser().then(({ data }) => {
+    const u = data && data.user; if (!u || !(u.identities || []).some(i => i.provider === "google")) return;
+    const k = "rs_google_" + u.id; if (localStorage.getItem(k)) return;
+    localStorage.setItem(k, "1");
+    track(Date.now() - new Date(u.created_at).getTime() < 15 * 60e3 ? "sign_up" : "login", { method: "google" });
+  }).catch(() => {});
   const precio = tier => (NIV ? NIV[tier] : LOCAL && LOCAL.n ? LOCAL.n[tier] : Number(String((C.PRICES || {})[tier] || "").replace(/[^0-9.]/g, ""))) || undefined;
   // Affiliate commissions are stored in pesos; the portal shows them in the affiliate's currency.
   const precioMXN = tier => (MONEDAS.MXN && MONEDAS.MXN.n ? MONEDAS.MXN.n[tier] : precio(tier));
@@ -523,6 +530,8 @@
     $$("[data-google]").forEach(btn => btn.addEventListener("click", async () => {
       const m = $("#googleMsg"); clearMsg(m);
       if (!sb) return notReady(m);
+      // the click is saved before leaving for Google, to see how many start with Google and don't come back
+      registrar("google_clic", {}); await new Promise(r => setTimeout(r, 250));
       const { error } = await sb.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: location.origin + next, queryParams: { prompt: "select_account" } }
