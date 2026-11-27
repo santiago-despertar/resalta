@@ -1525,6 +1525,8 @@
       if (conNombre) $("#who").textContent = conNombre.answers.nombre.split(" ")[0];
       const box = $("#orders");
       if (!orders || !orders.length) {
+        // a brand-new account (Google or email) with nothing yet goes straight to the onboarding
+        if (Date.now() - new Date(user.created_at).getTime() < 15 * 60e3) { location.replace("/analisis"); return; }
         box.innerHTML = '<p class="hint" style="padding:18px 0">Todavía no tienes análisis. <a href="/analisis">Empieza el tuyo</a>.</p>';
         return;
       }
