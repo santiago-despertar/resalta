@@ -852,13 +852,15 @@
       } catch (e) {}
     }
 
+    // Photos are stored at 1280 px and JPEG 0.82: looks the same on any screen and the analysis, and weighs about half,
+    // so the free storage plan lasts twice as long.
     async function resize(file) {
       const img = await createImageBitmap(file);
-      const max = 1600, s = Math.min(1, max / Math.max(img.width, img.height));
+      const max = 1280, s = Math.min(1, max / Math.max(img.width, img.height));
       const c = document.createElement("canvas");
       c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      return new Promise(r => c.toBlob(r, "image/jpeg", 0.9));
+      return new Promise(r => c.toBlob(r, "image/jpeg", 0.82));
     }
     async function handleFile(el, key, file) {
       const m = $("#photoMsg"); clearMsg(m);
@@ -1621,10 +1623,10 @@
         const f = ev.target.files[0]; if (!f) return;
         lab.querySelector("span").textContent = "Subiendo…"; saltar.disabled = true;
         try {
-          const img = await createImageBitmap(f), s2 = Math.min(1, 1600 / Math.max(img.width, img.height));
+          const img = await createImageBitmap(f), s2 = Math.min(1, 1280 / Math.max(img.width, img.height));
           const c = document.createElement("canvas"); c.width = Math.round(img.width * s2); c.height = Math.round(img.height * s2);
           c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-          const blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.9));
+          const blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.82));
           const { error } = await sb.storage.from("fotos").upload(`${user.id}/${o.id}/sonrisa.jpg`, blob, { upsert: true, contentType: "image/jpeg" });
           if (error) throw error;
           clearMsg(m); generar(o);
@@ -1715,10 +1717,10 @@
         const f = ev.target.files[0]; if (!f) return;
         lab.querySelector("span").textContent = "Subiendo…";
         try {
-          const img = await createImageBitmap(f), s2 = Math.min(1, 1600 / Math.max(img.width, img.height));
+          const img = await createImageBitmap(f), s2 = Math.min(1, 1280 / Math.max(img.width, img.height));
           const c = document.createElement("canvas"); c.width = Math.round(img.width * s2); c.height = Math.round(img.height * s2);
           c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-          const blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.9));
+          const blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.82));
           const { error } = await sb.storage.from("fotos").upload(`${user.id}/${o.id}/frente.jpg`, blob, { upsert: true, contentType: "image/jpeg" });
           if (error) throw error;
           o.medidas = null; clearMsg(m); generar(o);
@@ -2001,10 +2003,10 @@
     }
     async function redimensionar(file) {
       const img = await createImageBitmap(file);
-      const s = Math.min(1, 1400 / Math.max(img.width, img.height)), c = document.createElement("canvas");
+      const s = Math.min(1, 1280 / Math.max(img.width, img.height)), c = document.createElement("canvas");
       c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      return new Promise(r => c.toBlob(r, "image/jpeg", 0.88));
+      return new Promise(r => c.toBlob(r, "image/jpeg", 0.82));
     }
     async function urlFoto(ruta) { const { data } = await sb.storage.from("fotos").createSignedUrl(ruta, 3600); return data ? data.signedUrl : ""; }
     // Plans written since nov-2026 (v 2): a 4-week menu with recipes and a 4-week training block, one week at a time.
