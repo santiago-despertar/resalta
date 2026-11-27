@@ -1135,7 +1135,7 @@
       // a photo the AI can't rate fairly goes back to the photo step instead of getting a wrong number
       if (cal && cal.ok === false && cal.motivo) {
         go(2);
-        const t = { foto_mala: "Tu foto de frente o de perfil no se ve bien, así que tu calificación no saldría justa. Sube fotos nítidas, con buena luz y sin filtros.", sin_cara: "No encontramos bien tu cara en tus fotos. Sube una de frente y una de perfil, con buena luz.", menor: "El análisis es solo para mayores de 18 años." }[cal.motivo];
+        const t = { foto_mala: "Tu foto de frente o de perfil no se ve bien, así que tu calificación no saldría justa. Sube fotos nítidas, con buena luz y sin filtros.", sin_cara: "No encontramos bien tu cara en tus fotos. Sube una de frente y una de perfil, con buena luz.", menor: "El análisis es solo para mayores de 18 años.", limite: "Ya calificamos 5 fotos tuyas hoy, que es el máximo por día. Vuelve a subir las fotos de antes o inténtalo mañana." }[cal.motivo];
         msg($("#photoMsg"), t || "No pudimos calificar tus fotos. Prueba con otras.");
         if (cal.motivo === "foto_mala" || cal.motivo === "sin_cara") ["frente", "perfil_izq", "perfil_der"].forEach(k => { const sl = document.querySelector(`.slot[data-key="${k}"]`); if (sl) sl.classList.remove("done"); uploaded.delete(k); delete fotosIA[k]; });
         check();
