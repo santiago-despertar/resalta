@@ -170,7 +170,11 @@ async function enviar(key: string, email: string, asunto: string, cuerpo: string
     body: JSON.stringify({ from: { name: "Resalta", email: Deno.env.get("SENDER_FROM") ?? "contacto@resalta.co" }, to: { email, name: nombre }, subject: asunto, html: cuerpo }),
   });
   const t = await r.text();
-  if (!r.ok || !/"success"\s*:\s*true/.test(t)) { console.error("sender", r.status, t.slice(0, 200)); return false; }
+  if (!r.ok || !/"success"\s*:\s*true/.test(t)) { console.error("sender", r.status, t.slice(0, 200));
+    // a bounced or unsubscribed address never gets another try: it goes to bajas, which every flow skips
+    if (/subscriber_status|bounced|unsubscribed/i.test(t)) await admin.from("bajas").upsert({ email: email.toLowerCase() }).then(() => {}, () => {});
+    return false;
+  }
   return true;
 }
 
