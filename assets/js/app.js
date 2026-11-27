@@ -1067,12 +1067,11 @@
       const lista = metas.map(x => FOCO[x]);
       if (a.tiempo) lista.push(`Un plan de 90 días hecho para el tiempo que tienes: ${String(a.tiempo).toLowerCase()} al día`);
       if (lista.length) { $("#tuyoLista").innerHTML = lista.map(t => `<li>${esc(t)}</li>`).join(""); $("#tuyoFoco").hidden = false; }
-      // Someone who only wants natural changes is told honestly that Esencial covers it.
+      // Completo is always the recommended plan. Someone who only wants natural changes is still told honestly that both plans cover that.
       const natural = /^Solo/.test(a.procedimientos || ""), razon = $("#planRazon");
-      const recSoft = document.querySelector('[data-plan="soft"] .plan-rec'), recHard = document.querySelector('[data-plan="hard"] .plan-rec');
-      if (natural && recSoft && recHard) {
-        recSoft.hidden = false; recHard.hidden = true;
-        if (razon) { razon.textContent = "Nos dijiste que prefieres cambios sin procedimientos, así que el plan Esencial cubre todo lo que buscas."; razon.hidden = false; }
+      if (natural && razon) {
+        razon.textContent = "Nos dijiste que prefieres cambios sin procedimientos. Los dos planes cubren eso; el Completo además te deja ver cada cambio en tu cara con el simulador y preguntarle lo que quieras a tu reporte.";
+        razon.hidden = false;
       } else if (/procedimiento|cirug/i.test(a.procedimientos || "") && razon) {
         razon.textContent = "Como estás abierto a procedimientos, el plan Completo te dice cuáles sí tienen sentido para tu cara y cuáles no.";
         razon.hidden = false;
