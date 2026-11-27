@@ -130,13 +130,12 @@ function bloqueResultado(general: number, zs: [string, number][], foto: string |
     : general >= 4.5 ? "Estás en el promedio. Los cambios correctos se van a notar bastante."
     : "Tienes mucho margen para subir, y los cambios correctos se van a notar bastante.";
   const fila = ([n, v]: [string, number]) => `<tr><td style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,.18);font-family:${EM_SANS};font-size:15px;color:${EM_SUAVE}">${esc(n)}</td><td align="right" style="padding:9px 0;border-bottom:1px solid rgba(255,255,255,.18);font-family:${EM_MONO};font-size:15px;color:#FFFFFF">${v.toFixed(1)}</td></tr>`;
-  const fuerte = zs[0], debil = zs.length > 1 ? zs[zs.length - 1] : null;
   return (foto ? emCaja(`<img src="${esc(foto)}" width="100%" class="fi" alt="Tu foto con tus medidas" style="display:block;width:100%;max-width:510px;height:auto;margin:0 auto;border:0;border-radius:14px">`, "9px") : "")
     + emCaja(`<div style="text-align:center"><div style="font-family:${EM_MONO};font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)">Tu calificación facial</div>
       <div class="sc" style="margin-top:10px;font-family:${EM_SANS};font-size:84px;line-height:1;font-weight:300;letter-spacing:-.045em;color:#FFFFFF">${general.toFixed(1)}<span style="font-size:22px;letter-spacing:0;color:${EM_SUAVE}">&nbsp;/ 10</span></div>
       <div style="margin:14px auto 0;max-width:400px;font-family:${EM_SANS};font-size:16px;line-height:25px;color:${EM_SUAVE}">${esc(nivel)}</div></div>`, "30px 24px 28px")
     + (zs.length ? emCaja(`<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${zs.map(fila).join("")}</table>`
-      + (fuerte ? `<div style="margin-top:18px;font-family:${EM_SANS};font-size:16px;line-height:25px;color:${EM_SUAVE}">Tu punto más fuerte es <b style="color:#FFFFFF">${esc(fuerte[0].toLowerCase())}</b>.${debil ? ` Lo que más te baja la calificación es <b style="color:#FFFFFF">${esc(debil[0].toLowerCase())}</b>.` : ""}</div>` : "")) : "");
+    ) : "");
 }
 
 const nombreDe = (a: Obj, u: Obj) => String(a?.nombre || u?.user_metadata?.full_name || "").trim().split(/\s+/)[0] || "Hola";
