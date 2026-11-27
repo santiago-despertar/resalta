@@ -2,6 +2,40 @@
 // Secrets: ANTHROPIC_API_KEY, ANTHROPIC_CHAT_MODEL (optional, default claude-haiku-5-5), SITE_URL
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
+// Cost log: every Anthropic or Gemini call this function makes is saved in gasto_ia (the admin's Costos view reads it).
+// It reads a copy of the response after the fact, so it never slows down or breaks the real call.
+const _fetchReal = globalThis.fetch;
+globalThis.fetch = async (input: any, init?: any) => {
+  const res = await _fetchReal(input, init);
+  try {
+    const u = String(typeof input === "string" ? input : input?.url ?? input);
+    const ia = u.includes("api.anthropic.com") ? "anthropic" : u.includes("generativelanguage.googleapis.com") ? "gemini" : "";
+    if (ia && res.ok) {
+      const p = res.clone().json().then((j: any) => {
+        let modelo = j.model ?? "", entrada = 0, cache = 0, salida = 0, imagenes = 0;
+        if (ia === "anthropic") {
+          const s = j.usage ?? {};
+          entrada = (s.input_tokens ?? 0) + (s.cache_creation_input_tokens ?? 0); cache = s.cache_read_input_tokens ?? 0; salida = s.output_tokens ?? 0;
+        } else {
+          const s = j.usageMetadata ?? {};
+          entrada = s.promptTokenCount ?? 0; salida = s.candidatesTokenCount ?? 0;
+          modelo = j.modelVersion ?? (u.match(/models\/([^:?]+)/)?.[1] ?? "");
+          imagenes = (j.candidates ?? []).flatMap((c: any) => c.content?.parts ?? []).filter((x: any) => x.inlineData || x.inline_data).length;
+        }
+        const k = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+        return _fetchReal(`${Deno.env.get("SUPABASE_URL")}/rest/v1/gasto_ia`, {
+          method: "POST",
+          headers: { apikey: k, Authorization: `Bearer ${k}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+          body: JSON.stringify({ funcion: "chat", servicio: ia, modelo, entrada, cache, salida, imagenes }),
+        });
+      }).catch(() => {});
+      (globalThis as any).EdgeRuntime?.waitUntil?.(p);
+    }
+  } catch { /* never block the real call */ }
+  return res;
+};
+
+
 const cors = {
   "Access-Control-Allow-Origin": Deno.env.get("SITE_URL") ?? "https://resalta.co",
   "Access-Control-Allow-Headers": "authorization, apikey, content-type",
