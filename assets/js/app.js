@@ -1051,8 +1051,7 @@
         $("#tuyoZonas").innerHTML = abiertas.map(z => `<div><span>${esc(z.nombre)}</span><b>${esc(z.txt)}</b></div>`).join("") +
           cerradas.map(z => `<div><span>${esc(z.nombre)}</span><b class="lock" aria-label="Bloqueado"><i>${esc(z.lock)}</i></b></div>`).join("");
         const fuera = crudo.medidas.filter(m => m.estado && m.estado !== "dentro").length;
-        $("#tuyoNota").textContent = `Tu zona más fuerte es ${abiertas[0] ? abiertas[0].nombre.toLowerCase() : "tu cara"}. ` +
-          (fuera ? `${fuera} de tus ${crudo.medidas.length} medidas están fuera del rango de referencia. Tu reporte te dice cuáles, qué significan y qué hacer primero.` : "Tu reporte te dice qué significa cada medida y qué hacer primero.");
+        $("#tuyoNota").textContent = (fuera ? `${fuera} de tus ${crudo.medidas.length} medidas están fuera del rango de referencia. Tu reporte te dice cuáles, qué significan y qué hacer primero.` : "Tu reporte te dice qué significa cada medida y qué hacer primero.");
         box.hidden = false;
       }
       const metas = String(a.objetivo || "").split(", ").filter(x => FOCO[x]);
@@ -1107,9 +1106,8 @@
       nf.hidden = !tn;
       const fuera = crudo.medidas.filter(m => m.estado && m.estado !== "dentro").length;
       $("#prevPq").textContent = `¿Quieres saber por qué sacaste ${total}?`;
-      const debil = zs[zs.length - 1];
-      $("#prevNota").textContent = (fuera ? `${fuera} de tus ${n} medidas están fuera del rango de referencia` : "Tus medidas tienen detalles") +
-        (debil ? ` y lo que más te baja es ${debil.nombre.toLowerCase()}. ` : ". ") + "Tu análisis completo te dice cuáles, qué cambiar primero y hasta dónde puedes subir.";
+      $("#prevNota").textContent = fuera ? `${fuera} de tus ${n} medidas están fuera del rango de referencia. Tu análisis completo te dice cuáles, qué cambiar primero y hasta dónde puedes subir.`
+        : "Tu análisis completo te dice qué cambiar primero y hasta dónde puedes subir.";
       const t = $("#tuyo"); if (t) t.hidden = true; // the plans page doesn't repeat the photo
       const back = $("#payBack"); if (back) back.dataset.back = "2.7";
       return true;
