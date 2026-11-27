@@ -155,6 +155,13 @@ Deno.serve(async (req) => {
 
     if (accion === "yo") return json({ ok: true, email: yo.email });
 
+    // database and file sizes against the Free plan limits (egress is only in the Supabase usage page)
+    if (accion === "uso") {
+      const { data, error } = await admin.rpc("uso_supabase");
+      if (error) return json({ error: error.message }, 500);
+      return json({ ok: true, ...data });
+    }
+
     if (accion === "resumen") {
       const dias = Math.min(365, Math.max(1, Number(b.dias) || 30));
       const desde = new Date(hoy0().getTime() - (dias - 1) * DIA);
