@@ -185,7 +185,17 @@ Deno.serve(async (req) => {
           x.llamadas++; x.usd += c; x.imagenes += f.imagenes || 0;
         }
       }
-      return json({ ok: true, ia, funciones: Object.values(funciones).sort((a: any, b: any) => b.usd - a.usd), uso, desde_registro: primera?.creado ?? null, mes_inicio: mesIni.toISOString() });
+      // the real Anthropic bill for this month, when an Admin API key is saved as the ANTHROPIC_ADMIN_KEY secret
+      let anthropicReal: number | Obj | null = null;
+      const ak = Deno.env.get("ANTHROPIC_ADMIN_KEY");
+      if (ak) {
+        try {
+          const r = await fetch(`https://api.anthropic.com/v1/organizations/cost_report?starting_at=${mesIni.toISOString()}&bucket_width=1d&limit=31`, { headers: { "x-api-key": ak, "anthropic-version": "2023-06-01" } });
+          const j = await r.json();
+          anthropicReal = r.ok ? (j.data ?? []).reduce((s: number, b: Obj) => s + (b.results ?? []).reduce((t: number, x: Obj) => t + Number(x.amount ?? 0), 0), 0) / 100 : { error: j.error?.message ?? String(r.status) };
+        } catch (e) { anthropicReal = { error: String(e) }; }
+      }
+      return json({ ok: true, ia, anthropic_real: anthropicReal, funciones: Object.values(funciones).sort((a: any, b: any) => b.usd - a.usd), uso, desde_registro: primera?.creado ?? null, mes_inicio: mesIni.toISOString() });
     }
 
     if (accion === "uso") {
