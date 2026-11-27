@@ -325,9 +325,12 @@ function nota(t) {
   if (!n) { $("#resCanvas").insertAdjacentHTML("afterend", '<p class="hint" id="resCanvasNota" style="margin:-8px 0 16px;font-size:13px"></p>'); n = $("#resCanvasNota"); }
   n.textContent = t;
 }
+// The picture in their email is the one they saw on this tool (symmetry lines on the symmetry tool, the face
+// outline on the face-shape tool...), not the beauty-test drawing for every tool.
 function fotoCorreo() {
   try {
-    const c = document.createElement("canvas"); dibujarPuntaje(c);
+    let c = $("#resCanvas");
+    if (!c || !c.width) { c = document.createElement("canvas"); dibujarPuntaje(c); }
     const W = Math.min(600, c.width), Hh = Math.round(c.height * W / c.width);
     const o = document.createElement("canvas"); o.width = W; o.height = Hh;
     o.getContext("2d").drawImage(c, 0, 0, W, Hh);
