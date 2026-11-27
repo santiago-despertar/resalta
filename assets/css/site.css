@@ -2466,5 +2466,3 @@ body[data-page=index] .notes{padding-bottom:32px}
 #photoGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 @media (min-width:641px){#photoGrid .slot{aspect-ratio:1/1}}
 @media (max-width:640px){#photoGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:none}#photoGrid .slot small{display:block}}
-/* Google sign-in off while its client secret is being fixed (it fails with invalid_client). Delete these lines to bring it back. */
-#googleBox,.btn-google{display:none!important}
