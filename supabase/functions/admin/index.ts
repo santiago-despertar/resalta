@@ -195,7 +195,9 @@ Deno.serve(async (req) => {
           anthropicReal = r.ok ? (j.data ?? []).reduce((s: number, b: Obj) => s + (b.results ?? []).reduce((t: number, x: Obj) => t + Number(x.amount ?? 0), 0), 0) / 100 : { error: j.error?.message ?? String(r.status) };
         } catch (e) { anthropicReal = { error: String(e) }; }
       }
-      return json({ ok: true, ia, anthropic_real: anthropicReal, funciones: Object.values(funciones).sort((a: any, b: any) => b.usd - a.usd), uso, desde_registro: primera?.creado ?? null, mes_inicio: mesIni.toISOString() });
+      // the real Google (Gemini) bill for this month, sent by the Cloud budget through Pub/Sub to the google-gasto function
+      const { data: gg } = await admin.from("gasto_google").select("periodo,costo,moneda,monto_presupuesto,actualizado").order("periodo", { ascending: false }).limit(1).maybeSingle();
+      return json({ ok: true, ia, anthropic_real: anthropicReal, google_real: gg ?? null, funciones: Object.values(funciones).sort((a: any, b: any) => b.usd - a.usd), uso, desde_registro: primera?.creado ?? null, mes_inicio: mesIni.toISOString() });
     }
 
     // ads across every platform: what each one reports (spend, clicks, its own conversions) next to what really
