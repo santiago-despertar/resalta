@@ -198,6 +198,52 @@ Deno.serve(async (req) => {
       return json({ ok: true, ia, anthropic_real: anthropicReal, funciones: Object.values(funciones).sort((a: any, b: any) => b.usd - a.usd), uso, desde_registro: primera?.creado ?? null, mes_inicio: mesIni.toISOString() });
     }
 
+    // ads across every platform: what each one reports (spend, clicks, its own conversions) next to what really
+    // happened on the site (visitors, sign-ups and paid orders traced back to that platform)
+    if (accion === "anuncios") {
+      const dias = Math.min(365, Math.max(1, Number(b.dias) || 30));
+      const hasta = new Date(), desde = new Date(Date.now() - (dias - 1) * 864e5);
+      const ymd = (d: Date) => d.toISOString().slice(0, 10);
+      const plataformas: Obj = { meta: { conectado: false }, google: { conectado: false }, tiktok: { conectado: false }, x: { conectado: false } };
+      const num = (v: unknown) => Number(v ?? 0) || 0;
+      const resumen = (x: Obj | undefined) => {
+        if (!x) return null;
+        const acc = (...t: string[]) => { for (const k of t) { const v = ((x.actions ?? []) as Obj[]).find((a) => a.action_type === k)?.value; if (v != null) return num(v); } return 0; };
+        const gasto = num(x.spend);
+        const compras = acc("offsite_conversion.fb_pixel_purchase", "purchase"), registros = acc("offsite_conversion.fb_pixel_complete_registration", "complete_registration"), pagos = acc("offsite_conversion.fb_pixel_initiate_checkout", "initiate_checkout");
+        const valor = ((x.action_values ?? []) as Obj[]).find((a) => /purchase/.test(a.action_type))?.value;
+        return { gasto, impresiones: num(x.impressions), alcance: num(x.reach), frecuencia: num(x.frequency), clics: num(x.inline_link_clicks ?? x.clicks), ctr: num(x.inline_link_click_ctr ?? x.ctr), cpc: num(x.cost_per_inline_link_click ?? x.cpc), cpm: num(x.cpm), registros, pagos, compras, valor: num(valor) };
+      };
+      const mtok = Deno.env.get("META_ADS_TOKEN"), mcta = (Deno.env.get("META_AD_ACCOUNT") ?? "").replace(/^act_/, "");
+      const tareas: Promise<unknown>[] = [];
+      if (mtok && mcta) tareas.push((async () => {
+        try {
+          const base = `https://graph.facebook.com/v21.0/act_${mcta}`, tr = encodeURIComponent(JSON.stringify({ since: ymd(desde), until: ymd(hasta) }));
+          const campos = "spend,impressions,reach,frequency,clicks,inline_link_clicks,inline_link_click_ctr,cost_per_inline_link_click,ctr,cpc,cpm,actions,action_values";
+          const q = (extra: string) => fetch(`${base}/insights?fields=${campos}${extra}&time_range=${tr}&access_token=${mtok}`).then((r) => r.json());
+          const [cta, tot, dia, camp, ads] = await Promise.all([
+            fetch(`${base}?fields=name,currency,account_status,amount_spent&access_token=${mtok}`).then((r) => r.json()),
+            q(""), q("&time_increment=1&limit=400"), q(",campaign_name&level=campaign&limit=100"), q(",ad_name,campaign_name&level=ad&limit=100"),
+          ]);
+          if (cta.error) { plataformas.meta = { conectado: true, error: cta.error.message }; return; }
+          plataformas.meta = {
+            conectado: true, cuenta: cta.name, moneda: cta.currency, activa: cta.account_status === 1,
+            total: resumen(tot.data?.[0]) ?? resumen({}),
+            por_dia: ((dia.data ?? []) as Obj[]).map((x) => ({ fecha: x.date_start, ...resumen(x) })),
+            campanas: ((camp.data ?? []) as Obj[]).map((x) => ({ nombre: x.campaign_name, ...resumen(x) })).sort((a: any, b: any) => b.gasto - a.gasto),
+            anuncios: ((ads.data ?? []) as Obj[]).map((x) => ({ nombre: x.ad_name, campana: x.campaign_name, ...resumen(x) })).sort((a: any, b: any) => b.gasto - a.gasto),
+            error: tot.error?.message ?? null,
+          };
+        } catch (e) { plataformas.meta = { conectado: true, error: String(e) }; }
+      })());
+      const [, { data: atrib }, { data: ventas }] = await Promise.all([
+        Promise.all(tareas),
+        admin.rpc("ads_atribucion", { desde: desde.toISOString().slice(0, 10) }),
+        admin.from("orders").select("amount_mxn").in("status", ["pagado", "listo"]).gte("paid_at", desde.toISOString().slice(0, 10)),
+      ]);
+      return json({ ok: true, dias, desde: ymd(desde), hasta: ymd(hasta), plataformas, sitio: atrib ?? [], ventas_total: { compras: (ventas ?? []).length, ingresos: (ventas ?? []).reduce((t: number, o: Obj) => t + num(o.amount_mxn), 0) } });
+    }
+
     // live numbers from each connected service: Stripe (money), Sender (email list) and Meta (ads). Each part
     // fails on its own, so one service being down never blanks the others.
     if (accion === "cuentas") {
