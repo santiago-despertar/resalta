@@ -1151,7 +1151,8 @@
       const w = warmPay(); if (w) w.catch(() => {});
     });
 
-    // Both plans are shown side by side at the end; the one they came in with starts selected.
+    // Both plans are shown side by side at the end. Completo starts selected, unless they came in having picked Esencial.
+    { let antes = null; try { antes = sessionStorage.getItem("plan"); } catch (e) {} if (qsPlan !== "soft" && antes !== "soft") plan = "hard"; }
     $$('[name="planSel"]').forEach(r => {
       r.checked = r.value === plan;
       r.addEventListener("change", () => {
