@@ -15,7 +15,7 @@ const cors = {
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 const MODELO = "claude-sonnet-5-5";
-const POR_HORA = 12, POR_DIA = 30;
+const POR_HORA = 12, POR_DIA = 30, POR_DIA_CUENTA = 5;
 // bump when the rating prompt changes, so cached results from the old prompt are not reused
 const RUBRICA = "v6";
 
@@ -170,6 +170,10 @@ Deno.serve(async (req) => {
         admin.from("calificaciones").select("id", { count: "exact", head: true }).eq("ip", ip).gte("created_at", dia),
       ]);
       if ((h ?? 0) >= POR_HORA || (d ?? 0) >= POR_DIA) return json({ ok: false, limitado: true });
+    } else if (userId && !(await admin.from("admins").select("user_id").eq("user_id", userId).maybeSingle()).data) {
+      // onboarding: up to POR_DIA_CUENTA new ratings per account a day (the same photo again is free and doesn't count)
+      const { count } = await admin.from("calificaciones").select("id", { count: "exact", head: true }).eq("user_id", userId).eq("origen", "onboarding").gte("created_at", new Date(Date.now() - 864e5).toISOString());
+      if ((count ?? 0) >= POR_DIA_CUENTA) return json({ ok: false, motivo: "limite" });
     }
 
     const c = await calificarFotos(fotos, medidas);
