@@ -198,6 +198,89 @@ Deno.serve(async (req) => {
       return json({ ok: true, ia, anthropic_real: anthropicReal, funciones: Object.values(funciones).sort((a: any, b: any) => b.usd - a.usd), uso, desde_registro: primera?.creado ?? null, mes_inicio: mesIni.toISOString() });
     }
 
+    // live numbers from each connected service: Stripe (money), Sender (email list) and Meta (ads). Each part
+    // fails on its own, so one service being down never blanks the others.
+    if (accion === "cuentas") {
+      const mesIni = new Date(); mesIni.setUTCDate(1); mesIni.setUTCHours(0, 0, 0, 0);
+      const desdeSeg = Math.floor(mesIni.getTime() / 1000);
+      const sk = Deno.env.get("STRIPE_SECRET_KEY"), sd = Deno.env.get("SENDER_API_KEY");
+      const mtok = Deno.env.get("META_ADS_TOKEN"), mcta = (Deno.env.get("META_AD_ACCOUNT") ?? "").replace(/^act_/, "");
+      const out: Obj = {};
+      const tareas: Promise<unknown>[] = [];
+
+      if (sk) tareas.push((async () => {
+        try {
+          const h = { Authorization: `Bearer ${sk}` };
+          const bal = await (await fetch("https://api.stripe.com/v1/balance", { headers: h })).json();
+          const suma = (arr: Obj[] = []) => arr.reduce((t, x) => t + (x.amount ?? 0), 0) / 100;
+          const st: Obj = { disponible: suma(bal.available), pendiente: suma(bal.pending), moneda: (bal.available?.[0]?.currency ?? "mxn").toUpperCase(), cobros: 0, bruto: 0, comisiones: 0, reembolsos: 0, disputas: 0, depositado: 0 };
+          let after = "", vueltas = 0;
+          while (vueltas++ < 10) {
+            const j = await (await fetch(`https://api.stripe.com/v1/balance_transactions?limit=100&created[gte]=${desdeSeg}${after ? "&starting_after=" + after : ""}`, { headers: h })).json();
+            for (const t of (j.data ?? []) as Obj[]) {
+              if (t.type === "charge" || t.type === "payment") { st.cobros++; st.bruto += t.amount / 100; st.comisiones += t.fee / 100; }
+              else if (t.type === "refund" || t.type === "payment_refund") { st.reembolsos += -t.amount / 100; st.comisiones += t.fee / 100; }
+              else if (t.type === "adjustment" || t.type === "dispute") st.disputas += -t.amount / 100;
+              else if (t.type === "payout") st.depositado += -t.amount / 100;
+              else if (t.type === "stripe_fee") st.comisiones += -t.amount / 100;
+            }
+            if (!j.has_more || !(j.data ?? []).length) break;
+            after = j.data[j.data.length - 1].id;
+          }
+          st.neto = st.bruto - st.comisiones - st.reembolsos - st.disputas;
+          out.stripe = st;
+        } catch (e) { out.stripe = { error: String(e) }; }
+      })());
+
+      if (sd) tareas.push((async () => {
+        try {
+          const h = { Authorization: `Bearer ${sd}`, Accept: "application/json" };
+          const [g, sub] = await Promise.all([
+            fetch("https://api.sender.net/v2/groups", { headers: h }).then((r) => r.json()),
+            fetch("https://api.sender.net/v2/subscribers?limit=1", { headers: h }).then((r) => r.json()),
+          ]);
+          out.sender = {
+            total: sub?.meta?.total ?? null,
+            grupos: ((g.data ?? []) as Obj[]).filter((x) => !/test/i.test(x.title)).map((x) => ({ nombre: x.title, total: x.recipient_count, activos: x.active_subscribers, bajas: x.unsubscribed_count, rebotes: x.bounced_count })),
+          };
+        } catch (e) { out.sender = { error: String(e) }; }
+      })());
+
+      if (mtok && mcta) tareas.push((async () => {
+        try {
+          const base = `https://graph.facebook.com/v21.0/act_${mcta}`;
+          const campos = "spend,impressions,reach,clicks,inline_link_clicks,ctr,cpc,cpm,actions,cost_per_action_type";
+          const [cta, mes, d7, camp] = await Promise.all([
+            fetch(`${base}?fields=name,currency,account_status,amount_spent,balance,spend_cap&access_token=${mtok}`).then((r) => r.json()),
+            fetch(`${base}/insights?fields=${campos}&date_preset=this_month&access_token=${mtok}`).then((r) => r.json()),
+            fetch(`${base}/insights?fields=${campos}&date_preset=last_7d&access_token=${mtok}`).then((r) => r.json()),
+            fetch(`${base}/insights?level=campaign&fields=campaign_name,${campos}&date_preset=last_30d&limit=50&access_token=${mtok}`).then((r) => r.json()),
+          ]);
+          if (cta.error) { out.meta = { error: cta.error.message }; return; }
+          const resumen = (x: Obj) => {
+            if (!x) return null;
+            const acc = (t: string) => Number(((x.actions ?? []) as Obj[]).find((a) => a.action_type === t)?.value ?? 0);
+            const compras = acc("offsite_conversion.fb_pixel_purchase") || acc("purchase"), registros = acc("offsite_conversion.fb_pixel_complete_registration") || acc("complete_registration"), pagos = acc("offsite_conversion.fb_pixel_initiate_checkout") || acc("initiate_checkout");
+            const gasto = Number(x.spend ?? 0);
+            return { gasto, impresiones: Number(x.impressions ?? 0), alcance: Number(x.reach ?? 0), clics: Number(x.inline_link_clicks ?? x.clicks ?? 0), ctr: Number(x.ctr ?? 0), cpc: Number(x.cpc ?? 0), cpm: Number(x.cpm ?? 0), registros, pagos, compras, costo_compra: compras ? gasto / compras : null, costo_registro: registros ? gasto / registros : null };
+          };
+          out.meta = {
+            cuenta: { nombre: cta.name, moneda: cta.currency, estado: cta.account_status, gastado_total: Number(cta.amount_spent ?? 0) / 100, limite: cta.spend_cap ? Number(cta.spend_cap) / 100 : null },
+            mes: resumen(mes.data?.[0]), d7: resumen(d7.data?.[0]),
+            campanas: ((camp.data ?? []) as Obj[]).map((x) => ({ nombre: x.campaign_name, ...resumen(x) })).sort((a: any, b: any) => b.gasto - a.gasto),
+            error: mes.error?.message ?? camp.error?.message ?? null,
+          };
+        } catch (e) { out.meta = { error: String(e) }; }
+      })());
+
+      await Promise.all(tareas);
+      out.conexiones = {
+        stripe: !!sk, sender: !!sd, supabase: true, meta_ads: !!(mtok && mcta),
+        anthropic_real: !!Deno.env.get("ANTHROPIC_ADMIN_KEY"), meta_pixel: !!Deno.env.get("META_CAPI_TOKEN"),
+      };
+      return json({ ok: true, ...out });
+    }
+
     if (accion === "uso") {
       const { data, error } = await admin.rpc("uso_supabase");
       if (error) return json({ error: error.message }, 500);
