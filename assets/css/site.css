@@ -1428,7 +1428,7 @@ body:has(main.onb) .site-header,body:has(main.onb) .site-footer{display:none}
 .onb .plan-opt input:checked+.plan-in small{color:var(--ink-muted)}
 .onb .plan-opt input:checked+.plan-in .checks li{border-top-color:var(--line)}
 .onb .plan-opt input:checked+.plan-in .checks li::before{color:var(--slate-deep)}
-.onb .plan-rec{background:var(--azul-v);color:#fff;border:1px solid var(--azul-b);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.onb .plan-rec{background:var(--azul-deep);color:#fff;border:1px solid var(--azul-deep);box-shadow:0 4px 14px rgba(22,25,29,.18)}
 @media (max-width:560px){
   .app-main.onb{padding:64px 0 40px;justify-content:flex-start}
   .onb .panel{padding:28px 22px;border-radius:18px}
