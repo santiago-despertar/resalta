@@ -156,6 +156,38 @@ Deno.serve(async (req) => {
     if (accion === "yo") return json({ ok: true, email: yo.email });
 
     // database and file sizes against the Free plan limits (egress is only in the Supabase usage page)
+    // what each paid service is costing (AI from gasto_ia, priced here) plus Supabase and Sender usage against their free plans
+    if (accion === "costos") {
+      // USD per million tokens: [input, cache read, output]. Nano Banana Pro is per image (1K/2K).
+      const PRECIOS: Record<string, number[]> = { "claude-opus-5-5": [4, 0.2, 20], "claude-sonnet-5-5": [2, 0.1, 10], "claude-haiku-5-5": [0.1, 0.01, 0.5] };
+      const IMG = 0.134;
+      const precio = (m: string) => PRECIOS[Object.keys(PRECIOS).find((k) => String(m).startsWith(k)) ?? ""] ?? [4, 0.2, 20];
+      const costo = (f: Obj) => f.servicio === "gemini"
+        ? (f.imagenes || 0) * IMG + (f.entrada || 0) * 2 / 1e6
+        : ((f.entrada || 0) * precio(f.modelo)[0] + (f.cache || 0) * precio(f.modelo)[1] + (f.salida || 0) * precio(f.modelo)[2]) / 1e6;
+      const mesIni = new Date(); mesIni.setUTCDate(1); mesIni.setUTCHours(0, 0, 0, 0);
+      const t30 = Date.now() - 30 * 864e5, t1 = Date.now() - 864e5;
+      const desde = new Date(Math.min(mesIni.getTime(), t30)).toISOString();
+      const [{ data: filas }, { data: uso }, { data: primera }] = await Promise.all([
+        admin.from("gasto_ia").select("creado,funcion,servicio,modelo,entrada,cache,salida,imagenes").gte("creado", desde).limit(100000),
+        admin.rpc("uso_supabase"),
+        admin.from("gasto_ia").select("creado").order("creado").limit(1).maybeSingle(),
+      ]);
+      const ia: Obj = { anthropic: { mes: 0, d30: 0, hoy: 0 }, gemini: { mes: 0, d30: 0, hoy: 0, imagenes_mes: 0 } };
+      const funciones: Obj = {};
+      for (const f of (filas ?? []) as Obj[]) {
+        const c = costo(f), t = new Date(f.creado).getTime(), s = ia[f.servicio] ?? (ia[f.servicio] = { mes: 0, d30: 0, hoy: 0 });
+        if (t >= mesIni.getTime()) { s.mes += c; if (f.servicio === "gemini") s.imagenes_mes += f.imagenes || 0; }
+        if (t >= t1) s.hoy += c;
+        if (t >= t30) {
+          s.d30 += c;
+          const k = f.funcion + "|" + f.servicio, x = funciones[k] ?? (funciones[k] = { funcion: f.funcion, servicio: f.servicio, modelo: f.modelo, llamadas: 0, usd: 0, imagenes: 0 });
+          x.llamadas++; x.usd += c; x.imagenes += f.imagenes || 0;
+        }
+      }
+      return json({ ok: true, ia, funciones: Object.values(funciones).sort((a: any, b: any) => b.usd - a.usd), uso, desde_registro: primera?.creado ?? null, mes_inicio: mesIni.toISOString() });
+    }
+
     if (accion === "uso") {
       const { data, error } = await admin.rpc("uso_supabase");
       if (error) return json({ error: error.message }, 500);
