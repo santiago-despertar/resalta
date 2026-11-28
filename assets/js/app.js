@@ -150,7 +150,12 @@
     $$("[data-upsell-now]").forEach(e => { e.textContent = conCodigo(C.UPSELL.now); });
   }
   const header = $(".site-header");
-  if (header) addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 8), { passive: true });
+  // the nav glass changes when what's behind it changes: on the home page, when the hero photo ends under it
+  if (header) {
+    const hero = $(".hero2");
+    const upd = () => header.classList.toggle("scrolled", hero ? hero.getBoundingClientRect().bottom <= header.getBoundingClientRect().bottom : scrollY > 8);
+    addEventListener("scroll", upd, { passive: true }); addEventListener("resize", upd); upd();
+  }
 
   function msg(el, text, type = "err") {
     if (!el) return;
