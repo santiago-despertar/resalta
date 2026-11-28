@@ -2507,6 +2507,13 @@ body[data-page=index] .site-header:not(.scrolled) .btn-ghost:hover{background:rg
 }
 /* no animations until the nav knows where it is (first load, going back), so it doesn't jump */
 .site-header:not(.nav-ready),.site-header:not(.nav-ready) *,.site-header:not(.nav-ready) .nav::after{transition:none!important}
+/* the page never shifts sideways when a scrollbar appears or goes (going back from Entrar) */
+html{scrollbar-gutter:stable}
+/* Lenis smooth scrolling */
+html.lenis,html.lenis body{height:auto}
+html.lenis{scroll-behavior:auto!important}
+.lenis.lenis-stopped{overflow:clip}
+.lenis.lenis-smooth iframe{pointer-events:none}
 /* browsers without backdrop-filter get a solid version */
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .site-header .nav::before{background:rgba(232,238,243,.96)}
