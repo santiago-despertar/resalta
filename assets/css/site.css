@@ -2472,8 +2472,8 @@ body[data-page=index] .notes{padding-bottom:32px}
    glass with white text and logo. The blur never changes (animating a blur is very heavy):
    ::before is the glass with a light tint, ::after is a dark tint that fades in with opacity,
    which the GPU animates smoothly. */
-.site-header .nav{position:relative;isolation:isolate;background:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:0;box-shadow:0 10px 30px rgba(22,25,29,.14),0 1px 3px rgba(22,25,29,.07)}
-.site-header .nav::before,.site-header .nav::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none}
+.site-header .nav{position:relative;isolation:isolate;transform:translateZ(0);background:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:0;box-shadow:0 10px 30px rgba(22,25,29,.14),0 1px 3px rgba(22,25,29,.07)}
+.site-header .nav::before,.site-header .nav::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;transform:translateZ(0);backface-visibility:hidden}
 .site-header .nav::before{background:linear-gradient(180deg,rgba(255,255,255,.58),rgba(255,255,255,.38));
   -webkit-backdrop-filter:blur(12px) saturate(1.8);backdrop-filter:blur(12px) saturate(1.8)}
 .site-header .nav::after{background:linear-gradient(180deg,rgba(62,75,89,.86),rgba(48,59,71,.9));opacity:1;transition:opacity .45s cubic-bezier(.4,0,.2,1)}
@@ -2507,6 +2507,8 @@ body[data-page=index] .site-header:not(.scrolled) .btn-ghost:hover{background:rg
 }
 /* no animations until the nav knows where it is (first load, going back), so it doesn't jump */
 .site-header:not(.nav-ready),.site-header:not(.nav-ready) *,.site-header:not(.nav-ready) .nav::after{transition:none!important}
+/* the logged-out and logged-in buttons get the same width, so nothing in the nav moves when they swap */
+.site-header .nav-cta .btn-primary[data-auth]{min-width:10.4em}
 /* the page never shifts sideways when a scrollbar appears or goes (going back from Entrar) */
 html{scrollbar-gutter:stable}
 /* Lenis smooth scrolling */
