@@ -151,10 +151,25 @@
   }
   const header = $(".site-header");
   // the nav glass changes when what's behind it changes: on the home page, when the hero photo ends under it
+  // an IntersectionObserver does this without any work on each scroll frame, so scrolling stays smooth
   if (header) {
     const hero = $(".hero2");
-    const upd = () => header.classList.toggle("scrolled", hero ? hero.getBoundingClientRect().bottom <= header.getBoundingClientRect().bottom : scrollY > 8);
-    addEventListener("scroll", upd, { passive: true }); addEventListener("resize", upd); upd();
+    // turn on the nav animations only after its first state is set, two frames later
+    const listo = () => { if (!header.classList.contains("nav-ready")) requestAnimationFrame(() => requestAnimationFrame(() => header.classList.add("nav-ready"))); };
+    if (hero && "IntersectionObserver" in window) {
+      const navBottom = () => Math.round((header.querySelector(".nav") || header).getBoundingClientRect().bottom);
+      let io;
+      const watch = () => {
+        if (io) io.disconnect();
+        io = new IntersectionObserver(([e]) => { header.classList.toggle("scrolled", !e.isIntersecting); listo(); }, { rootMargin: `-${navBottom()}px 0px 0px 0px` });
+        io.observe(hero);
+      };
+      watch(); addEventListener("resize", watch);
+    } else {
+      let t = false;
+      const upd = () => { t = false; header.classList.toggle("scrolled", scrollY > 8); };
+      addEventListener("scroll", () => { if (!t) { t = true; requestAnimationFrame(upd); } }, { passive: true }); upd(); listo();
+    }
   }
 
   function msg(el, text, type = "err") {
