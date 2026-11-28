@@ -2493,3 +2493,40 @@ if (new URLSearchParams(location.search).get("cuenta") === "borrada") {
   document.addEventListener("keydown", e => { if (e.key === "Escape" && nav.classList.contains("open")) { poner(false); btn.focus(); } });
   matchMedia("(min-width:861px)").addEventListener("change", m => { if (m.matches) poner(false); });
 })();
+
+// smooth, premium scrolling on the marketing pages (Lenis): the wheel glides, and links to a section
+// ease in and out instead of jumping. Pages with forms or tools keep the browser's normal scrolling.
+(() => {
+  const pg = document.body.dataset.page || "";
+  if (!/^(index|blog|blog-.+|creadores|privacidad|terminos|404)$/.test(pg)) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const nav = document.querySelector(".site-header .nav");
+  let lenis = null;
+  document.addEventListener("click", e => {
+    if (!lenis || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest('a[href*="#"]'); if (!a) return;
+    const u = new URL(a.getAttribute("href"), location.href);
+    const mismaPagina = u.origin === location.origin && (u.pathname === location.pathname || (u.pathname === "/" && /^\/(index(\.html)?)?$/.test(location.pathname)));
+    if (!mismaPagina || !u.hash || u.hash === "#") return;
+    const el = document.getElementById(decodeURIComponent(u.hash.slice(1))); if (!el) return;
+    e.preventDefault();
+    lenis.start();
+    const dist = Math.abs(el.getBoundingClientRect().top);
+    lenis.scrollTo(el, { offset: -((nav ? nav.getBoundingClientRect().bottom : 0) + 16), duration: Math.min(1.9, 1 + dist / 5000), easing: ease });
+    try { history.pushState(null, "", u.hash); } catch (err) {}
+  });
+  const s = document.createElement("script");
+  s.src = "https://cdn.jsdelivr.net/npm/lenis@1.3.29/dist/lenis.min.js";
+  s.integrity = "sha384-OHGPFWKcc+jP8Q7LpOJtmcyBSz6L1L/nH2wKWNQ456cvisoFPacxtBsDQPmwEjLu"; s.crossOrigin = "anonymous"; s.async = true;
+  s.onload = () => {
+    if (!window.Lenis) return;
+    lenis = new Lenis({ lerp: .085, smoothWheel: true, allowNestedScroll: true });
+    const raf = t => { lenis.raf(t); requestAnimationFrame(raf); };
+    requestAnimationFrame(raf);
+    // the phone menu and pop-ups lock the page; the smooth scroll pauses with them
+    const sync = () => { const c = document.documentElement.classList; (c.contains("menu-abierto") || c.contains("esc-on") || c.contains("fq-abierto")) ? lenis.stop() : lenis.start(); };
+    new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  };
+  document.head.appendChild(s);
+})();
