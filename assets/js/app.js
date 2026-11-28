@@ -1,5 +1,8 @@
 (function () {
   "use strict";
+  // logged-in state right away (Supabase keeps the session in localStorage), so the nav buttons
+  // don't swap a moment after the page loads; getUser() below confirms it
+  try { if (localStorage.getItem("sb-jxluabbugwdonqchbaxm-auth-token")) document.documentElement.classList.add("authed"); } catch (e) {}
   const C = window.RESALTA || {};
   const configured = !!(C.SUPABASE_URL && C.SUPABASE_ANON_KEY && window.supabase);
   const sb = configured ? window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY) : null;
@@ -2494,8 +2497,8 @@ if (new URLSearchParams(location.search).get("cuenta") === "borrada") {
   matchMedia("(min-width:861px)").addEventListener("change", m => { if (m.matches) poner(false); });
 })();
 
-// smooth, premium scrolling on the marketing pages (Lenis): the wheel glides, and links to a section
-// ease in and out instead of jumping. Pages with forms or tools keep the browser's normal scrolling.
+// smooth, premium scrolling on the marketing pages (Lenis): links to a section ease in and out
+// instead of jumping. Pages with forms or tools keep the browser's normal scrolling.
 (() => {
   const pg = document.body.dataset.page || "";
   if (!/^(index|blog|blog-.+|creadores|privacidad|terminos|404)$/.test(pg)) return;
@@ -2521,7 +2524,8 @@ if (new URLSearchParams(location.search).get("cuenta") === "borrada") {
   s.integrity = "sha384-OHGPFWKcc+jP8Q7LpOJtmcyBSz6L1L/nH2wKWNQ456cvisoFPacxtBsDQPmwEjLu"; s.crossOrigin = "anonymous"; s.async = true;
   s.onload = () => {
     if (!window.Lenis) return;
-    lenis = new Lenis({ lerp: .085, smoothWheel: true, allowNestedScroll: true });
+    // normal wheel and finger scrolling stay native; only clicks on section links glide
+    lenis = new Lenis({ smoothWheel: false, syncTouch: false, allowNestedScroll: true });
     const raf = t => { lenis.raf(t); requestAnimationFrame(raf); };
     requestAnimationFrame(raf);
     // the phone menu and pop-ups lock the page; the smooth scroll pauses with them
