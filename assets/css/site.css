@@ -2507,7 +2507,7 @@ body[data-page=index] .site-header:not(.scrolled) .btn-ghost:hover{background:rg
 @media (min-width:861px){
   .site-header .nav-links{gap:4px}
   .site-header .nav-links a{padding:8px 14px;border-radius:999px;transition:background .2s ease,color .2s ease,box-shadow .2s ease}
-  .site-header .nav-links a:hover{background:rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.45);color:#fff}
+  .site-header .nav-links a:hover{background:rgba(255,255,255,.18);box-shadow:none;color:#fff}
 }
 .site-header .btn-ghost{transition:background .2s ease,color .35s ease}
 .site-header .btn-ghost:hover{background:rgba(255,255,255,.18)}
